@@ -4,12 +4,14 @@
 #include <mservclient/client.h>
 #include <mservclient/user.h>
 #include <mservclient/track.h>
+#include <mservclient/queue.h>
 
 typedef void (*msc_ev_argnone)( mservclient *c );
 typedef void (*msc_ev_argstring)( mservclient *c, const char *s );
 typedef void (*msc_ev_argint)( mservclient *c, int i );
 typedef void (*msc_ev_argclient)( mservclient *c, msc_client *t );
 typedef void (*msc_ev_argtrack)( mservclient *c, msc_track *t );
+typedef void (*msc_ev_argqueue)( mservclient *c, msc_queue *t );
 
 typedef struct {
 	/* my connection status */
@@ -30,6 +32,12 @@ typedef struct {
 
 	/* random/filter */
 	msc_ev_argstring filter;
+
+	/* queue */
+	msc_ev_argqueue queuefetch;
+	msc_ev_argqueue queueadd;
+	msc_ev_argqueue queuedel;
+	msc_ev_argnone queueclear;
 
 	// temporary:
 	msc_ev_argstring bcast;

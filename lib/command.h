@@ -10,6 +10,7 @@
 #include <mservclient/track.h>
 #include <mservclient/player.h>
 #include <mservclient/random.h>
+#include <mservclient/queue.h>
 
 
 #endif

@@ -84,6 +84,10 @@ static void _msc_bcast( mservclient *p, const char *line )
 			_msc_bcast_random( p, line );
 			break;
 			
+		case '6':
+			_msc_bcast_queue( p, line );
+			break;
+			
 		default:
 			_MSC_EVENT(p,bcast,p,line);
 	}
