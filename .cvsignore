@@ -13,3 +13,4 @@ stamp-h
 stamp-h.in
 config.sub
 config.guess
+*-stamp

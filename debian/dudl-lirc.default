@@ -1,0 +1,2 @@
+conf=/etc/irdudl.conf
+flags="-b -l"
