@@ -52,16 +52,16 @@ static int track2id( const char *in, char **end )
 	int a;
 	int b;
 	char *s, *e;
-	msc_track *t;
+	duc_track *t;
 
 	if( end ) (const char*) *end = in;
 
 	if( *in == 'c' ){
-		if(NULL == (t = msc_cmd_curtrack(con))){
+		if(NULL == (t = duc_cmd_curtrack(con))){
 			return -1;
 		}
 		a = t->id;
-		msc_track_free(t);
+		duc_track_free(t);
 
 		if( end ) (*end)++;
 		return a;
@@ -82,7 +82,7 @@ static int track2id( const char *in, char **end )
 		return -1;
 
 	if( end ) *end = e;
-	return msc_cmd_track2id(con, a, b );
+	return duc_cmd_track2id(con, a, b );
 }
 
 static int tag2id( const char *in, char **end )
@@ -106,7 +106,7 @@ static int tag2id( const char *in, char **end )
 
 	(const char*) e = in +len;
 	strncpy( tag, in, len );
-	if( 0 > ( id = msc_cmd_tag2id( con, tag ))){
+	if( 0 > ( id = duc_cmd_tag2id( con, tag ))){
 		return -1;
 	}
 
@@ -133,10 +133,10 @@ static int right2id( const char *in, char **end )
 #define MSG_ARGMIS(a)	tty_msg( "missing argument: %s\n",a )
 #define MSG_ARGMANY	tty_msg( "too many arguments\n" )
 #define MSG_FAIL	\
-	if( 0 > msc_fd(con) ){\
+	if( 0 > duc_fd(con) ){\
 		tty_msg( "failed: connection error\n"); \
 	} else {\
-		tty_msg( "failed: %s\n", msc_rmsg(con)); \
+		tty_msg( "failed: %s\n", duc_rmsg(con)); \
 	}
 
 
@@ -164,7 +164,7 @@ CMD(cmd_quit)
 CMD(cmd_open)
 {
 	ARG_NONE;
-	if( msc_open( con ) ){
+	if( duc_open( con ) ){
 		MSG_FAIL;
 	}
 }
@@ -175,7 +175,7 @@ static char *cgen_cmd_raw( const char *text, int state )
 	static int last = 0;
 
 	if( state == 0 ){
-		msc_it_help *it;
+		duc_it_help *it;
 		char *s;
 		unsigned int len;
 		int total = 0;
@@ -183,9 +183,9 @@ static char *cgen_cmd_raw( const char *text, int state )
 
 		len = strlen(text);
 
-		it = msc_cmd_help(con);
-		for( s = msc_it_help_cur(it); s; 
-				s = msc_it_help_next(it) ){
+		it = duc_cmd_help(con);
+		for( s = duc_it_help_cur(it); s; 
+				s = duc_it_help_next(it) ){
 
 			if( 0 != strncasecmp( s, text, len) ){
 				free(s);
@@ -208,7 +208,7 @@ static char *cgen_cmd_raw( const char *text, int state )
 
 			helpv[used++] = s;
 		}
-		msc_it_help_done(it);
+		duc_it_help_done(it);
 
 		if( helpv ){
 			helpv[used] = NULL;
@@ -247,16 +247,16 @@ CMD(cmd_raw)
 	ARG_NEED("raw_command" );
 
 	// TODO: make this a lib function
-	_msc_send( con, line );
-	if( _msc_rnext(con) ){
+	_duc_send( con, line );
+	if( _duc_rnext(con) ){
 		tty_msg( "connection error\n" );
 		return;
 	}
 
-	tty_msg( "code: %s\n", _msc_rcode(con));
+	tty_msg( "code: %s\n", _duc_rcode(con));
 	do {
-		tty_msg( " %s\n", _msc_rline(con));
-	} while( ! _msc_rnext(con));
+		tty_msg( " %s\n", _duc_rline(con));
+	} while( ! _duc_rnext(con));
 }
 
 /************************************************************
@@ -278,27 +278,27 @@ CMD(cmd_user)
 		return;
 	}
 	
-	if( msc_setauth(con, line, pass)){
+	if( duc_setauth(con, line, pass)){
 		MSG_FAIL;
 		return;
 	}
 
 	/* disconnect - and let reconnect re-auth with new credentials */
-	msc_close(con);
+	duc_close(con);
 }
 
 CMD(cmd_clientlist)
 {
-	msc_it_client *it;
+	duc_it_client *it;
 
 	ARG_NONE;
 
-	if( NULL == (it = msc_cmd_clientlist(con))){
+	if( NULL == (it = duc_cmd_clientlist(con))){
 		MSG_FAIL;
 		return;
 	}
 	dump_clients(it);
-	msc_it_client_done(it);
+	duc_it_client_done(it);
 }
 
 // TODO: client ID completer using who output
@@ -309,7 +309,7 @@ CMD(cmd_clientclose)
 	ARG_NEED("conID");
 
 	num = atoi(line);
-	if( 0 == msc_cmd_clientclose( con, num ) ){
+	if( 0 == duc_cmd_clientclose( con, num ) ){
 		tty_msg( "disconnected client #%d\n", num );
 		return;
 	}
@@ -330,7 +330,7 @@ CMD(cmd_clientcloseuser)
 		return;
 	}
 
-	if( 0 == msc_cmd_clientcloseuser( con, uid ) ){
+	if( 0 == duc_cmd_clientcloseuser( con, uid ) ){
 		tty_msg( "kicked user #%d\n", uid );
 	}
 	MSG_FAIL;
@@ -342,7 +342,7 @@ CMD(cmd_user2id)
 	int uid;
 	ARG_NEED("name");
 
-	if( 0 > ( uid = msc_cmd_usergetname(con, line))){
+	if( 0 > ( uid = duc_cmd_usergetname(con, line))){
 		MSG_FAIL;
 		return;
 	}
@@ -353,7 +353,7 @@ CMD(cmd_user2id)
 CMD(cmd_userget)
 {
 	int uid;
-	msc_user *u;
+	duc_user *u;
 	char buf[BUFLENUSER];
 	char *end;
 
@@ -365,7 +365,7 @@ CMD(cmd_userget)
 		return;
 	}
 
-	if( NULL == ( u = msc_cmd_userget( con, uid ))){
+	if( NULL == ( u = duc_cmd_userget( con, uid ))){
 		MSG_FAIL;
 		return;
 	}
@@ -373,19 +373,19 @@ CMD(cmd_userget)
 	tty_msg( "%s\n\n", mkuserhead(buf, BUFLENUSER));
 	tty_msg( "%s\n", mkuser(buf, BUFLENUSER, u));
 
-	msc_user_free(u);
+	duc_user_free(u);
 }
 
 CMD(cmd_userlist)
 {
-	msc_it_user *it;
+	duc_it_user *it;
 
 	ARG_NONE;
 	(void)line;
 
-	it = msc_cmd_userlist( con );
+	it = duc_cmd_userlist( con );
 	dump_users(it);
-	msc_it_user_done(it);
+	duc_it_user_done(it);
 }
 
 CMD(cmd_usersetpass)
@@ -402,7 +402,7 @@ CMD(cmd_usersetpass)
 	}
 
 	end += strspn(end, "\t ");
-	if( msc_cmd_usersetpass(con, uid, end )){
+	if( duc_cmd_usersetpass(con, uid, end )){
 		MSG_FAIL;
 	}
 	tty_msg( "password changed\n");
@@ -429,7 +429,7 @@ CMD(cmd_usersetright)
 		return;
 	}
 
-	if( msc_cmd_usersetright( con, uid, right )){
+	if( duc_cmd_usersetright( con, uid, right )){
 		MSG_FAIL;
 	}
 	tty_msg( "right changed\n");
@@ -440,7 +440,7 @@ CMD(cmd_useradd)
 	int uid;
 	ARG_NEED("name");
 
-	if( 0 > (uid = msc_cmd_useradd(con, line))){
+	if( 0 > (uid = duc_cmd_useradd(con, line))){
 		MSG_FAIL;
 		return;
 	}
@@ -461,7 +461,7 @@ CMD(cmd_userdel)
 		return;
 	}
 
-	if( msc_cmd_userdel(con, uid)){
+	if( duc_cmd_userdel(con, uid)){
 		MSG_FAIL;
 		return;
 	}
@@ -476,7 +476,7 @@ CMD(cmd_userdel)
 CMD(cmd_play)
 {
 	ARG_NONE;
-	if( msc_cmd_play(con) ){
+	if( duc_cmd_play(con) ){
 		MSG_FAIL;
 	}
 }
@@ -484,7 +484,7 @@ CMD(cmd_play)
 CMD(cmd_stop)
 {
 	ARG_NONE;
-	if( msc_cmd_stop(con) ){
+	if( duc_cmd_stop(con) ){
 		MSG_FAIL;
 	}
 }
@@ -492,7 +492,7 @@ CMD(cmd_stop)
 CMD(cmd_next)
 {
 	ARG_NONE;
-	if( msc_cmd_next(con) ){
+	if( duc_cmd_next(con) ){
 		MSG_FAIL;
 	}
 }
@@ -500,7 +500,7 @@ CMD(cmd_next)
 CMD(cmd_prev)
 {
 	ARG_NONE;
-	if( msc_cmd_prev(con) ){
+	if( duc_cmd_prev(con) ){
 		MSG_FAIL;
 	}
 }
@@ -508,7 +508,7 @@ CMD(cmd_prev)
 CMD(cmd_pause)
 {
 	ARG_NONE;
-	if( msc_cmd_pause(con) ){
+	if( duc_cmd_pause(con) ){
 		MSG_FAIL;
 	}
 }
@@ -518,7 +518,7 @@ CMD(cmd_status)
 	int stat;
 
 	ARG_NONE;
-	if( 0 > ( stat = msc_cmd_status(con))){
+	if( 0 > ( stat = duc_cmd_status(con))){
 		MSG_FAIL;
 		return;
 	}
@@ -541,18 +541,18 @@ CMD(cmd_status)
 // TODO: remove curtrack cmd
 CMD(cmd_curtrack)
 {
-	msc_track *t;
+	duc_track *t;
 	char buf[BUFLENTRACK];
 
 	ARG_NONE;
-	if( NULL == (t = msc_cmd_curtrack(con))){
+	if( NULL == (t = duc_cmd_curtrack(con))){
 		MSG_FAIL;
 		return;
 	}
 
 	tty_msg( "%s\n\n", mktrackhead(buf, BUFLENTRACK));
 	tty_msg( "%s\n", mktrack(buf, BUFLENTRACK, t));
-	msc_track_free(t);
+	duc_track_free(t);
 }
 
 CMD(cmd_gap)
@@ -560,7 +560,7 @@ CMD(cmd_gap)
 	int gap;
 
 	ARG_NONE;
-	if( 0 > (gap = msc_cmd_gap(con))){
+	if( 0 > (gap = duc_cmd_gap(con))){
 		MSG_FAIL;
 		return;
 	}
@@ -581,7 +581,7 @@ CMD(cmd_gapset)
 		return;
 	}
 
-	if( msc_cmd_gapset(con, gap )){
+	if( duc_cmd_gapset(con, gap )){
 		MSG_FAIL;
 		return;
 	}
@@ -594,7 +594,7 @@ CMD(cmd_random)
 	int random;
 
 	ARG_NONE;
-	if( 0 > (random = msc_cmd_random(con))){
+	if( 0 > (random = duc_cmd_random(con))){
 		MSG_FAIL;
 		return;
 	}
@@ -614,7 +614,7 @@ CMD(cmd_randomset)
 		return;
 	}
 
-	if( msc_cmd_randomset(con, random)){
+	if( duc_cmd_randomset(con, random)){
 		MSG_FAIL;
 	}
 }
@@ -629,7 +629,7 @@ CMD(cmd_trackcount)
 
 	ARG_NONE;
 
-	if( 0 > ( num = msc_cmd_tracks(con))){
+	if( 0 > ( num = duc_cmd_tracks(con))){
 		MSG_FAIL;
 		return;
 	}
@@ -662,7 +662,7 @@ CMD(cmd_track2id)
 		return;
 	}
 
-	if( 0 > (id = msc_cmd_track2id( con, albumid, num))){
+	if( 0 > (id = duc_cmd_track2id( con, albumid, num))){
 		tty_msg( "track not found" );
 		return;
 	}
@@ -674,7 +674,7 @@ CMD(cmd_track2id)
 CMD(cmd_trackget)
 {
 	int num;
-	msc_track *t;
+	duc_track *t;
 	char buf[BUFLENTRACK];
 
 	ARG_NEED("trackID");
@@ -682,29 +682,29 @@ CMD(cmd_trackget)
 	if( 0 > (num = track2id( line, NULL ))){
 		MSG_BADARG( "trackID" );
 	}
-	if( NULL == ( t = msc_cmd_trackget(con, num ))){
+	if( NULL == ( t = duc_cmd_trackget(con, num ))){
 		MSG_FAIL;
 		return;
 	}
 
 	tty_msg( "%s\n\n", mktrackhead(buf, BUFLENTRACK));
 	tty_msg( "%s\n", mktrack(buf,BUFLENTRACK,t));
-	msc_track_free( t );
+	duc_track_free( t );
 }
 
 CMD(cmd_tracksearch)
 {
-	msc_it_track *it;
+	duc_it_track *it;
 
 	ARG_NEED("substr");
 
-	if( NULL == (it = msc_cmd_tracksearch( con, line ))){
+	if( NULL == (it = duc_cmd_tracksearch( con, line ))){
 		MSG_FAIL;
 		return;
 	}
 
 	dump_tracks(it);
-	msc_it_track_done(it);
+	duc_it_track_done(it);
 }
 
 // TODO: use album name
@@ -712,18 +712,18 @@ CMD(cmd_tracksearch)
 CMD(cmd_tracksalbum)
 {
 	int id;
-	msc_it_track *it;
+	duc_it_track *it;
 
 	ARG_NEED("albumID");
 
 	id = atoi(line);
-	if( NULL == (it = msc_cmd_tracksalbum( con, id ))){
+	if( NULL == (it = duc_cmd_tracksalbum( con, id ))){
 		MSG_FAIL;
 		return;
 	}
 
 	dump_tracks(it);
-	msc_it_track_done(it);
+	duc_it_track_done(it);
 }
 
 // TODO: use artist name
@@ -731,18 +731,18 @@ CMD(cmd_tracksalbum)
 CMD(cmd_tracksartist)
 {
 	int id;
-	msc_it_track *it;
+	duc_it_track *it;
 
 	ARG_NEED("artistID");
 
 	id = atoi(line);
-	if( NULL == (it = msc_cmd_tracksartist( con, id ))){
+	if( NULL == (it = duc_cmd_tracksartist( con, id ))){
 		MSG_FAIL;
 		return;
 	}
 
 	dump_tracks(it);
-	msc_it_track_done(it);
+	duc_it_track_done(it);
 }
 
 // TODO: track_alter
@@ -758,7 +758,7 @@ CMD(cmd_filter)
 
 	ARG_NONE;
 
-	if( NULL == (f = msc_cmd_filter( con ))){
+	if( NULL == (f = duc_cmd_filter( con ))){
 		MSG_FAIL;
 		return;
 	}
@@ -769,7 +769,7 @@ CMD(cmd_filter)
 
 CMD(cmd_filterset)
 {
-	if( msc_cmd_filterset(con, line)){
+	if( duc_cmd_filterset(con, line)){
 		MSG_FAIL;
 	}
 }
@@ -779,7 +779,7 @@ CMD(cmd_filterstat)
 	int n;
 
 	ARG_NONE;
-	if( 0 > ( n = msc_cmd_filterstat(con))){
+	if( 0 > ( n = duc_cmd_filterstat(con))){
 		MSG_FAIL;
 		return;
 	}
@@ -791,7 +791,7 @@ CMD(cmd_randomtop)
 {
 	int num = 20;
 	char *end;
-	msc_it_track *it;
+	duc_it_track *it;
 
 	if( *line ){
 		num = strtol(line, &end, 10 );
@@ -801,13 +801,13 @@ CMD(cmd_randomtop)
 		}
 	}
 
-	if( NULL == (it = msc_cmd_randomtop( con, num ))){
+	if( NULL == (it = duc_cmd_randomtop( con, num ))){
 		MSG_FAIL;
 		return;
 	}
 
 	dump_tracks(it);
-	msc_it_track_done(it);
+	duc_it_track_done(it);
 }
 
 
@@ -817,34 +817,34 @@ CMD(cmd_randomtop)
 
 CMD(cmd_queuelist)
 {
-	msc_it_queue *it;
+	duc_it_queue *it;
 
 	ARG_NONE;
 
-	if( NULL == (it = msc_cmd_queuelist( con ))){
+	if( NULL == (it = duc_cmd_queuelist( con ))){
 		MSG_FAIL;
 		return;
 	}
 	dump_queue(it);
-	msc_it_queue_done(it);
+	duc_it_queue_done(it);
 }
 
 CMD(cmd_queueget)
 {
 	char buf[BUFLENTRACK];
 	int id;
-	msc_queue *q;
+	duc_queue *q;
 
 	ARG_NEED("queueID");
 	id = atoi(line);
-	if( NULL == (q = msc_cmd_queueget(con, id))){
+	if( NULL == (q = duc_cmd_queueget(con, id))){
 		MSG_FAIL;
 		return;
 	}
 
 	tty_msg("%s\n\n", mkqueuehead(buf, BUFLENTRACK));
 	tty_msg("%s\n", mkqueue(buf, BUFLENTRACK,q));
-	msc_queue_free(q);
+	duc_queue_free(q);
 }
 
 // TODO: queue a specified list of tracks
@@ -859,7 +859,7 @@ CMD(cmd_queueadd)
 		return;
 	}
 
-	if( 0 > msc_cmd_queueadd(con, id)){
+	if( 0 > duc_cmd_queueadd(con, id)){
 		MSG_FAIL;
 	}
 }
@@ -877,7 +877,7 @@ CMD(cmd_queuealbum)
 		return;
 	}
 
-	if( 0 > msc_cmd_queuealbum(con, id)){
+	if( 0 > duc_cmd_queuealbum(con, id)){
 		MSG_FAIL;
 	}
 }
@@ -891,7 +891,7 @@ CMD(cmd_queuedel)
 
 	ARG_NEED("queueID");
 	id = atoi(line);
-	if( msc_cmd_queuedel(con, id )){
+	if( duc_cmd_queuedel(con, id )){
 		MSG_FAIL;
 	}
 }
@@ -900,7 +900,7 @@ CMD(cmd_queueclear)
 {
 	ARG_NONE;
 
-	if( msc_cmd_queueclear( con )){
+	if( duc_cmd_queueclear( con )){
 		MSG_FAIL;
 	}
 }
@@ -914,7 +914,7 @@ CMD(cmd_sleep)
 	int r;
 	ARG_NONE;
 
-	if( 0 > ( r = msc_cmd_sleep( con ))){
+	if( 0 > ( r = duc_cmd_sleep( con ))){
 		MSG_FAIL;
 		return;
 	}
@@ -934,7 +934,7 @@ CMD(cmd_sleepset)
 		return;
 	}
 
-	if( msc_cmd_sleepset(con, t )){
+	if( duc_cmd_sleepset(con, t )){
 		MSG_FAIL;
 	}
 }
@@ -948,7 +948,7 @@ CMD(cmd_history)
 {
 	int num = 20;
 	char *end;
-	msc_it_history *it;
+	duc_it_history *it;
 
 	if( *line ){
 		num = strtol(line, &end, 10 );
@@ -958,16 +958,16 @@ CMD(cmd_history)
 		}
 	}
 
-	it = msc_cmd_history(con, num );
+	it = duc_cmd_history(con, num );
 	dump_history(it);
-	msc_it_history_done(it);
+	duc_it_history_done(it);
 }
 
 CMD(cmd_historytrack)
 {
 	int num = 20;
 	int id;
-	msc_it_history *it;
+	duc_it_history *it;
 	char *end;
 
 	if( 0 > (id = track2id(line, &end))){
@@ -983,9 +983,9 @@ CMD(cmd_historytrack)
 		}
 	}
 
-	it = msc_cmd_historytrack(con, id, num );
+	it = duc_cmd_historytrack(con, id, num );
 	dump_history(it);
-	msc_it_history_done(it);
+	duc_it_history_done(it);
 }
 
 /************************************************************
@@ -998,7 +998,7 @@ CMD(cmd_tag2id)
 	int id;
 
 	ARG_NEED("tagName");
-	if( 0 > (id = msc_cmd_tag2id(con, line))){
+	if( 0 > (id = duc_cmd_tag2id(con, line))){
 		MSG_FAIL;
 		return;
 	}
@@ -1010,7 +1010,7 @@ CMD(cmd_tagget)
 {
 	int id;
 	char *e;
-	msc_tag *t;
+	duc_tag *t;
 	char buf[BUFLENTAG];
 
 	ARG_NEED("tagID");
@@ -1020,7 +1020,7 @@ CMD(cmd_tagget)
 		return;
 	}
 
-	if( NULL == (t= msc_cmd_tagget(con, id))){
+	if( NULL == (t= duc_cmd_tagget(con, id))){
 		MSG_FAIL;
 		return;
 	}
@@ -1028,17 +1028,17 @@ CMD(cmd_tagget)
 	tty_msg( "%s\n\n", mktaghead(buf,BUFLENTAG));
 	tty_msg( "%s\n", mktag(buf,BUFLENTAG, t));
 
-	msc_tag_free(t);
+	duc_tag_free(t);
 }
 
 CMD(cmd_taglist)
 {
-	msc_it_tag *it;
+	duc_it_tag *it;
 
 	ARG_NONE;
-	it = msc_cmd_taglist( con );
+	it = duc_cmd_taglist( con );
 	dump_tags( it );
-	msc_it_tag_done( it );
+	duc_it_tag_done( it );
 }
 
 CMD(cmd_tagadd)
@@ -1046,7 +1046,7 @@ CMD(cmd_tagadd)
 	int id;
 
 	ARG_NEED( "tagName" );
-	if( 0 > (id = msc_cmd_tagadd( con, line ))){
+	if( 0 > (id = duc_cmd_tagadd( con, line ))){
 		MSG_FAIL;
 		return;
 	}
@@ -1068,7 +1068,7 @@ CMD(cmd_tagsetname)
 	}
 
 	e += strspn(e, "\t ");
-	if( msc_cmd_tagsetname(con, id, e)){
+	if( duc_cmd_tagsetname(con, id, e)){
 		MSG_FAIL;
 	}
 }
@@ -1087,7 +1087,7 @@ CMD(cmd_tagsetdesc)
 	}
 
 	e += strspn(e, "\t ");
-	if( msc_cmd_tagsetdesc(con, id, e)){
+	if( duc_cmd_tagsetdesc(con, id, e)){
 		MSG_FAIL;
 	}
 }
@@ -1104,7 +1104,7 @@ CMD(cmd_tagdel)
 		return;
 	}
 
-	if( msc_cmd_tagdel(con, id)){
+	if( duc_cmd_tagdel(con, id)){
 		MSG_FAIL;
 	}
 }
@@ -1113,7 +1113,7 @@ CMD(cmd_tracktaglist)
 {
 	int id;
 	char *e;
-	msc_it_tag *it;
+	duc_it_tag *it;
 
 	ARG_NEED("trackID");
 	id = track2id( line, &e );
@@ -1122,9 +1122,9 @@ CMD(cmd_tracktaglist)
 		return;
 	}
 
-	it = msc_cmd_tracktaglist( con, id );
+	it = duc_cmd_tracktaglist( con, id );
 	dump_tags( it );
-	msc_it_tag_done( it );
+	duc_it_tag_done( it );
 }
 
 CMD(cmd_tracktagged)
@@ -1147,7 +1147,7 @@ CMD(cmd_tracktagged)
 		return;
 	}
 
-	if( 0 > (r = msc_cmd_tracktagged( con, trid, tid ))){
+	if( 0 > (r = duc_cmd_tracktagged( con, trid, tid ))){
 		MSG_FAIL;
 		return;
 	}
@@ -1174,7 +1174,7 @@ CMD(cmd_tracktagset)
 		return;
 	}
 
-	if( msc_cmd_tracktagset( con, trid, tid )){
+	if( duc_cmd_tracktagset( con, trid, tid )){
 		MSG_FAIL;
 		return;
 	}
@@ -1200,7 +1200,7 @@ CMD(cmd_tracktagdel)
 		return;
 	}
 
-	if( msc_cmd_tracktagdel( con, trid, tid )){
+	if( duc_cmd_tracktagdel( con, trid, tid )){
 		MSG_FAIL;
 		return;
 	}

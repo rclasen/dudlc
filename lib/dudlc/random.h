@@ -1,15 +1,15 @@
-#ifndef _MSERVCLIENT_RANDOM_H
-#define _MSERVCLIENT_RANDOM_H
+#ifndef _DUDLC_RANDOM_H
+#define _DUDLC_RANDOM_H
 
 #include "session.h"
 #include "track.h"
 
-char *msc_cmd_filter( mservclient *c );
-int msc_cmd_filterset( mservclient *c, const char *filter );
-int msc_cmd_filterstat( mservclient *c );
+char *duc_cmd_filter( dudlc *c );
+int duc_cmd_filterset( dudlc *c, const char *filter );
+int duc_cmd_filterstat( dudlc *c );
 
-msc_it_track *msc_cmd_randomtop( mservclient *c, int num );
+duc_it_track *duc_cmd_randomtop( dudlc *c, int num );
 
-void _msc_bcast_random( mservclient *c, const char *line );
+void _duc_bcast_random( dudlc *c, const char *line );
 
 #endif

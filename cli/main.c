@@ -14,7 +14,7 @@
 #include "events.h"
 #include "main.h"
 
-mservclient *con = NULL;
+dudlc *con = NULL;
 
 int terminate = 0;
 
@@ -43,9 +43,9 @@ static void loop( void )
 		FD_SET(0,&rfds);
 		largest( &maxfd, 0 );
 
-		if( -1 != msc_fd(con)){
-			FD_SET( msc_fd(con), &rfds );
-			largest( &maxfd, msc_fd(con));
+		if( -1 != duc_fd(con)){
+			FD_SET( duc_fd(con), &rfds );
+			largest( &maxfd, duc_fd(con));
 		}
 
 		maxfd++;
@@ -60,8 +60,8 @@ static void loop( void )
 			exit( 1 );
 		}
 		
-		if( -1 != msc_fd(con) && FD_ISSET(msc_fd(con), &rfds)){
-			msc_poll(con);
+		if( -1 != duc_fd(con) && FD_ISSET(duc_fd(con), &rfds)){
+			duc_poll(con);
 			tty_redraw();
 		}
 
@@ -83,8 +83,8 @@ int main( int argc, char **argv )
 
 	// TODO: getopt 
 
-	con = msc_new( "localhost", 4445 );
-	msc_setauth( con, user, pass );
+	con = duc_new( "localhost", 4445 );
+	duc_setauth( con, user, pass );
 
 	events_init(con);
 	
@@ -94,7 +94,7 @@ int main( int argc, char **argv )
 
 	tty_init( "dudlc", "> " );
 
-	msc_open(con);
+	duc_open(con);
 
 	loop();
 

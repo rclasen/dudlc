@@ -1,5 +1,5 @@
-#ifndef _MSERVCLIENT_SESSION_H
-#define _MSERVCLIENT_SESSION_H
+#ifndef _DUDLC_SESSION_H
+#define _DUDLC_SESSION_H
 
 #include "sock.h"
 
@@ -10,27 +10,27 @@ typedef struct {
 	char *user;
 	char *pass;
 
-	t_msc_sock *con;
+	t_duc_sock *con;
 
 	int inreply;
 	char code[4];
 	const char *line;
-} mservclient;
+} dudlc;
 
 
-mservclient *msc_new( const char *hostname, int port);
-void msc_free( mservclient *p );
+dudlc *duc_new( const char *hostname, int port);
+void duc_free( dudlc *p );
 
-int msc_setauth( mservclient *c, const char *user, const char *pass );
-int msc_open( mservclient *p );
-void msc_close( mservclient *p );
+int duc_setauth( dudlc *c, const char *user, const char *pass );
+int duc_open( dudlc *p );
+void duc_close( dudlc *p );
 
-int msc_fd( mservclient *p );
-void msc_poll( mservclient *p );
-
-
+int duc_fd( dudlc *p );
+void duc_poll( dudlc *p );
 
 
-int msc_cmd_auth( mservclient *p );
+
+
+int duc_cmd_auth( dudlc *p );
 
 #endif

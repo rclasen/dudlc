@@ -5,9 +5,9 @@
 #include "dudlc/event.h"
 #include "dudlc/album.h"
 
-msc_album *_msc_album_parse( const char *line, char **end )
+duc_album *_duc_album_parse( const char *line, char **end )
 {
-	msc_album *n;
+	duc_album *n;
 	const char *s;
 	char *e;
 
@@ -15,7 +15,7 @@ msc_album *_msc_album_parse( const char *line, char **end )
 	 * now we have to cast the const hackishly away */
 	(const char*)e = s = line;
 
-	if( NULL == (n = malloc(sizeof(msc_album)))){
+	if( NULL == (n = malloc(sizeof(duc_album)))){
 		goto clean1;
 	}
 
@@ -24,7 +24,7 @@ msc_album *_msc_album_parse( const char *line, char **end )
 		goto clean2;
 
 	s = e+1;
-	if( NULL == ( n->album = _msc_fielddup( s, &e )))
+	if( NULL == ( n->album = _duc_fielddup( s, &e )))
 		goto clean2;
 
 	s = e+1;
@@ -44,38 +44,38 @@ clean1:
 	return NULL;
 }
 
-void msc_album_free( msc_album *a )
+void duc_album_free( duc_album *a )
 {
 	free(a->album);
 	free(a);
 }
 
-msc_album *msc_cmd_albumget( mservclient *c, int id )
+duc_album *duc_cmd_albumget( dudlc *c, int id )
 {
-	return _msc_cmd_conv( c, (_msc_converter)_msc_album_parse,
+	return _duc_cmd_conv( c, (_duc_converter)_duc_album_parse,
 			"albumget %d", id );
 }
 
-msc_it_album *msc_cmd_albumlist( mservclient *c )
+duc_it_album *duc_cmd_albumlist( dudlc *c )
 {
-	return _msc_iterate( c, (_msc_converter)_msc_album_parse, 
+	return _duc_iterate( c, (_duc_converter)_duc_album_parse, 
 			"albumlist" );
 }
 
-msc_it_album *msc_cmd_albumsearch( mservclient *c, const char *str )
+duc_it_album *duc_cmd_albumsearch( dudlc *c, const char *str )
 {
-	return _msc_iterate( c, (_msc_converter)_msc_album_parse, 
+	return _duc_iterate( c, (_duc_converter)_duc_album_parse, 
 			"albumsearch %s", str );
 }
 
-int msc_cmd_albumsetname( mservclient *c, int id, const char *name )
+int duc_cmd_albumsetname( dudlc *c, int id, const char *name )
 {
-	return _msc_cmd_succ(c, "albumsetname %d %s", id, name );
+	return _duc_cmd_succ(c, "albumsetname %d %s", id, name );
 }
 
-int msc_cmd_albumsetartist( mservclient *c, int id, int artistid )
+int duc_cmd_albumsetartist( dudlc *c, int id, int artistid )
 {
-	return _msc_cmd_succ(c, "albumsetartist %d %d", id, artistid );
+	return _duc_cmd_succ(c, "albumsetartist %d %d", id, artistid );
 }
 
 

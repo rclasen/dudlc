@@ -5,9 +5,9 @@
 #include "dudlc/event.h"
 #include "dudlc/tag.h"
 
-static msc_tag *_msc_tag_parse( const char *line, char **end )
+static duc_tag *_duc_tag_parse( const char *line, char **end )
 {
-	msc_tag *n;
+	duc_tag *n;
 	const char *s;
 	char *e;
 
@@ -15,7 +15,7 @@ static msc_tag *_msc_tag_parse( const char *line, char **end )
 	 * now we have to cast the const hackishly away */
 	(const char*)e = s = line;
 
-	if( NULL == (n = malloc(sizeof(msc_track)))){
+	if( NULL == (n = malloc(sizeof(duc_track)))){
 		goto clean1;
 	}
 
@@ -24,11 +24,11 @@ static msc_tag *_msc_tag_parse( const char *line, char **end )
 		goto clean2;
 
 	s = e+1;
-	if( NULL == ( n->name = _msc_fielddup(s, &e)))
+	if( NULL == ( n->name = _duc_fielddup(s, &e)))
 		goto clean2;
 
 	s = e+1;
-	if( NULL == ( n->desc = _msc_fielddup(s, &e)))
+	if( NULL == ( n->desc = _duc_fielddup(s, &e)))
 		goto clean3;
 
 
@@ -44,7 +44,7 @@ clean1:
 	return NULL;
 }
 
-void msc_tag_free( msc_tag *n )
+void duc_tag_free( duc_tag *n )
 {
 	if( ! n )
 		return;
@@ -53,82 +53,82 @@ void msc_tag_free( msc_tag *n )
 	free(n);
 }
 
-msc_tag *msc_cmd_tagget( mservclient *c, int id )
+duc_tag *duc_cmd_tagget( dudlc *c, int id )
 {
-	return _msc_cmd_conv(c, (_msc_converter)_msc_tag_parse, 
+	return _duc_cmd_conv(c, (_duc_converter)_duc_tag_parse, 
 			"tagget %d", id );
 }
 
-int msc_cmd_tag2id( mservclient *c, const char *name )
+int duc_cmd_tag2id( dudlc *c, const char *name )
 {
-	return _msc_cmd_int(c, "tag2id %s", name );
+	return _duc_cmd_int(c, "tag2id %s", name );
 }
 
 
-msc_it_tag *msc_cmd_taglist( mservclient *c )
+duc_it_tag *duc_cmd_taglist( dudlc *c )
 {
-	return _msc_iterate(c, (_msc_converter)_msc_tag_parse, "taglist" );
+	return _duc_iterate(c, (_duc_converter)_duc_tag_parse, "taglist" );
 }
 
-int msc_cmd_tagadd( mservclient *c, const char *name )
+int duc_cmd_tagadd( dudlc *c, const char *name )
 {
-	return _msc_cmd_int(c, "tagadd %s", name );
+	return _duc_cmd_int(c, "tagadd %s", name );
 }
 
-int msc_cmd_tagsetname( mservclient *c, int id, const char *name )
+int duc_cmd_tagsetname( dudlc *c, int id, const char *name )
 {
-	return _msc_cmd_succ( c, "tagsetname %d %s", id, name );
+	return _duc_cmd_succ( c, "tagsetname %d %s", id, name );
 }
 
-int msc_cmd_tagsetdesc( mservclient *c, int id, const char *desc )
+int duc_cmd_tagsetdesc( dudlc *c, int id, const char *desc )
 {
-	return _msc_cmd_succ( c, "tagsetdesc %d %s", id, desc );
+	return _duc_cmd_succ( c, "tagsetdesc %d %s", id, desc );
 }
 
-int msc_cmd_tagdel( mservclient *c, int id )
+int duc_cmd_tagdel( dudlc *c, int id )
 {
-	return _msc_cmd_succ( c, "tagdel %d", id );
+	return _duc_cmd_succ( c, "tagdel %d", id );
 }
 
 
-msc_it_tag *msc_cmd_tracktaglist( mservclient *c, int tid )
+duc_it_tag *duc_cmd_tracktaglist( dudlc *c, int tid )
 {
-	return _msc_iterate(c, (_msc_converter)_msc_tag_parse, 
+	return _duc_iterate(c, (_duc_converter)_duc_tag_parse, 
 			"tracktaglist %d", tid );
 }
 
-int msc_cmd_tracktagged( mservclient *c, int tid, int id )
+int duc_cmd_tracktagged( dudlc *c, int tid, int id )
 {
-	return _msc_cmd_int(c, "tracktagged %d %d", tid, id );
+	return _duc_cmd_int(c, "tracktagged %d %d", tid, id );
 }
 
-int msc_cmd_tracktagset( mservclient *c, int tid, int id )
+int duc_cmd_tracktagset( dudlc *c, int tid, int id )
 {
-	return _msc_cmd_succ( c, "tracktagset %d %d", tid, id );
+	return _duc_cmd_succ( c, "tracktagset %d %d", tid, id );
 }
 
-int msc_cmd_tracktagdel( mservclient *c, int tid, int id )
+int duc_cmd_tracktagdel( dudlc *c, int tid, int id )
 {
-	return _msc_cmd_succ( c, "tracktagdel %d %d", tid, id );
+	return _duc_cmd_succ( c, "tracktagdel %d %d", tid, id );
 }
 
-void _msc_bcast_tag( mservclient *c, const char *line )
+void _duc_bcast_tag( dudlc *c, const char *line )
 {
-	msc_tag *t;
+	duc_tag *t;
 
 	switch(line[2]){
 		case '0': /* tag changed */
-			if( NULL == (t = _msc_tag_parse(line+4,NULL)))
+			if( NULL == (t = _duc_tag_parse(line+4,NULL)))
 				break;
 			_MSC_EVENT(c,tagchange,c,t);
-			msc_tag_free(t);
+			duc_tag_free(t);
 			break;
 
 		case '1': /* tag changed */
-			if( NULL == (t = _msc_tag_parse(line+4,NULL)))
+			if( NULL == (t = _duc_tag_parse(line+4,NULL)))
 				break;
 			_MSC_EVENT(c,tagdel,c,t);
-			msc_tag_free(t);
+			duc_tag_free(t);
 			break;
 
 

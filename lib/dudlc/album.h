@@ -1,5 +1,5 @@
-#ifndef _MSERVCLIENT_ALBUM_H
-#define _MSERVCLIENT_ALBUM_H
+#ifndef _DUDLC_ALBUM_H
+#define _DUDLC_ALBUM_H
 
 #include "session.h"
 #include "iterate.h"
@@ -8,22 +8,22 @@ typedef struct {
 	int id;
 	char *album;
 	int artistid;
-} msc_album;
+} duc_album;
 
-#define msc_it_album	_msc_iter
-#define msc_it_album_cur(x)	(msc_album*)_msc_it_cur((_msc_iter*)x)
-#define msc_it_album_next(x)	(msc_album*)_msc_it_next((_msc_iter*)x)
-#define msc_it_album_done(x)	_msc_it_done((_msc_iter*)x)
+#define duc_it_album	_duc_iter
+#define duc_it_album_cur(x)	(duc_album*)_duc_it_cur((_duc_iter*)x)
+#define duc_it_album_next(x)	(duc_album*)_duc_it_next((_duc_iter*)x)
+#define duc_it_album_done(x)	_duc_it_done((_duc_iter*)x)
 
-msc_album *_msc_album_parse( const char *line, char **end );
-void msc_album_free( msc_album *a );
+duc_album *_duc_album_parse( const char *line, char **end );
+void duc_album_free( duc_album *a );
 
-msc_album *msc_cmd_albumget( mservclient *c, int id );
+duc_album *duc_cmd_albumget( dudlc *c, int id );
 
-msc_it_album *msc_cmd_albumlist( mservclient *c );
-msc_it_album *msc_cmd_albumsearch( mservclient *c, const char *substr );
+duc_it_album *duc_cmd_albumlist( dudlc *c );
+duc_it_album *duc_cmd_albumsearch( dudlc *c, const char *substr );
 
-int msc_cmd_albumsetname( mservclient *c, int id, const char *name );
-int msc_cmd_albumsetartist( mservclient *c, int id, int artistid );
+int duc_cmd_albumsetname( dudlc *c, int id, const char *name );
+int duc_cmd_albumsetartist( dudlc *c, int id, int artistid );
 
 #endif

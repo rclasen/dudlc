@@ -10,11 +10,11 @@
 
 #include "dudlc/sock.h"
 
-t_msc_sock *msc_sock_open( const char *h, int p )
+t_duc_sock *duc_sock_open( const char *h, int p )
 {
-	t_msc_sock *s;
+	t_duc_sock *s;
 
-	if( NULL == (s = malloc(sizeof(t_msc_sock))))
+	if( NULL == (s = malloc(sizeof(t_duc_sock))))
 		return NULL;
 
 	if( NULL == (s->host = strdup( h )))
@@ -33,18 +33,18 @@ clean1:
 	return NULL;
 }
 
-void msc_sock_close( t_msc_sock *s )
+void duc_sock_close( t_duc_sock *s )
 {
 	if( ! s )
 		return;
 
-	msc_sock_disconnect( s );
+	duc_sock_disconnect( s );
 	free(s->host);
 	free(s);
 }
 
 
-int msc_sock_connect( t_msc_sock *s )
+int duc_sock_connect( t_duc_sock *s )
 {
 	struct protoent *prot;
 	struct hostent *he;
@@ -72,14 +72,14 @@ int msc_sock_connect( t_msc_sock *s )
 
 	if( 0 > connect( s->fd, (const struct sockaddr*)&sa, 
 				sizeof(struct sockaddr_in))){
-		msc_sock_disconnect( s );
+		duc_sock_disconnect( s );
 		return -1;
 	}
 
 	return 0;
 }
 
-void msc_sock_disconnect( t_msc_sock *s )
+void duc_sock_disconnect( t_duc_sock *s )
 {
 	if( ! s )
 		return;
@@ -95,18 +95,18 @@ void msc_sock_disconnect( t_msc_sock *s )
 	s->llen = 0;
 }
 
-int msc_sock_reconnect( t_msc_sock *s )
+int duc_sock_reconnect( t_duc_sock *s )
 {
-	msc_sock_disconnect( s );
-	return msc_sock_connect(s);
+	duc_sock_disconnect( s );
+	return duc_sock_connect(s);
 }
 
-int msc_sock_fd( t_msc_sock *s )
+int duc_sock_fd( t_duc_sock *s )
 {
 	return s->fd;
 }
 
-int msc_sock_send( t_msc_sock *s, const char *cmd )
+int duc_sock_send( t_duc_sock *s, const char *cmd )
 {
 	int len;
 
@@ -121,7 +121,7 @@ int msc_sock_send( t_msc_sock *s, const char *cmd )
 	return 0;
 }
 
-static inline void freeline( t_msc_sock *s )
+static inline void freeline( t_duc_sock *s )
 {
 	if( ! s->llen )
 		return;
@@ -132,7 +132,7 @@ static inline void freeline( t_msc_sock *s )
 	s->buf[s->ilen] = 0; 
 }
 
-int msc_sock_recv( t_msc_sock *s )
+int duc_sock_recv( t_duc_sock *s )
 {
 	int len;
 
@@ -145,7 +145,7 @@ int msc_sock_recv( t_msc_sock *s )
 	}
 
 	if( ! len ){
-		msc_sock_disconnect( s );
+		duc_sock_disconnect( s );
 		return -1;
 	}
 
@@ -155,7 +155,7 @@ int msc_sock_recv( t_msc_sock *s )
 	return 0;
 }
 	
-const char *msc_sock_getline( t_msc_sock *s )
+const char *duc_sock_getline( t_duc_sock *s )
 {
 	freeline( s );
 

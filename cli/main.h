@@ -4,6 +4,6 @@
 #include <dudlc.h>
 
 extern int terminate;
-extern mservclient *con;
+extern dudlc *con;
 
 #endif

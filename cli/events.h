@@ -1,6 +1,6 @@
 #ifndef _EVENTS_H
 #define _EVENTS_H
 
-void events_init( mservclient *c );
+void events_init( dudlc *c );
 
 #endif

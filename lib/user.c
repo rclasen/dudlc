@@ -4,16 +4,16 @@
 #include "dudlc/event.h"
 #include "dudlc/user.h"
 
-static msc_user *_msc_user_parse( const char *line, char **end )
+static duc_user *_duc_user_parse( const char *line, char **end )
 {
-	msc_user *c;
+	duc_user *c;
 
 	const char *s;
 	char *e;
 
 	(const char*)e = s = line;
 
-	if( NULL == (c = malloc(sizeof(msc_user))))
+	if( NULL == (c = malloc(sizeof(duc_user))))
 		goto clean1;
 
 	c->id = strtol(s, &e, 10 );
@@ -21,7 +21,7 @@ static msc_user *_msc_user_parse( const char *line, char **end )
 		goto clean2;
 
 	s = e+1;
-	if( NULL == (c->name = _msc_fielddup( s, &e )))
+	if( NULL == (c->name = _duc_fielddup( s, &e )))
 		goto clean2;
 		s = e+1;
 
@@ -41,7 +41,7 @@ clean1:
 	return NULL;
 }
 
-void msc_user_free( msc_user *c )
+void duc_user_free( duc_user *c )
 {
 	if( ! c )
 		return;
@@ -52,41 +52,41 @@ void msc_user_free( msc_user *c )
 
 
 
-msc_it_user *msc_cmd_userlist( mservclient *c )
+duc_it_user *duc_cmd_userlist( dudlc *c )
 {
-	return _msc_iterate( c, (_msc_converter)_msc_user_parse, 
+	return _duc_iterate( c, (_duc_converter)_duc_user_parse, 
 			"userlist" );
 }
 
-msc_user *msc_cmd_userget( mservclient *c, int uid )
+duc_user *duc_cmd_userget( dudlc *c, int uid )
 {
-	return _msc_cmd_conv(c, (_msc_converter)_msc_user_parse, 
+	return _duc_cmd_conv(c, (_duc_converter)_duc_user_parse, 
 			"userget %d", uid);
 }
 
-int msc_cmd_usergetname( mservclient *c, const char *name )
+int duc_cmd_usergetname( dudlc *c, const char *name )
 {
-	return _msc_cmd_int(c, "user2id %s", name);
+	return _duc_cmd_int(c, "user2id %s", name);
 }
 
-int msc_cmd_usersetpass( mservclient *c, int uid, const char *pass )
+int duc_cmd_usersetpass( dudlc *c, int uid, const char *pass )
 {
-	return _msc_cmd_succ(c, "usersetpass %d %s", uid, pass);
+	return _duc_cmd_succ(c, "usersetpass %d %s", uid, pass);
 }
 
-int msc_cmd_usersetright( mservclient *c, int uid, int right )
+int duc_cmd_usersetright( dudlc *c, int uid, int right )
 {
-	return _msc_cmd_succ(c, "usersetright %d %d", uid, right);
+	return _duc_cmd_succ(c, "usersetright %d %d", uid, right);
 }
 
-int msc_cmd_userdel( mservclient *c, int uid )
+int duc_cmd_userdel( dudlc *c, int uid )
 {
-	return _msc_cmd_succ(c, "userdel %d", uid);
+	return _duc_cmd_succ(c, "userdel %d", uid);
 }
 
-int msc_cmd_useradd( mservclient *c, const char *name )
+int duc_cmd_useradd( dudlc *c, const char *name )
 {
-	return _msc_cmd_int(c, "useradd %s", name);
+	return _duc_cmd_int(c, "useradd %s", name);
 }
 
 

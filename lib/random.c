@@ -5,28 +5,28 @@
 #include "dudlc/event.h"
 #include "dudlc/random.h"
 
-char *msc_cmd_filter( mservclient *c )
+char *duc_cmd_filter( dudlc *c )
 {
-	return _msc_cmd_string(c, "filter" );
+	return _duc_cmd_string(c, "filter" );
 }
 
-int msc_cmd_filterset( mservclient *c, const char *filter )
+int duc_cmd_filterset( dudlc *c, const char *filter )
 {
-	return _msc_cmd_succ(c, "filterset %s", filter );
+	return _duc_cmd_succ(c, "filterset %s", filter );
 }
 
-int msc_cmd_filterstat( mservclient *c )
+int duc_cmd_filterstat( dudlc *c )
 {
-	return _msc_cmd_int(c, "filterstat" );
+	return _duc_cmd_int(c, "filterstat" );
 }
 
-msc_it_track *msc_cmd_randomtop( mservclient *c, int num )
+duc_it_track *duc_cmd_randomtop( dudlc *c, int num )
 {
-	return _msc_iterate( c, (_msc_converter)_msc_track_parse, 
+	return _duc_iterate( c, (_duc_converter)_duc_track_parse, 
 			"randomtop %d", num );
 }
 
-void _msc_bcast_random( mservclient *c, const char *line )
+void _duc_bcast_random( dudlc *c, const char *line )
 {
 	switch(line[2]){
 		case '0': /* filter changed */

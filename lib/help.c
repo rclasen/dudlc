@@ -4,14 +4,14 @@
 #include "dudlc/proto.h"
 #include "dudlc/help.h"
 
-static char *_msc_help_parse( const char *line, char **end )
+static char *_duc_help_parse( const char *line, char **end )
 {
 	if( end ) (const char*) *end = line + strlen(line);
 	return strdup(line);
 }
 
-msc_it_help *msc_cmd_help( mservclient *c )
+duc_it_help *duc_cmd_help( dudlc *c )
 {
-	return _msc_iterate(c, (_msc_converter)_msc_help_parse, "help");
+	return _duc_iterate(c, (_duc_converter)_duc_help_parse, "help");
 }
 

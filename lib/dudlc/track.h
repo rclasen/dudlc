@@ -1,5 +1,5 @@
-#ifndef _MSERVCLIENT_TRACK_H
-#define _MSERVCLIENT_TRACK_H
+#ifndef _DUDLC_TRACK_H
+#define _DUDLC_TRACK_H
 
 #include "session.h"
 #include "iterate.h"
@@ -11,23 +11,23 @@ typedef struct {
 	char *title;
 	int artistid;
 	int duration;
-} msc_track;
+} duc_track;
 
-#define msc_it_track	_msc_iter
-#define msc_it_track_cur(x)	(msc_track*)_msc_it_cur((_msc_iter*)x)
-#define msc_it_track_next(x)	(msc_track*)_msc_it_next((_msc_iter*)x)
-#define msc_it_track_done(x)	_msc_it_done((_msc_iter*)x)
+#define duc_it_track	_duc_iter
+#define duc_it_track_cur(x)	(duc_track*)_duc_it_cur((_duc_iter*)x)
+#define duc_it_track_next(x)	(duc_track*)_duc_it_next((_duc_iter*)x)
+#define duc_it_track_done(x)	_duc_it_done((_duc_iter*)x)
 
-msc_track *_msc_track_parse( const char *line, char **end );
-void msc_track_free( msc_track *t );
+duc_track *_duc_track_parse( const char *line, char **end );
+void duc_track_free( duc_track *t );
 
-int msc_cmd_tracks( mservclient *c );
-int msc_cmd_track2id( mservclient *c, int albumid, int nr );
-msc_track *msc_cmd_trackget( mservclient *c, int id );
+int duc_cmd_tracks( dudlc *c );
+int duc_cmd_track2id( dudlc *c, int albumid, int nr );
+duc_track *duc_cmd_trackget( dudlc *c, int id );
 
-msc_it_track *msc_cmd_tracksearch( mservclient *c, const char *substr );
-msc_it_track *msc_cmd_tracksalbum( mservclient *c, int id );
-msc_it_track *msc_cmd_tracksartist( mservclient *c, int id );
+duc_it_track *duc_cmd_tracksearch( dudlc *c, const char *substr );
+duc_it_track *duc_cmd_tracksalbum( dudlc *c, int id );
+duc_it_track *duc_cmd_tracksartist( dudlc *c, int id );
 
 // TODO: alter 
 

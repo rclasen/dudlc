@@ -1,5 +1,9 @@
 AUTOMAKE_OPTIONS=foreign
 
+CFLAGS:= -g -Wall  -W -Wunused -Wmissing-prototypes -Wcast-qual -Wcast-align -Werror -I../lib
+
+SUBDIRS = dudlc
+
 lib_LTLIBRARIES=libdudlc.la
 
 include_HEADERS= dudlc.h

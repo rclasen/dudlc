@@ -1,5 +1,5 @@
-#ifndef _MSERVCLIENT_PLAYER_H
-#define _MSERVCLIENT_PLAYER_H
+#ifndef _DUDLC_PLAYER_H
+#define _DUDLC_PLAYER_H
 
 #include "session.h"
 
@@ -10,23 +10,23 @@ typedef enum {
 	pl_stop,
 	pl_play,
 	pl_pause,
-} msc_playstatus;
+} duc_playstatus;
 
-msc_playstatus msc_cmd_status( mservclient *c );
-msc_track *msc_cmd_curtrack( mservclient *c );
+duc_playstatus duc_cmd_status( dudlc *c );
+duc_track *duc_cmd_curtrack( dudlc *c );
 
-int msc_cmd_play( mservclient *c );
-int msc_cmd_stop( mservclient *c );
-int msc_cmd_next( mservclient *c );
-int msc_cmd_prev( mservclient *c );
-int msc_cmd_pause( mservclient *c );
+int duc_cmd_play( dudlc *c );
+int duc_cmd_stop( dudlc *c );
+int duc_cmd_next( dudlc *c );
+int duc_cmd_prev( dudlc *c );
+int duc_cmd_pause( dudlc *c );
 
-int msc_cmd_gap( mservclient *c );
-int msc_cmd_gapset( mservclient *c, unsigned int gap );
+int duc_cmd_gap( dudlc *c );
+int duc_cmd_gapset( dudlc *c, unsigned int gap );
 
-int msc_cmd_random( mservclient *c );
-int msc_cmd_randomset( mservclient *c, int r );
+int duc_cmd_random( dudlc *c );
+int duc_cmd_randomset( dudlc *c, int r );
 
-void _msc_bcast_player( mservclient *c, const char *line );
+void _duc_bcast_player( dudlc *c, const char *line );
 
 #endif

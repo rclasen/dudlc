@@ -5,10 +5,10 @@
 #include "events.h"
 
 
-msc_events events;
+duc_events events;
 
 
-static void cb_bcast( mservclient *c, const char *line )
+static void cb_bcast( dudlc *c, const char *line )
 {
 	tty_msg( "%s\n", line );
 	(void)c;
@@ -18,15 +18,15 @@ static void cb_bcast( mservclient *c, const char *line )
  * dis-/connect
  */
 
-static void cb_disc( mservclient *c )
+static void cb_disc( dudlc *c )
 {
 	tty_msg( "disconnected, trying to reconnect\n");
-	if( msc_open(c)){
+	if( duc_open(c)){
 		tty_msg( "reconnect failed\n" );
 	}
 }
 
-static void cb_conn( mservclient *c )
+static void cb_conn( dudlc *c )
 {
 	tty_msg( "connected\n");
 	(void)c;
@@ -36,7 +36,7 @@ static void cb_conn( mservclient *c )
  * user/clients
  */
 
-static void cb_login( mservclient *c, msc_client *u )
+static void cb_login( dudlc *c, duc_client *u )
 {
 	char buf[BUFLENCLIENT];
 
@@ -44,7 +44,7 @@ static void cb_login( mservclient *c, msc_client *u )
 	(void)c;
 }
 
-static void cb_logout( mservclient *c, msc_client *u )
+static void cb_logout( dudlc *c, duc_client *u )
 {
 	char buf[BUFLENCLIENT];
 
@@ -52,7 +52,7 @@ static void cb_logout( mservclient *c, msc_client *u )
 	(void)c;
 }
 
-static void cb_kicked( mservclient *c )
+static void cb_kicked( dudlc *c )
 {
 	tty_msg( "you were kicked from the server\n" );
 	(void)c;
@@ -62,8 +62,8 @@ static void cb_kicked( mservclient *c )
  * player
  */
 
-static void cb_nexttrack( mservclient *c, msc_track *t, 
-		msc_artist *ar, msc_album *al )
+static void cb_nexttrack( dudlc *c, duc_track *t, 
+		duc_artist *ar, duc_album *al )
 {
 	char buf[BUFLENTRACK];
 
@@ -74,25 +74,25 @@ static void cb_nexttrack( mservclient *c, msc_track *t,
 	(void)al;
 }
 
-static void cb_stopped( mservclient *c )
+static void cb_stopped( dudlc *c )
 {
 	tty_msg( "stopped\n" );
 	(void)c;
 }
 
-static void cb_paused( mservclient *c )
+static void cb_paused( dudlc *c )
 {
 	tty_msg( "paused\n" );
 	(void)c;
 }
 
-static void cb_resumed( mservclient *c )
+static void cb_resumed( dudlc *c )
 {
 	tty_msg( "resumed\n");
 	(void)c;
 }
 
-static void cb_random( mservclient *c, int r )
+static void cb_random( dudlc *c, int r )
 {
 	tty_msg( "random mode turned %s\n", r ? "on": "off" );
 	(void)c;
@@ -102,7 +102,7 @@ static void cb_random( mservclient *c, int r )
  * random/filter
  */
 
-static void cb_filter( mservclient *c, const char *f )
+static void cb_filter( dudlc *c, const char *f )
 {
 	tty_msg( "new filter: %s\n", f );
 	(void)c;
@@ -112,14 +112,14 @@ static void cb_filter( mservclient *c, const char *f )
  * queue
  */
 
-static void cb_queueadd( mservclient *c, msc_queue *q )
+static void cb_queueadd( dudlc *c, duc_queue *q )
 {
 	char buf[BUFLENQUEUE];
 	tty_msg( "queued: %s\n", mkqueue(buf, BUFLENQUEUE,q ));
 	(void)c;
 }
 
-static void cb_queuedel( mservclient *c, msc_queue *q )
+static void cb_queuedel( dudlc *c, duc_queue *q )
 {
 	char buf[BUFLENQUEUE];
 
@@ -127,7 +127,7 @@ static void cb_queuedel( mservclient *c, msc_queue *q )
 	(void)c;
 }
 
-static void cb_queueclear( mservclient *c )
+static void cb_queueclear( dudlc *c )
 {
 	tty_msg( "queue was cleared\n" );
 	(void)c;
@@ -137,7 +137,7 @@ static void cb_queueclear( mservclient *c )
  * sleep
  */
 
-static void cb_sleep( mservclient *c, int del )
+static void cb_sleep( dudlc *c, int del )
 {
 	tty_msg( "falling asleep in %d sec\n", del );
 	(void)c;
@@ -147,7 +147,7 @@ static void cb_sleep( mservclient *c, int del )
  * tag
  */
 
-static void cb_tagchange( mservclient *c, msc_tag *q )
+static void cb_tagchange( dudlc *c, duc_tag *q )
 {
 	char buf[BUFLENTAG];
 
@@ -155,7 +155,7 @@ static void cb_tagchange( mservclient *c, msc_tag *q )
 	(void)c;
 }
 
-static void cb_tagdel( mservclient *c, msc_tag *q )
+static void cb_tagdel( dudlc *c, duc_tag *q )
 {
 	char buf[BUFLENTAG];
 
@@ -168,10 +168,10 @@ static void cb_tagdel( mservclient *c, msc_tag *q )
  * init
  */
 
-void events_init( mservclient *c )
+void events_init( dudlc *c )
 {
 	memset(&events, 0, sizeof(events));
-	msc_setevents( c, &events );
+	duc_setevents( c, &events );
 
 	events.bcast = cb_bcast;
 

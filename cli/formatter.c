@@ -57,21 +57,21 @@ const char *mkclienthead( char *buf, unsigned int len )
 }
 
 // TODO: lookup user name
-const char *mkclient( char *buf, unsigned int len, msc_client *c )
+const char *mkclient( char *buf, unsigned int len, duc_client *c )
 {
 	snprintf( buf, len, "%4d %4d %-15s", c->id, c->uid, c->addr );
 	return buf;
 }
 
-void dump_clients( msc_it_client *it )
+void dump_clients( duc_it_client *it )
 {
 	char buf[BUFLENCLIENT];
-	msc_client *c;
+	duc_client *c;
 
 	tty_msg( "%s\n\n", mkclienthead(buf, BUFLENCLIENT));
-	for( c = msc_it_client_cur(it); c; c = msc_it_client_next(it)){
+	for( c = duc_it_client_cur(it); c; c = duc_it_client_next(it)){
 		tty_msg( "%s\n", mkclient(buf, BUFLENCLIENT, c ));
-		msc_client_free(c);
+		duc_client_free(c);
 	}
 }
 
@@ -95,7 +95,7 @@ const char *mktrackhead( char *buf, unsigned int len )
 }
 
 const char *mkrtrack( char *buf, unsigned int len, 
-		msc_track *t, msc_artist *ar, msc_album *al )
+		duc_track *t, duc_artist *ar, duc_album *al )
 {
 	char tim[10];
 
@@ -109,7 +109,7 @@ const char *mkrtrack( char *buf, unsigned int len,
 
 // TODO: lookup artist and album name
 // TODO: include duration
-const char *mktrack( char *buf, unsigned int len, msc_track *t )
+const char *mktrack( char *buf, unsigned int len, duc_track *t )
 {
 	char tim[10];
 
@@ -122,15 +122,15 @@ const char *mktrack( char *buf, unsigned int len, msc_track *t )
 	return buf;
 }
 
-void dump_tracks( msc_it_track *it )
+void dump_tracks( duc_it_track *it )
 {
-	msc_track *t;
+	duc_track *t;
 	char buf[BUFLENTRACK];
 
 	tty_msg( "%s\n\n", mktrackhead(buf, BUFLENTRACK));
-	for( t = msc_it_track_cur(it); t; t = msc_it_track_next(it)){
+	for( t = duc_it_track_cur(it); t; t = duc_it_track_next(it)){
 		tty_msg( "%s\n", mktrack(buf,BUFLENTRACK,t));
-		msc_track_free(t);
+		duc_track_free(t);
 	}
 }
 
@@ -150,7 +150,7 @@ const char *mkqueuehead( char *buf, unsigned int len )
 	return buf;
 }
 
-const char *mkqueue( char *buf, unsigned int len, msc_queue *q )
+const char *mkqueue( char *buf, unsigned int len, duc_queue *q )
 {
 	unsigned int l;
 
@@ -169,15 +169,15 @@ const char *mkqueue( char *buf, unsigned int len, msc_queue *q )
 	return buf;
 }
 
-void dump_queue( msc_it_queue *it )
+void dump_queue( duc_it_queue *it )
 {
-	msc_queue *t;
+	duc_queue *t;
 	char buf[BUFLENQUEUE];
 
 	tty_msg( "%s\n\n", mkqueuehead(buf, BUFLENQUEUE));
-	for( t = msc_it_queue_cur(it); t; t = msc_it_queue_next(it)){
+	for( t = duc_it_queue_cur(it); t; t = duc_it_queue_next(it)){
 		tty_msg( "%s\n", mkqueue(buf,BUFLENQUEUE,t));
-		msc_queue_free(t);
+		duc_queue_free(t);
 	}
 }
 
@@ -198,7 +198,7 @@ const char *mkhistoryhead( char *buf, unsigned int len )
 	return buf;
 }
 
-const char *mkhistory( char *buf, unsigned int len, msc_history *q )
+const char *mkhistory( char *buf, unsigned int len, duc_history *q )
 {
 	unsigned int l;
 
@@ -217,15 +217,15 @@ const char *mkhistory( char *buf, unsigned int len, msc_history *q )
 	return buf;
 }
 
-void dump_history( msc_it_history *it )
+void dump_history( duc_it_history *it )
 {
-	msc_history *t;
+	duc_history *t;
 	char buf[BUFLENQUEUE];
 
 	tty_msg( "%s\n\n", mkhistoryhead(buf, BUFLENQUEUE));
-	for( t = msc_it_history_cur(it); t; t = msc_it_history_next(it)){
+	for( t = duc_it_history_cur(it); t; t = duc_it_history_next(it)){
 		tty_msg( "%s\n", mkhistory(buf,BUFLENQUEUE,t));
-		msc_history_free(t);
+		duc_history_free(t);
 	}
 }
 
@@ -245,7 +245,7 @@ const char *mktaghead( char *buf, unsigned int len )
 	return buf;
 }
 
-const char *mktag( char *buf, unsigned int len, msc_tag *q )
+const char *mktag( char *buf, unsigned int len, duc_tag *q )
 {
 	unsigned int l;
 
@@ -256,15 +256,15 @@ const char *mktag( char *buf, unsigned int len, msc_tag *q )
 	return buf;
 }
 
-void dump_tags( msc_it_tag *it )
+void dump_tags( duc_it_tag *it )
 {
-	msc_tag *t;
+	duc_tag *t;
 	char buf[BUFLENTAG];
 
 	tty_msg( "%s\n\n", mktaghead(buf, BUFLENTAG));
-	for( t = msc_it_tag_cur(it); t; t = msc_it_tag_next(it)){
+	for( t = duc_it_tag_cur(it); t; t = duc_it_tag_next(it)){
 		tty_msg( "%s\n", mktag(buf,BUFLENTAG,t));
-		msc_tag_free(t);
+		duc_tag_free(t);
 	}
 }
 
@@ -283,7 +283,7 @@ const char *mkuserhead( char *buf, unsigned int len )
 	return buf;
 }
 
-const char *mkuser( char *buf, unsigned int len, msc_user *q )
+const char *mkuser( char *buf, unsigned int len, duc_user *q )
 {
 	unsigned int l;
 
@@ -294,15 +294,15 @@ const char *mkuser( char *buf, unsigned int len, msc_user *q )
 	return buf;
 }
 
-void dump_users( msc_it_user *it )
+void dump_users( duc_it_user *it )
 {
-	msc_user *t;
+	duc_user *t;
 	char buf[BUFLENUSER];
 
 	tty_msg( "%s\n\n", mkuserhead(buf, BUFLENUSER));
-	for( t = msc_it_user_cur(it); t; t = msc_it_user_next(it)){
+	for( t = duc_it_user_cur(it); t; t = duc_it_user_next(it)){
 		tty_msg( "%s\n", mkuser(buf,BUFLENUSER,t));
-		msc_user_free(t);
+		duc_user_free(t);
 	}
 }
 

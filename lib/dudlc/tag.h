@@ -1,5 +1,5 @@
-#ifndef _MSERVCLIENT_TAG_H
-#define _MSERVCLIENT_TAG_H
+#ifndef _DUDLC_TAG_H
+#define _DUDLC_TAG_H
 
 #include "session.h"
 
@@ -7,32 +7,32 @@ typedef struct {
 	int id;
 	char *name;
 	char *desc;
-} msc_tag;
+} duc_tag;
 
-#define msc_it_tag	_msc_iter
-#define msc_it_tag_cur(x)	(msc_tag*)_msc_it_cur((_msc_iter*)x)
-#define msc_it_tag_next(x)	(msc_tag*)_msc_it_next((_msc_iter*)x)
-#define msc_it_tag_done(x)	_msc_it_done((_msc_iter*)x)
+#define duc_it_tag	_duc_iter
+#define duc_it_tag_cur(x)	(duc_tag*)_duc_it_cur((_duc_iter*)x)
+#define duc_it_tag_next(x)	(duc_tag*)_duc_it_next((_duc_iter*)x)
+#define duc_it_tag_done(x)	_duc_it_done((_duc_iter*)x)
 
-void msc_tag_free( msc_tag *t );
+void duc_tag_free( duc_tag *t );
 
-msc_tag *msc_cmd_tagget( mservclient *c, int id );
-int msc_cmd_tag2id( mservclient *c, const char *name );
+duc_tag *duc_cmd_tagget( dudlc *c, int id );
+int duc_cmd_tag2id( dudlc *c, const char *name );
 
-msc_it_tag *msc_cmd_taglist( mservclient *c );
+duc_it_tag *duc_cmd_taglist( dudlc *c );
 
-int msc_cmd_tagadd( mservclient *c, const char *name );
-int msc_cmd_tagsetname( mservclient *c, int id, const char *name );
-int msc_cmd_tagsetdesc( mservclient *c, int id, const char *desc );
-int msc_cmd_tagdel( mservclient *c, int id );
+int duc_cmd_tagadd( dudlc *c, const char *name );
+int duc_cmd_tagsetname( dudlc *c, int id, const char *name );
+int duc_cmd_tagsetdesc( dudlc *c, int id, const char *desc );
+int duc_cmd_tagdel( dudlc *c, int id );
 
-msc_it_tag *msc_cmd_tracktaglist( mservclient *c, int tid );
-int msc_cmd_tracktagged( mservclient *c, int tid, int id );
+duc_it_tag *duc_cmd_tracktaglist( dudlc *c, int tid );
+int duc_cmd_tracktagged( dudlc *c, int tid, int id );
 
-int msc_cmd_tracktagset( mservclient *c, int tid, int id );
-int msc_cmd_tracktagdel( mservclient *c, int tid, int id );
+int duc_cmd_tracktagset( dudlc *c, int tid, int id );
+int duc_cmd_tracktagdel( dudlc *c, int tid, int id );
 
-void _msc_bcast_tag( mservclient *c, const char *line );
+void _duc_bcast_tag( dudlc *c, const char *line );
 
 
 #endif

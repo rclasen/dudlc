@@ -1,5 +1,5 @@
-#ifndef _MSERVCLIENT_USER_H
-#define _MSERVCLIENT_USER_H
+#ifndef _DUDLC_USER_H
+#define _DUDLC_USER_H
 
 #include "session.h"
 #include "iterate.h"
@@ -8,24 +8,24 @@ typedef struct {
 	int id;
 	char *name;
 	int right;
-} msc_user;
+} duc_user;
 
-void msc_user_free( msc_user *u );
+void duc_user_free( duc_user *u );
 
-#define msc_it_user	_msc_iter
-#define msc_it_user_cur(x)	(msc_user*)_msc_it_cur((_msc_iter*)x)
-#define msc_it_user_next(x)	(msc_user*)_msc_it_next((_msc_iter*)x)
-#define msc_it_user_done(x)	_msc_it_done((_msc_iter*)x)
+#define duc_it_user	_duc_iter
+#define duc_it_user_cur(x)	(duc_user*)_duc_it_cur((_duc_iter*)x)
+#define duc_it_user_next(x)	(duc_user*)_duc_it_next((_duc_iter*)x)
+#define duc_it_user_done(x)	_duc_it_done((_duc_iter*)x)
 
 
 
-msc_it_user *msc_cmd_userlist( mservclient *c );
-msc_user *msc_cmd_userget( mservclient *c, int uid );
-int msc_cmd_usergetname( mservclient *c, const char *name );
-int msc_cmd_usersetpass( mservclient *c, int uid, const char *pass );
-int msc_cmd_usersetright( mservclient *c, int uid, int right );
-int msc_cmd_useradd( mservclient *c, const char *name );
-int msc_cmd_userdel( mservclient *c, int uid);
+duc_it_user *duc_cmd_userlist( dudlc *c );
+duc_user *duc_cmd_userget( dudlc *c, int uid );
+int duc_cmd_usergetname( dudlc *c, const char *name );
+int duc_cmd_usersetpass( dudlc *c, int uid, const char *pass );
+int duc_cmd_usersetright( dudlc *c, int uid, int right );
+int duc_cmd_useradd( dudlc *c, const char *name );
+int duc_cmd_userdel( dudlc *c, int uid);
 
 
 

@@ -5,9 +5,9 @@
 #include "dudlc/event.h"
 #include "dudlc/history.h"
 
-static msc_history *_msc_history_parse( const char *line, char **end )
+static duc_history *_duc_history_parse( const char *line, char **end )
 {
-	msc_history *n;
+	duc_history *n;
 	const char *s;
 	char *e;
 
@@ -15,7 +15,7 @@ static msc_history *_msc_history_parse( const char *line, char **end )
 	 * now we have to cast the const hackishly away */
 	(const char*)e = s = line;
 
-	if( NULL == (n = malloc(sizeof(msc_history)))){
+	if( NULL == (n = malloc(sizeof(duc_history)))){
 		goto clean1;
 	}
 
@@ -29,7 +29,7 @@ static msc_history *_msc_history_parse( const char *line, char **end )
 		goto clean2;
 
 	s = e+1;
-	if( NULL == ( n->_track = _msc_track_parse( s, &e )))
+	if( NULL == ( n->_track = _duc_track_parse( s, &e )))
 		goto clean2;
 
 
@@ -43,23 +43,23 @@ clean1:
 	return NULL;
 }
 
-void msc_history_free( msc_history *q )
+void duc_history_free( duc_history *q )
 {
 	if( ! q )
 		return;
-	msc_track_free(q->_track);
+	duc_track_free(q->_track);
 	free(q);
 }
 
-msc_it_history *msc_cmd_history( mservclient *c, int num )
+duc_it_history *duc_cmd_history( dudlc *c, int num )
 {
-	return _msc_iterate( c, (_msc_converter)_msc_history_parse, 
+	return _duc_iterate( c, (_duc_converter)_duc_history_parse, 
 			"history %d", num );
 }
 
-msc_it_history *msc_cmd_historytrack( mservclient *c, int tid, int num )
+duc_it_history *duc_cmd_historytrack( dudlc *c, int tid, int num )
 {
-	return _msc_iterate( c, (_msc_converter)_msc_history_parse,
+	return _duc_iterate( c, (_duc_converter)_duc_history_parse,
 			"historytrack %d %d", tid, num );
 }
 

@@ -1,5 +1,5 @@
-#ifndef _MSERVCLIENT_COMMAND_H
-#define _MSERVCLIENT_COMMAND_H
+#ifndef _DUDLC_COMMAND_H
+#define _DUDLC_COMMAND_H
 
 #include "session.h"
 #include "event.h"

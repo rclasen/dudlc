@@ -4,16 +4,16 @@
 #include "dudlc/event.h"
 #include "dudlc/client.h"
 
-static msc_client *_msc_client_parse( const char *line, char **end )
+static duc_client *_duc_client_parse( const char *line, char **end )
 {
-	msc_client *c;
+	duc_client *c;
 
 	const char *s;
 	char *e;
 
 	(const char*)e = s = line;
 
-	if( NULL == (c = malloc(sizeof(msc_client))))
+	if( NULL == (c = malloc(sizeof(duc_client))))
 		goto clean1;
 
 	c->id = strtol(s, &e, 10 );
@@ -26,7 +26,7 @@ static msc_client *_msc_client_parse( const char *line, char **end )
 		goto clean2;
 
 	s = e+1;
-	if( NULL == (c->addr = _msc_fielddup( s, &e )))
+	if( NULL == (c->addr = _duc_fielddup( s, &e )))
 		goto clean2;
 	
 	if( end ) *end = e;
@@ -38,7 +38,7 @@ clean1:
 	return NULL;
 }
 
-void msc_client_free( msc_client *c )
+void duc_client_free( duc_client *c )
 {
 	if( ! c )
 		return;
@@ -47,38 +47,38 @@ void msc_client_free( msc_client *c )
 	free(c);
 }
 
-msc_it_client *msc_cmd_clientlist( mservclient *c )
+duc_it_client *duc_cmd_clientlist( dudlc *c )
 {
-	return _msc_iterate( c, (_msc_converter)_msc_client_parse, 
+	return _duc_iterate( c, (_duc_converter)_duc_client_parse, 
 			"clientlist" );
 }
 
-int msc_cmd_clientclose( mservclient *c, int id )
+int duc_cmd_clientclose( dudlc *c, int id )
 {
-	return _msc_cmd_succ(c, "clientclose %u", id );
+	return _duc_cmd_succ(c, "clientclose %u", id );
 }
 
-int msc_cmd_clientcloseuser( mservclient *c, int uid )
+int duc_cmd_clientcloseuser( dudlc *c, int uid )
 {
-	return _msc_cmd_succ(c, "clientcloseuser %d", uid );
+	return _duc_cmd_succ(c, "clientcloseuser %d", uid );
 }
 
-void _msc_bcast_client( mservclient *c, const char *line )
+void _duc_bcast_client( dudlc *c, const char *line )
 {
-	msc_client *u;
+	duc_client *u;
 
 	switch(line[2]){
 		case '0': /* login */
-			if( NULL != (u = _msc_client_parse( line+4, NULL ))){
+			if( NULL != (u = _duc_client_parse( line+4, NULL ))){
 				_MSC_EVENT(c,login,c,u);
-				msc_client_free(u);
+				duc_client_free(u);
 			}
 			break;
 
 		case '1': /* logout */
-			if( NULL != (u = _msc_client_parse( line+4, NULL ))){
+			if( NULL != (u = _duc_client_parse( line+4, NULL ))){
 				_MSC_EVENT(c,logout,c,u);
-				msc_client_free(u);
+				duc_client_free(u);
 			}
 			break;
 

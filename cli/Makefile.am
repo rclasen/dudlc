@@ -1,6 +1,6 @@
 AUTOMAKE_OPTIONS=foreign
 
-CFLAGS:= -g -Wall -Werror -I../lib
+CFLAGS:= -g -Wall  -W -Wunused -Wmissing-prototypes -Wcast-qual -Wcast-align -Werror -I../lib
 
 bin_PROGRAMS=dudlc
 

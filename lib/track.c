@@ -5,9 +5,9 @@
 #include "dudlc/proto.h"
 #include "dudlc/track.h"
 
-msc_track *_msc_track_parse( const char *line, char **end )
+duc_track *_duc_track_parse( const char *line, char **end )
 {
-	msc_track *t;
+	duc_track *t;
 	const char *s;
 	char *e;
 
@@ -15,7 +15,7 @@ msc_track *_msc_track_parse( const char *line, char **end )
 	 * now we have to cast the const hackishly away */
 	(const char*)e = s = line;
 
-	if( NULL == (t = malloc(sizeof(msc_track)))){
+	if( NULL == (t = malloc(sizeof(duc_track)))){
 		goto clean1;
 	}
 
@@ -34,7 +34,7 @@ msc_track *_msc_track_parse( const char *line, char **end )
 		goto clean2;
 
 	s = e+1;
-	if( NULL == (t->title = _msc_fielddup( s, &e )))
+	if( NULL == (t->title = _duc_fielddup( s, &e )))
 		goto clean2;
 
 	s = e+1;
@@ -61,7 +61,7 @@ clean1:
 }
 
 
-void msc_track_free( msc_track *t )
+void duc_track_free( duc_track *t )
 {
 	if( ! t )
 		return;
@@ -70,37 +70,37 @@ void msc_track_free( msc_track *t )
 	free(t);
 }
 
-int msc_cmd_tracks( mservclient *c )
+int duc_cmd_tracks( dudlc *c )
 {
-	return _msc_cmd_int( c, "trackcount" );
+	return _duc_cmd_int( c, "trackcount" );
 }
 
-int msc_cmd_track2id( mservclient *c, int albumid, int nr )
+int duc_cmd_track2id( dudlc *c, int albumid, int nr )
 {
-	return _msc_cmd_int( c, "track2id %d %d", albumid, nr );
+	return _duc_cmd_int( c, "track2id %d %d", albumid, nr );
 }
 
-msc_track *msc_cmd_trackget( mservclient *c, int id )
+duc_track *duc_cmd_trackget( dudlc *c, int id )
 {
-	return _msc_cmd_conv( c, (_msc_converter)_msc_track_parse,
+	return _duc_cmd_conv( c, (_duc_converter)_duc_track_parse,
 			"trackget %d", id );
 }
 
-msc_it_track *msc_cmd_tracksearch( mservclient *c, const char *substr )
+duc_it_track *duc_cmd_tracksearch( dudlc *c, const char *substr )
 {
-	return _msc_iterate( c, (_msc_converter)_msc_track_parse, 
+	return _duc_iterate( c, (_duc_converter)_duc_track_parse, 
 			"tracksearch %s", substr );
 }
 
-msc_it_track *msc_cmd_tracksalbum( mservclient *c, int id )
+duc_it_track *duc_cmd_tracksalbum( dudlc *c, int id )
 {
-	return _msc_iterate( c, (_msc_converter)_msc_track_parse, 
+	return _duc_iterate( c, (_duc_converter)_duc_track_parse, 
 			"tracksalbum %d", id );
 }
 
-msc_it_track *msc_cmd_tracksartist( mservclient *c, int id )
+duc_it_track *duc_cmd_tracksartist( dudlc *c, int id )
 {
-	return _msc_iterate( c, (_msc_converter)_msc_track_parse, 
+	return _duc_iterate( c, (_duc_converter)_duc_track_parse, 
 			"tracksartist %d", id );
 }
 

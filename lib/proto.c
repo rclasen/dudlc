@@ -10,7 +10,7 @@
 
 #define BUFLENLINE	2048
 
-int _msc_vsend( mservclient *p, const char *fmt, va_list ap )
+int _duc_vsend( dudlc *p, const char *fmt, va_list ap )
 {
 	char buf[BUFLENLINE];
 	int len;
@@ -18,7 +18,7 @@ int _msc_vsend( mservclient *p, const char *fmt, va_list ap )
 	if( p->inreply )
 		return -1;
 
-	if( msc_open(p) )
+	if( duc_open(p) )
 		return -1;
 
 	len = vsnprintf( buf, BUFLENLINE -1, fmt, ap );
@@ -30,124 +30,124 @@ int _msc_vsend( mservclient *p, const char *fmt, va_list ap )
 
 	*p->code = 0;
 	p->line = NULL;
-	if( ! msc_sock_send( p->con, buf ) ){
+	if( ! duc_sock_send( p->con, buf ) ){
 		p->inreply = 1;
 		return 0;
 	}
 
-	msc_close( p );
+	duc_close( p );
 	return -1;
 }
 
-int _msc_send( mservclient *p, const char *fmt, ... )
+int _duc_send( dudlc *p, const char *fmt, ... )
 {
 	va_list ap;
 	int r;
 
 	va_start( ap, fmt );
-	r = _msc_vsend( p, fmt, ap );
+	r = _duc_vsend( p, fmt, ap );
 	va_end( ap );
 
 	return r;
 }
 
-int _msc_cmd( mservclient *p, const char *fmt, ... )
+int _duc_cmd( dudlc *p, const char *fmt, ... )
 {
 	va_list ap;
 
 	va_start( ap, fmt );
-	if( _msc_vsend( p, fmt, ap )){
+	if( _duc_vsend( p, fmt, ap )){
 		va_end(ap);
 		return -1;
 	}
 	va_end( ap );
 
-	return _msc_rlast(p);
+	return _duc_rlast(p);
 }
 
-int _msc_cmd_succ( mservclient *c, const char *fmt, ... )
+int _duc_cmd_succ( dudlc *c, const char *fmt, ... )
 {
 	va_list ap;
 
 	va_start(ap, fmt );
-	if( _msc_vsend(c, fmt, ap ) ){
+	if( _duc_vsend(c, fmt, ap ) ){
 		va_end(ap);
 		return -1;
 	}
 	va_end(ap);
 
-	if( _msc_rlast(c) )
+	if( _duc_rlast(c) )
 		return -1;
 
-	if( *_msc_rcode(c) == '2' || *_msc_rcode(c) == '3' )
+	if( *_duc_rcode(c) == '2' || *_duc_rcode(c) == '3' )
 		return 0;
 
 	return 1;
 }
 
-char *_msc_cmd_string( mservclient *c, const char *fmt, ... )
+char *_duc_cmd_string( dudlc *c, const char *fmt, ... )
 {
 	va_list ap;
 
 	va_start(ap, fmt );
-	if( _msc_vsend(c, fmt, ap ) ){
+	if( _duc_vsend(c, fmt, ap ) ){
 		va_end(ap);
 		return NULL;
 	}
 	va_end(ap);
 
-	if( _msc_rlast(c) )
+	if( _duc_rlast(c) )
 		return NULL;
 
-	if( *_msc_rcode(c) == '2' )
-		return strdup(_msc_rline(c));
+	if( *_duc_rcode(c) == '2' )
+		return strdup(_duc_rline(c));
 
 	return  NULL;
 }
 
-int _msc_cmd_int( mservclient *c, const char *fmt, ... )
+int _duc_cmd_int( dudlc *c, const char *fmt, ... )
 {
 	va_list ap;
 
 	va_start(ap, fmt );
-	if( _msc_vsend(c, fmt, ap ) ){
+	if( _duc_vsend(c, fmt, ap ) ){
 		va_end(ap);
 		return -1;
 	}
 	va_end(ap);
 
-	if( _msc_rlast(c) )
+	if( _duc_rlast(c) )
 		return -1;
 
-	if( *_msc_rcode(c) == '2' )
-		return atoi(_msc_rline(c));
+	if( *_duc_rcode(c) == '2' )
+		return atoi(_duc_rline(c));
 
 	return  -1;
 }
 
-void *_msc_cmd_conv( mservclient *c, _msc_converter conv, 
+void *_duc_cmd_conv( dudlc *c, _duc_converter conv, 
 		const char *fmt, ... )
 {
 	va_list ap;
 
 	va_start(ap, fmt );
-	if( _msc_vsend(c, fmt, ap ) ){
+	if( _duc_vsend(c, fmt, ap ) ){
 		va_end(ap);
 		return NULL;
 	}
 	va_end(ap);
 
-	if( _msc_rlast(c) )
+	if( _duc_rlast(c) )
 		return NULL;
 
-	if( *_msc_rcode(c) == '2' )
-		return (*conv)(_msc_rline(c), NULL);
+	if( *_duc_rcode(c) == '2' )
+		return (*conv)(_duc_rline(c), NULL);
 
 	return  NULL;
 }
 
 
-int _msc_rnext( mservclient *p )
+int _duc_rnext( dudlc *p )
 {
 	const char *l = NULL;
 
@@ -157,9 +157,9 @@ int _msc_rnext( mservclient *p )
 	while( 1 ){
 
 		/* process next line */
-		if( NULL != (l = msc_sock_getline(p->con)) ){
+		if( NULL != (l = duc_sock_getline(p->con)) ){
 			if( strlen(l) < 4 ){
-				msc_close( p );
+				duc_close( p );
 				return -1;
 			}
 
@@ -168,13 +168,13 @@ int _msc_rnext( mservclient *p )
 				break;
 			}
 
-			_msc_bcast( p, l );
+			_duc_bcast( p, l );
 			continue;
 		} 
 		
 		/* or fetch next input from server */
-		if( msc_sock_recv( p->con)){
-			msc_close( p );
+		if( duc_sock_recv( p->con)){
+			duc_close( p );
 			return -1;
 		}
 	}
@@ -183,7 +183,7 @@ int _msc_rnext( mservclient *p )
 
 	if( *p->code ){
 		if( strncmp(p->code, l, 3) ){
-			msc_close( p );
+			duc_close( p );
 			return -1;
 		}
 	} else {
@@ -196,12 +196,12 @@ int _msc_rnext( mservclient *p )
 	return 0;
 }
 
-int _msc_rlast( mservclient *p )
+int _duc_rlast( dudlc *p )
 {
 	int r;
 
 	/* read everything up to the last line */
-	while( ! (r = _msc_rnext(p)));
+	while( ! (r = _duc_rnext(p)));
 
 	if( r == -1 )
 		return -1;
@@ -209,12 +209,12 @@ int _msc_rlast( mservclient *p )
 	return 0;
 }
 
-int _msc_rend( mservclient *p )
+int _duc_rend( dudlc *p )
 {
 	return ! p->inreply;
 }
 
-const char *_msc_rcode( mservclient *p )
+const char *_duc_rcode( dudlc *p )
 {
 	if( ! *p->code )
 		return NULL;
@@ -222,7 +222,7 @@ const char *_msc_rcode( mservclient *p )
 	return p->code;
 }
 
-const char *_msc_rline( mservclient *p )
+const char *_duc_rline( dudlc *p )
 {
 	if( ! p->line )
 		return NULL;
@@ -230,19 +230,19 @@ const char *_msc_rline( mservclient *p )
 	return p->line;
 }
 
-void msc_poll( mservclient *p )
+void duc_poll( dudlc *p )
 {
 	const char *l;
 
-	if( msc_open(p) )
+	if( duc_open(p) )
 		return;
 
-	if( msc_sock_recv(p->con) )
-		msc_close( p );
+	if( duc_sock_recv(p->con) )
+		duc_close( p );
 
-	while( NULL != (l = msc_sock_getline(p->con))){
+	while( NULL != (l = duc_sock_getline(p->con))){
 		if( strlen(l) < 4 ){
-			msc_close( p );
+			duc_close( p );
 			return;
 		}
 
@@ -251,11 +251,11 @@ void msc_poll( mservclient *p )
 			continue;
 		}
 
-		_msc_bcast( p, l );
+		_duc_bcast( p, l );
 	}
 }
 
-const char *_msc_skipspace( const char *s )
+const char *_duc_skipspace( const char *s )
 {
 	while( *s && isspace(*s))
 		s++;
@@ -263,7 +263,7 @@ const char *_msc_skipspace( const char *s )
 	return s;
 }
 
-char *_msc_fielddup( const char *s, char **end )
+char *_duc_fielddup( const char *s, char **end )
 {
 	char *dup;
 	char *p;

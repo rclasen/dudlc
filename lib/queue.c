@@ -5,9 +5,9 @@
 #include "dudlc/event.h"
 #include "dudlc/queue.h"
 
-static msc_queue *_msc_queue_parse( const char *line, char **end )
+static duc_queue *_duc_queue_parse( const char *line, char **end )
 {
-	msc_queue *n;
+	duc_queue *n;
 	const char *s;
 	char *e;
 
@@ -15,7 +15,7 @@ static msc_queue *_msc_queue_parse( const char *line, char **end )
 	 * now we have to cast the const hackishly away */
 	(const char*)e = s = line;
 
-	if( NULL == (n = malloc(sizeof(msc_queue)))){
+	if( NULL == (n = malloc(sizeof(duc_queue)))){
 		goto clean1;
 	}
 
@@ -34,7 +34,7 @@ static msc_queue *_msc_queue_parse( const char *line, char **end )
 		goto clean2;
 
 	s = e+1;
-	if( NULL == ( n->_track = _msc_track_parse( s, &e )))
+	if( NULL == ( n->_track = _duc_track_parse( s, &e )))
 		goto clean2;
 
 
@@ -48,44 +48,44 @@ clean1:
 	return NULL;
 }
 
-void msc_queue_free( msc_queue *q )
+void duc_queue_free( duc_queue *q )
 {
 	if( ! q )
 		return;
-	msc_track_free(q->_track);
+	duc_track_free(q->_track);
 	free(q);
 }
 
-msc_it_queue *msc_cmd_queuelist( mservclient *c )
+duc_it_queue *duc_cmd_queuelist( dudlc *c )
 {
-	return _msc_iterate( c, (_msc_converter)_msc_queue_parse, 
+	return _duc_iterate( c, (_duc_converter)_duc_queue_parse, 
 			"queuelist" );
 }
 
-msc_queue *msc_cmd_queueget( mservclient *c, int qid )
+duc_queue *duc_cmd_queueget( dudlc *c, int qid )
 {
-	return _msc_cmd_conv( c, (_msc_converter)_msc_queue_parse,
+	return _duc_cmd_conv( c, (_duc_converter)_duc_queue_parse,
 			"queueget %d", qid );
 }
 
-int msc_cmd_queueadd( mservclient *c, int id )
+int duc_cmd_queueadd( dudlc *c, int id )
 {
-	return _msc_cmd_int( c, "queueadd %d", id );
+	return _duc_cmd_int( c, "queueadd %d", id );
 }
 
-int msc_cmd_queuealbum( mservclient *c, int id )
+int duc_cmd_queuealbum( dudlc *c, int id )
 {
-	msc_it_track *it;
-	msc_track *t;
+	duc_it_track *it;
+	duc_track *t;
 	int *ids = NULL;
 	int total = 0;
 	int found = 0;
 	int i;
 
-	if( NULL == (it = msc_cmd_tracksalbum(c,id)))
+	if( NULL == (it = duc_cmd_tracksalbum(c,id)))
 		return -1;
 
-	for( t = msc_it_track_cur(it); t; t = msc_it_track_next(it)){
+	for( t = duc_it_track_cur(it); t; t = duc_it_track_next(it)){
 		if( found >= total ){
 			int *tmp;
 
@@ -101,10 +101,10 @@ int msc_cmd_queuealbum( mservclient *c, int id )
 		ids[found++] = t->id;
 		free(t);
 	}
-	msc_it_track_done(it);
+	duc_it_track_done(it);
 
 	for( i = 0; i < found; ++i ){
-		if( 0 > msc_cmd_queueadd(c, ids[i]) ){
+		if( 0 > duc_cmd_queueadd(c, ids[i]) ){
 			free(ids);
 			return -1;
 		}
@@ -114,40 +114,40 @@ int msc_cmd_queuealbum( mservclient *c, int id )
 	return 0;
 }
 
-int msc_cmd_queuedel( mservclient *c, int id )
+int duc_cmd_queuedel( dudlc *c, int id )
 {
-	return _msc_cmd_succ( c, "queuedel %d", id );
+	return _duc_cmd_succ( c, "queuedel %d", id );
 }
 
-int msc_cmd_queueclear( mservclient *c )
+int duc_cmd_queueclear( dudlc *c )
 {
-	return _msc_cmd_succ( c, "queueclear" );
+	return _duc_cmd_succ( c, "queueclear" );
 }
 
-void _msc_bcast_queue( mservclient *c, const char *line )
+void _duc_bcast_queue( dudlc *c, const char *line )
 {
-	msc_queue *q;
+	duc_queue *q;
 
 	switch(line[2]){
 		case '0': /* fetched from queue */
-			if( NULL == (q = _msc_queue_parse(line+4,NULL)))
+			if( NULL == (q = _duc_queue_parse(line+4,NULL)))
 				break;
 			_MSC_EVENT(c,queuefetch,c,q);
-			msc_queue_free(q);
+			duc_queue_free(q);
 			break;
 
 		case '1': /* added to queue */
-			if( NULL == (q = _msc_queue_parse(line+4,NULL)))
+			if( NULL == (q = _duc_queue_parse(line+4,NULL)))
 				break;
 			_MSC_EVENT(c,queueadd,c,q);
-			msc_queue_free(q);
+			duc_queue_free(q);
 			break;
 
 		case '2': /* deleted from queue */
-			if( NULL == (q = _msc_queue_parse(line+4,NULL)))
+			if( NULL == (q = _duc_queue_parse(line+4,NULL)))
 				break;
 			_MSC_EVENT(c,queuedel,c,q);
-			msc_queue_free(q);
+			duc_queue_free(q);
 			break;
 
 		case '3': /* queue cleared */

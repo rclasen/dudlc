@@ -4,97 +4,97 @@
 #include "dudlc/event.h"
 #include "dudlc/player.h"
 
-msc_playstatus msc_cmd_status( mservclient *c )
+duc_playstatus duc_cmd_status( dudlc *c )
 {
-	return _msc_cmd_int(c, "status");
+	return _duc_cmd_int(c, "status");
 }
 
-msc_track *msc_cmd_curtrack( mservclient *c )
+duc_track *duc_cmd_curtrack( dudlc *c )
 {
-	return _msc_cmd_conv(c, (_msc_converter) _msc_track_parse, 
+	return _duc_cmd_conv(c, (_duc_converter) _duc_track_parse, 
 			"curtrack");
 }
 
-int msc_cmd_play( mservclient *c )
+int duc_cmd_play( dudlc *c )
 {
-	return _msc_cmd_succ(c, "play");
+	return _duc_cmd_succ(c, "play");
 }
 
-int msc_cmd_stop( mservclient *c )
+int duc_cmd_stop( dudlc *c )
 {
-	return _msc_cmd_succ(c, "stop");
+	return _duc_cmd_succ(c, "stop");
 }
 
-int msc_cmd_next( mservclient *c )
+int duc_cmd_next( dudlc *c )
 {
-	return _msc_cmd_succ(c, "next");
+	return _duc_cmd_succ(c, "next");
 }
 
-int msc_cmd_prev( mservclient *c )
+int duc_cmd_prev( dudlc *c )
 {
-	return _msc_cmd_succ(c, "prev");
+	return _duc_cmd_succ(c, "prev");
 }
 
-int msc_cmd_pause( mservclient *c )
+int duc_cmd_pause( dudlc *c )
 {
-	return _msc_cmd_succ(c, "pause");
-}
-
-
-int msc_cmd_gap( mservclient *c )
-{
-	return _msc_cmd_int(c, "gap");
-}
-
-int msc_cmd_gapset( mservclient *c, unsigned int gap )
-{
-	return _msc_cmd_int(c, "gapset %u", gap );
+	return _duc_cmd_succ(c, "pause");
 }
 
 
-int msc_cmd_random( mservclient *c )
+int duc_cmd_gap( dudlc *c )
 {
-	return _msc_cmd_int(c, "random");
+	return _duc_cmd_int(c, "gap");
 }
 
-int msc_cmd_randomset( mservclient *c, int r )
+int duc_cmd_gapset( dudlc *c, unsigned int gap )
 {
-	return _msc_cmd_succ(c, "randomset %d", r );
+	return _duc_cmd_int(c, "gapset %u", gap );
 }
 
 
-static void _msc_bcast_newtrack( mservclient *c, const char *line )
+int duc_cmd_random( dudlc *c )
 {
-	msc_track *t;
-	msc_artist *art;
-	msc_album *alb;
+	return _duc_cmd_int(c, "random");
+}
+
+int duc_cmd_randomset( dudlc *c, int r )
+{
+	return _duc_cmd_succ(c, "randomset %d", r );
+}
+
+
+static void _duc_bcast_newtrack( dudlc *c, const char *line )
+{
+	duc_track *t;
+	duc_artist *art;
+	duc_album *alb;
 	char *end;
 
-	if( NULL == (t= _msc_track_parse(line+4,&end)))
+	if( NULL == (t= _duc_track_parse(line+4,&end)))
 		return;
 
-	if( NULL == (art= _msc_artist_parse(end+1,&end)))
+	if( NULL == (art= _duc_artist_parse(end+1,&end)))
 		goto clean2;
 
-	if( NULL == (alb= _msc_album_parse(end+1,NULL)))
+	if( NULL == (alb= _duc_album_parse(end+1,NULL)))
 		goto clean3;
 
 	_MSC_EVENT(c, nexttrack, c, t, art, alb);
 
-	msc_album_free(alb);
+	duc_album_free(alb);
 clean3:
-	msc_artist_free(art);
+	duc_artist_free(art);
 clean2:
-	msc_track_free(t);
+	duc_track_free(t);
 }
 
-void _msc_bcast_player( mservclient *c, const char *line )
+void _duc_bcast_player( dudlc *c, const char *line )
 {
 	int r;
 
 	switch(line[2]){
 		case '0': /* newtrack */
-			_msc_bcast_newtrack(c,line);
+			_duc_bcast_newtrack(c,line);
 			break;
 
 		case '1': /* stopped */

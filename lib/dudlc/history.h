@@ -1,5 +1,5 @@
-#ifndef _MSERVCLIENT_HISTORY_H
-#define _MSERVCLIENT_HISTORY_H
+#ifndef _DUDLC_HISTORY_H
+#define _DUDLC_HISTORY_H
 
 #include "session.h"
 #include "track.h"
@@ -7,17 +7,17 @@
 typedef struct {
 	int uid;
 	int played;
-	msc_track *_track;
-} msc_history;
+	duc_track *_track;
+} duc_history;
 
-void msc_history_free( msc_history *h );
+void duc_history_free( duc_history *h );
 
-#define msc_it_history	_msc_iter
-#define msc_it_history_cur(x)	(msc_history*)_msc_it_cur((_msc_iter*)x)
-#define msc_it_history_next(x)	(msc_history*)_msc_it_next((_msc_iter*)x)
-#define msc_it_history_done(x)	_msc_it_done((_msc_iter*)x)
+#define duc_it_history	_duc_iter
+#define duc_it_history_cur(x)	(duc_history*)_duc_it_cur((_duc_iter*)x)
+#define duc_it_history_next(x)	(duc_history*)_duc_it_next((_duc_iter*)x)
+#define duc_it_history_done(x)	_duc_it_done((_duc_iter*)x)
 
-msc_it_history *msc_cmd_history(mservclient *c, int num );
-msc_it_history *msc_cmd_historytrack( mservclient *c, int trackid, int num );
+duc_it_history *duc_cmd_history(dudlc *c, int num );
+duc_it_history *duc_cmd_historytrack( dudlc *c, int trackid, int num );
 
 #endif

@@ -1,5 +1,5 @@
-#ifndef _MSERVCLIENT_QUEUE_H
-#define _MSERVCLIENT_QUEUE_H
+#ifndef _DUDLC_QUEUE_H
+#define _DUDLC_QUEUE_H
 
 #include "session.h"
 #include "track.h"
@@ -8,25 +8,25 @@ typedef struct {
 	int id;
 	int uid;
 	int queued;
-	msc_track *_track;
-} msc_queue;
+	duc_track *_track;
+} duc_queue;
 
-void msc_queue_free( msc_queue *q );
+void duc_queue_free( duc_queue *q );
 
-#define msc_it_queue	_msc_iter
-#define msc_it_queue_cur(x)	(msc_queue*)_msc_it_cur((_msc_iter*)x)
-#define msc_it_queue_next(x)	(msc_queue*)_msc_it_next((_msc_iter*)x)
-#define msc_it_queue_done(x)	_msc_it_done((_msc_iter*)x)
+#define duc_it_queue	_duc_iter
+#define duc_it_queue_cur(x)	(duc_queue*)_duc_it_cur((_duc_iter*)x)
+#define duc_it_queue_next(x)	(duc_queue*)_duc_it_next((_duc_iter*)x)
+#define duc_it_queue_done(x)	_duc_it_done((_duc_iter*)x)
 
 
-msc_it_queue *msc_cmd_queuelist( mservclient *c );
-msc_queue *msc_cmd_queueget( mservclient *c, int qid );
+duc_it_queue *duc_cmd_queuelist( dudlc *c );
+duc_queue *duc_cmd_queueget( dudlc *c, int qid );
 
-int msc_cmd_queuealbum( mservclient *c, int id );
-int msc_cmd_queueadd( mservclient *c, int tid );
-int msc_cmd_queuedel( mservclient *c, int qid );
-int msc_cmd_queueclear( mservclient *c );
+int duc_cmd_queuealbum( dudlc *c, int id );
+int duc_cmd_queueadd( dudlc *c, int tid );
+int duc_cmd_queuedel( dudlc *c, int qid );
+int duc_cmd_queueclear( dudlc *c );
 
-void _msc_bcast_queue( mservclient *c, const char *line );
+void _duc_bcast_queue( dudlc *c, const char *line );
 
 #endif

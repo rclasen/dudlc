@@ -3,13 +3,13 @@
 #include "dudlc/proto.h"
 #include "dudlc/sleep.h"
 
-int msc_cmd_sleep( mservclient *c )
+int duc_cmd_sleep( dudlc *c )
 {
-	return _msc_cmd_int(c, "sleep" );
+	return _duc_cmd_int(c, "sleep" );
 }
 
-int msc_cmd_sleepset( mservclient *c, int delay )
+int duc_cmd_sleepset( dudlc *c, int delay )
 {
-	return _msc_cmd_succ(c, "sleepset %d", delay );
+	return _duc_cmd_succ(c, "sleepset %d", delay );
 }
 

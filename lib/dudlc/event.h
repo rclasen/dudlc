@@ -1,5 +1,5 @@
-#ifndef _MSERVCLIENT_EVENT_H
-#define _MSERVCLIENT_EVENT_H
+#ifndef _DUDLC_EVENT_H
+#define _DUDLC_EVENT_H
 
 #include "session.h"
 #include "client.h"
@@ -10,63 +10,63 @@
 #include "artist.h"
 #include "album.h"
 
-typedef void (*msc_ev_argnone)( mservclient *c );
-typedef void (*msc_ev_argstring)( mservclient *c, const char *s );
-typedef void (*msc_ev_argint)( mservclient *c, int i );
-typedef void (*msc_ev_argclient)( mservclient *c, msc_client *t );
-typedef void (*msc_ev_argqueue)( mservclient *c, msc_queue *t );
-typedef void (*msc_ev_argtag)( mservclient *c, msc_tag *t );
-typedef void (*msc_ev_argntrack)( mservclient *c, 
-		msc_track *t, msc_artist *ar, msc_album *al );
+typedef void (*duc_ev_argnone)( dudlc *c );
+typedef void (*duc_ev_argstring)( dudlc *c, const char *s );
+typedef void (*duc_ev_argint)( dudlc *c, int i );
+typedef void (*duc_ev_argclient)( dudlc *c, duc_client *t );
+typedef void (*duc_ev_argqueue)( dudlc *c, duc_queue *t );
+typedef void (*duc_ev_argtag)( dudlc *c, duc_tag *t );
+typedef void (*duc_ev_argntrack)( dudlc *c, 
+		duc_track *t, duc_artist *ar, duc_album *al );
 
 typedef struct {
 	/* my connection status */
-	msc_ev_argnone connect;
-	msc_ev_argnone disconnect;
+	duc_ev_argnone connect;
+	duc_ev_argnone disconnect;
 
 	/* other users/clients */
-	msc_ev_argclient login;
-	msc_ev_argclient logout;
-	msc_ev_argnone kicked;
+	duc_ev_argclient login;
+	duc_ev_argclient logout;
+	duc_ev_argnone kicked;
 
 	/* player */
-	msc_ev_argntrack nexttrack;
-	msc_ev_argnone stopped;
-	msc_ev_argnone paused;
-	msc_ev_argnone resumed;
-	msc_ev_argint random;
+	duc_ev_argntrack nexttrack;
+	duc_ev_argnone stopped;
+	duc_ev_argnone paused;
+	duc_ev_argnone resumed;
+	duc_ev_argint random;
 
 	/* random/filter */
-	msc_ev_argstring filter;
+	duc_ev_argstring filter;
 
 	/* sleep */
-	msc_ev_argint sleep;
+	duc_ev_argint sleep;
 
 	/* queue */
-	msc_ev_argqueue queuefetch;
-	msc_ev_argqueue queueadd;
-	msc_ev_argqueue queuedel;
-	msc_ev_argnone queueclear;
+	duc_ev_argqueue queuefetch;
+	duc_ev_argqueue queueadd;
+	duc_ev_argqueue queuedel;
+	duc_ev_argnone queueclear;
 
 	/* tags */
-	msc_ev_argtag tagchange;
-	msc_ev_argtag tagdel;
+	duc_ev_argtag tagchange;
+	duc_ev_argtag tagdel;
 
 	// temporary:
-	msc_ev_argstring bcast;
-} msc_events;
+	duc_ev_argstring bcast;
+} duc_events;
 
-msc_events *msc_getevents( mservclient *p );
-msc_events *msc_setevents( mservclient *p, msc_events *e );
+duc_events *duc_getevents( dudlc *p );
+duc_events *duc_setevents( dudlc *p, duc_events *e );
 
 
 #define _MSC_EVENT(c,name,arg...)	\
-	if( (c)->ev && ((msc_events*)(c)->ev)->name ){ \
-		(*((msc_events*)(c)->ev)->name)(arg); \
+	if( (c)->ev && ((duc_events*)(c)->ev)->name ){ \
+		(*((duc_events*)(c)->ev)->name)(arg); \
 	}
 
 
 #endif
 
-void _msc_bcast( mservclient *p, const char *line );
+void _duc_bcast( dudlc *p, const char *line );
 

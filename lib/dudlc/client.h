@@ -1,5 +1,5 @@
-#ifndef _MSERVCLIENT_CLIENT_H
-#define _MSERVCLIENT_CLIENT_H
+#ifndef _DUDLC_CLIENT_H
+#define _DUDLC_CLIENT_H
 
 #include "session.h"
 #include "iterate.h"
@@ -10,22 +10,22 @@ typedef struct {
 	int id;
 	int uid;
 	char *addr;
-} msc_client;
+} duc_client;
 
-void msc_client_free( msc_client *c );
+void duc_client_free( duc_client *c );
 
-#define msc_it_client	_msc_iter
-#define msc_it_client_cur(x)	(msc_client*)_msc_it_cur((_msc_iter*)x)
-#define msc_it_client_next(x)	(msc_client*)_msc_it_next((_msc_iter*)x)
-#define msc_it_client_done(x)	_msc_it_done((_msc_iter*)x)
+#define duc_it_client	_duc_iter
+#define duc_it_client_cur(x)	(duc_client*)_duc_it_cur((_duc_iter*)x)
+#define duc_it_client_next(x)	(duc_client*)_duc_it_next((_duc_iter*)x)
+#define duc_it_client_done(x)	_duc_it_done((_duc_iter*)x)
 
-msc_it_client *msc_cmd_clientlist( mservclient *p );
+duc_it_client *duc_cmd_clientlist( dudlc *p );
 
-int msc_cmd_clientcloseuser( mservclient *p, int uid );
+int duc_cmd_clientcloseuser( dudlc *p, int uid );
 
-int msc_cmd_clientclose( mservclient *p, int id );
+int duc_cmd_clientclose( dudlc *p, int id );
 
-void _msc_bcast_client( mservclient *c, const char *line );
+void _duc_bcast_client( dudlc *c, const char *line );
 
 #endif
 
