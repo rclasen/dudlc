@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdarg.h>
+#include <ctype.h>
 
 #include <mservclient/proto.h>
 
@@ -14,14 +15,14 @@ int _msc_vsend( mservclient *p, const char *fmt, va_list ap )
 	int len;
 
 	if( p->inreply )
-		return 1;
+		return -1;
 
 	if( msc_open(p) )
-		return 1;
+		return -1;
 
 	len = vsnprintf( buf, BUFLENLINE -1, fmt, ap );
 	if( len < 0 || len > BUFLENLINE -1 )
-		return 1;
+		return -1;
 
 	buf[len++] = '\n';
 	buf[len++] = 0;
@@ -34,7 +35,7 @@ int _msc_vsend( mservclient *p, const char *fmt, va_list ap )
 	}
 
 	msc_close( p );
-	return 1;
+	return -1;
 }
 
 int _msc_send( mservclient *p, const char *fmt, ... )
@@ -80,7 +81,7 @@ int _msc_rnext( mservclient *p )
 	const char *l = NULL;
 
 	if( ! p->inreply )
-		return 1;
+		return -2;
 
 	while( 1 ){
 
@@ -131,8 +132,8 @@ int _msc_rlast( mservclient *p )
 	/* read everything up to the last line */
 	while( ! (r = _msc_rnext(p)));
 
-	if( r < 0 )
-		return 1;
+	if( r == -1 )
+		return -1;
 
 	return 0;
 }
@@ -181,6 +182,55 @@ void msc_poll( mservclient *p )
 
 		_msc_bcast( p, l );
 	}
+}
+
+const char *_msc_skipspace( const char *s )
+{
+	while( *s && isspace(*s))
+		s++;
+
+	return s;
+}
+
+char *_msc_fielddup( const char *s, char **end )
+{
+	char *dup;
+	char *p;
+	int escape = 0;
+
+	/* alloc a string large enough for escaped string - the result
+	 * will be smaller */
+	if( NULL == (dup = malloc(1 + strcspn(s,"\t"))))
+		return NULL;
+
+	p = dup;
+	for(; *s && *s != '\t'; ++s ){
+		if( escape ){
+			switch( *s ){
+				case 't':
+					*p++ = '\t';
+					break;
+				case '\\':
+				default:
+					*p++ = *s;
+					break;
+			}
+			escape = 0;
+			continue;
+		} 
+
+		if( *s == '\\' ){
+			escape++;
+			continue;
+		}
+
+		*p++ = *s;
+	}
+	*p++= 0;
+
+	if( end ) (const char *)*end = s;
+
+	return dup;
 }
 
 

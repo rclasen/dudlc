@@ -26,5 +26,8 @@ const char *_msc_rline( mservclient *p );
 /* convenience pack for single-line responses: */
 int _msc_cmd( mservclient *p, const char *fmt, ... );
 
+char *_msc_fielddup( const char *s, char **end );
+const char *_msc_skipspace( const char *s );
+
 #endif
 
