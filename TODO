@@ -1,4 +1,12 @@
-error handling
+error handling in lib and cmd is horrible
+
+print error messages to stderr
+
+cli: readline handling is clumsy
+
+cmd: uses hardcoded terminal control codes for bold output
+
+cli: put nexttrack bcast in current line, opening a new one
 
 implement all lib commands
 
@@ -6,3 +14,6 @@ implement all cli commands
 
 cache layer for artists, albums, tags, user
 
+make completion list generation more modular:
+ - only return what shall be completed
+ - provide a way to get a list of completions for this

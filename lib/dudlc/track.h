@@ -26,6 +26,7 @@ int duc_cmd_track2id( dudlc *c, int albumid, int nr );
 duc_track *duc_cmd_trackget( dudlc *c, int id );
 
 duc_it_track *duc_cmd_tracksearch( dudlc *c, const char *substr );
+duc_it_track *duc_cmd_tracksearchf( dudlc *c, const char *filter );
 duc_it_track *duc_cmd_tracksalbum( dudlc *c, int id );
 duc_it_track *duc_cmd_tracksartist( dudlc *c, int id );
 

@@ -115,14 +115,14 @@ static int tag2id( dudlc *con, const char *in, char **end )
 	return id;
 }
 
-// TODO: user2id
+// TODO: ask server for user2id
 static int user2id( dudlc *con, const char *in, char **end )
 {
 	(void) con;
 	return strtol( in, end, 10 );
 }
 
-// TODO: right2id
+// TODO: ask server for right2id
 static int right2id( dudlc *con, const char *in, char **end )
 {
 	(void) con;
@@ -183,7 +183,7 @@ CMD(cmd_help)
 	(void) con;
 
 	ARG_NONE;
-	// TODO: remote help
+	// TODO: ask server for CMD help
 
 	dmsg_msg( "not yet implemented\n" );
 	return -ENOTSUP;
@@ -195,7 +195,7 @@ CMD(cmd_raw)
 
 	ARG_NEED("raw_command" );
 
-	// TODO: make this a lib function
+	// TODO: make cmd_raw a lib function
 	_duc_send( con, line );
 	if( _duc_rnext(con) )
 		CMD_FAIL;
@@ -277,25 +277,6 @@ CGEN(cgen_raw)
 /************************************************************
  * commands: user
  */
-
-#ifdef TODO_pass
-CMD(cmd_user)
-{
-	char *pass;
-
-	ARG_NEED("username");
-
-	if( NULL == ( pass = getpass("Password:" ) ))
-		return errno;
-	
-	if( duc_setauth(con, line, pass))
-		CMD_FAIL;
-
-	/* disconnect - and let reconnect re-auth with new credentials */
-	duc_close(con);
-	CMD_OK;
-}
-#endif
 
 CMD(cmd_clientlist)
 {
@@ -563,6 +544,49 @@ CMD(cmd_curtrack)
 	CMD_OK;
 }
 
+CMD(cmd_info)
+{
+	duc_track *t;
+	duc_it_tag *tit;
+	duc_it_history *hit;
+	char buf[BUFLENTRACK];
+
+	ARG_NONE;
+
+	/* track itself */
+	if( NULL == (t = duc_cmd_curtrack(con)))
+		CMD_FAIL;
+
+	dmsg_msg( "%s\n\n", dfmt_trackhead(buf, BUFLENTRACK));
+	dmsg_msg( "%s\n", dfmt_track(buf, BUFLENTRACK, t));
+
+	//TODO: show info about album
+
+	/* history */
+	if( NULL == (hit = duc_cmd_historytrack(con, t->id, 10 ))){
+		duc_track_free(t);
+		CMD_FAIL;
+	}
+
+	dmsg_msg( "\nhistory:\n" );
+	dmsg_dump_history(hit);
+	duc_it_history_done(hit);
+
+	/* tags */
+	if( NULL == (tit = duc_cmd_tracktaglist( con, t->id ))){
+		duc_track_free(t);
+		CMD_FAIL;
+	}
+
+	dmsg_msg( "\ntags:\n" );
+	dmsg_dump_tags( tit );
+	duc_it_tag_done( tit );
+
+
+	duc_track_free(t);
+	CMD_OK;
+}
+
 CMD(cmd_gap)
 {
 	int gap;
@@ -696,6 +720,20 @@ CMD(cmd_tracksearch)
 	ARG_NEED("substr");
 
 	if( NULL == (it = duc_cmd_tracksearch( con, line )))
+		CMD_FAIL;
+
+	dmsg_dump_tracks(it);
+	duc_it_track_done(it);
+	CMD_OK;
+}
+
+CMD(cmd_tracksearchf)
+{
+	duc_it_track *it;
+
+	ARG_NEED("filter");
+
+	if( NULL == (it = duc_cmd_tracksearchf( con, line )))
 		CMD_FAIL;
 
 	dmsg_dump_tracks(it);
@@ -1182,6 +1220,8 @@ CMD(cmd_tracktagdel)
 	CMD_OK;
 }
 
+//TODO: album commands
+//TODO: artist commands
 
 /************************************************************
  * command list
@@ -1198,7 +1238,6 @@ static t_command commands[] = {
 	{ "help", NULL, cmd_help },
 	{ "raw", cgen_raw, cmd_raw },
 	{ "open", NULL, cmd_open },
-	//{ "user", NULL, cmd_user },
 
 	{ "clientlist", NULL, cmd_clientlist },
 	{ "clientclose", NULL, cmd_clientclose },
@@ -1219,6 +1258,7 @@ static t_command commands[] = {
 	{ "pause", NULL, cmd_pause },
 	{ "status", NULL, cmd_status },
 	{ "curtrack", NULL, cmd_curtrack },
+	{ "info", NULL, cmd_info },
 	{ "gap", NULL, cmd_gap },
 	{ "gapset", NULL, cmd_gapset },
 	{ "random", NULL, cmd_random },
@@ -1228,6 +1268,7 @@ static t_command commands[] = {
 	{ "track2id", NULL, cmd_track2id },
 	{ "trackget", NULL, cmd_trackget },
 	{ "tracksearch", NULL, cmd_tracksearch },
+	{ "tracksearchf", NULL, cmd_tracksearchf },
 	{ "tracksalbum", NULL, cmd_tracksalbum },
 	{ "tracksartist", NULL, cmd_tracksartist },
 
@@ -1312,7 +1353,7 @@ CGEN(cgen_top)
 	char *name;
 
 	(void) con;
-	/* TODO use "help" */
+	/* TODO use "help" to find currently allowed commands for cgen_top? */
 	if( state == 0 ){
 		c = 0;
 		len = strlen(text);

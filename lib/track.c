@@ -92,6 +92,12 @@ duc_it_track *duc_cmd_tracksearch( dudlc *c, const char *substr )
 			"tracksearch %s", substr );
 }
 
+duc_it_track *duc_cmd_tracksearchf( dudlc *c, const char *filter )
+{
+	return _duc_iterate( c, (_duc_converter)_duc_track_parse, 
+			"tracksearchf %s", filter );
+}
+
 duc_it_track *duc_cmd_tracksalbum( dudlc *c, int id )
 {
 	return _duc_iterate( c, (_duc_converter)_duc_track_parse, 
