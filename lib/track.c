@@ -72,35 +72,18 @@ void msc_track_free( msc_track *t )
 
 int msc_cmd_tracks( mservclient *c )
 {
-	if( _msc_cmd( c, "tracks" ))
-		return -1;
-
-	if( *_msc_rcode(c) != '2' )
-		return -1;
-
-	return atoi(_msc_rline(c));
+	return _msc_cmd_int( c, "tracks" );
 }
 
 int msc_cmd_trackid( mservclient *c, int albumid, int nr )
 {
-	if( _msc_cmd( c, "trackid %d %d", albumid, nr ))
-		return -1;
-
-	if( *_msc_rcode(c) != '2' )
-		return -1;
-
-	return atoi(_msc_rline(c));
+	return _msc_cmd_int( c, "trackid %d %d", albumid, nr );
 }
 
 msc_track *msc_cmd_trackget( mservclient *c, int id )
 {
-	if( _msc_cmd( c, "trackget %d", id ))
-		return NULL;
-
-	if( *_msc_rcode(c) != '2' )
-		return NULL;
-
-	return _msc_track_parse(_msc_rline(c),NULL);
+	return _msc_cmd_conv( c, (_msc_converter)_msc_track_parse,
+			"trackget %d", id );
 }
 
 msc_it_track *msc_cmd_tracksearch( mservclient *c, const char *substr )

@@ -24,6 +24,7 @@ const char *_msc_rline( mservclient *p );
 int _msc_cmd( mservclient *p, const char *fmt, ... );
 int _msc_cmd_succ( mservclient *c, const char *fmt, ... );
 int _msc_cmd_int( mservclient *c, const char *fmt, ... );
+char *_msc_cmd_string( mservclient *c, const char *fmt, ... );
 void *_msc_cmd_conv( mservclient *c, _msc_converter conv, 
 		const char *fmt, ... );
 

@@ -86,6 +86,26 @@ int _msc_cmd_succ( mservclient *c, const char *fmt, ... )
 	return 1;
 }
 
+char *_msc_cmd_string( mservclient *c, const char *fmt, ... )
+{
+	va_list ap;
+
+	va_start(ap, fmt );
+	if( _msc_vsend(c, fmt, ap ) ){
+		va_end(ap);
+		return NULL;
+	}
+	va_end(ap);
+
+	if( _msc_rlast(c) )
+		return NULL;
+
+	if( *_msc_rcode(c) == '2' )
+		return strdup(_msc_rline(c));
+
+	return  NULL;
+}
+
 int _msc_cmd_int( mservclient *c, const char *fmt, ... )
 {
 	va_list ap;

@@ -63,20 +63,13 @@ msc_it_queue *msc_cmd_queue( mservclient *c )
 
 msc_queue *msc_cmd_queueget( mservclient *c, int qid )
 {
-	if( _msc_cmd( c, "queueget %d", qid ))
-		return NULL;
-	if( *_msc_rcode(c) != '2' )
-		return NULL-1;
-	return _msc_queue_parse(_msc_rline(c), NULL);
+	return _msc_cmd_conv( c, (_msc_converter)_msc_queue_parse,
+			"queueget %d", qid );
 }
 
 int msc_cmd_queueadd( mservclient *c, int id )
 {
-	if( _msc_cmd( c, "queueadd %d", id ))
-		return -1;
-	if( *_msc_rcode(c) != '2' )
-		return -1;
-	return atoi(_msc_rline(c));
+	return _msc_cmd_int( c, "queueadd %d", id );
 }
 
 int msc_cmd_queuealbum( mservclient *c, int id )
@@ -122,20 +115,12 @@ int msc_cmd_queuealbum( mservclient *c, int id )
 
 int msc_cmd_queuedel( mservclient *c, int id )
 {
-	if( _msc_cmd( c, "queuedel %d", id ))
-		return -1;
-	if( *_msc_rcode(c) != '2' )
-		return -1;
-	return 0;
+	return _msc_cmd_succ( c, "queuedel %d", id );
 }
 
 int msc_cmd_queueclear( mservclient *c )
 {
-	if( _msc_cmd( c, "queueclear" ))
-		return -1;
-	if( *_msc_rcode(c) != '2' )
-		return -1;
-	return 0;
+	return _msc_cmd_succ( c, "queueclear" );
 }
 
 void _msc_bcast_queue( mservclient *c, const char *line )

@@ -54,11 +54,7 @@ msc_it_client *msc_cmd_who( mservclient *c )
 
 int msc_cmd_kick( mservclient *c, int uid )
 {
-	if( _msc_cmd(c, "kick %d", uid ))
-		return -1;
-	if( *_msc_rcode(c) != '2' )
-		return -1;
-	return 0;
+	return _msc_cmd_succ(c, "kick %d", uid );
 }
 
 void _msc_bcast_user( mservclient *c, const char *line )

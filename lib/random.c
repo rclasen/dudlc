@@ -7,29 +7,17 @@
 
 char *msc_cmd_filter( mservclient *c )
 {
-	if( _msc_cmd(c, "filter" ))
-		return NULL;
-	if( *_msc_rcode(c) != '2' )
-		return NULL;
-	return strdup( _msc_rline(c));
+	return _msc_cmd_string(c, "filter" );
 }
 
 int msc_cmd_filterset( mservclient *c, const char *filter )
 {
-	if( _msc_cmd(c, "filterset %s", filter ))
-		return -1;
-	if( *_msc_rcode(c) != '2' )
-		return -1;
-	return 0;
+	return _msc_cmd_succ(c, "filterset %s", filter );
 }
 
 int msc_cmd_filterstat( mservclient *c )
 {
-	if( _msc_cmd(c, "filterstat" ))
-		return -1;
-	if( *_msc_rcode(c) != '2' )
-		return -1;
-	return atoi(_msc_rline(c));
+	return _msc_cmd_int(c, "filterstat" );
 }
 
 msc_it_track *msc_cmd_randomtop( mservclient *c, int num )

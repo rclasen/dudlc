@@ -79,11 +79,7 @@ int msc_open( mservclient *p )
 	if( !c || *c != '3' )
 		goto clean1;
 
-	if( _msc_cmd( p, "pass %s", p->pass ))
-		goto clean1;
-
-	c = _msc_rcode(p);
-	if( !c || *c != '2' )
+	if( _msc_cmd_succ( p, "pass %s", p->pass ))
 		goto clean1;
 
 	_MSC_EVENT(p,connect,p);
@@ -112,11 +108,7 @@ const char *msc_rmsg( mservclient *p )
 
 int msc_cmd_disconnect( mservclient *c, int id )
 {
-	if( _msc_cmd(c, "disconnect %u", id ))
-		return -1;
-	if( *_msc_rcode(c) != '2' )
-		return -1;
-	return 0;
+	return _msc_cmd_succ(c, "disconnect %u", id );
 }
 
 

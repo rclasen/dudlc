@@ -5,19 +5,11 @@
 
 int msc_cmd_sleep( mservclient *c )
 {
-	if( _msc_cmd(c, "sleep" ))
-		return -1;
-	if( *_msc_rcode(c) != '2' )
-		return -1;
-	return atoi(_msc_rline(c));
+	return _msc_cmd_int(c, "sleep" );
 }
 
 int msc_cmd_sleepset( mservclient *c, int delay )
 {
-	if( _msc_cmd(c, "sleepset %d", delay ))
-		return -1;
-	if( *_msc_rcode(c) != '2' )
-		return -1;
-	return 0;
+	return _msc_cmd_succ(c, "sleepset %d", delay );
 }
 
