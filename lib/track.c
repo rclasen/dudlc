@@ -13,7 +13,7 @@ msc_track *_msc_track_parse( const char *line, char **end )
 
 	/* why isn't strtol's endptr defined as (const char*) ?
 	 * now we have to cast the const hackishly away */
-	(const char*)e = s = _msc_skipspace(line);
+	(const char*)e = s = line;
 
 	if( NULL == (t = malloc(sizeof(msc_track)))){
 		goto clean1;
@@ -23,26 +23,26 @@ msc_track *_msc_track_parse( const char *line, char **end )
 	if( s == e )
 		goto clean2;
 
-	s = _msc_skipspace(e);
+	s = e+1;
 	t->albumid = strtol( s, &e, 10 );
 	if( s == e )
 		goto clean2;
 
-	s = _msc_skipspace(e);
+	s = e+1;
 	t->albumnr = strtol( s, &e, 10 );
 	if( s == e )
 		goto clean3;
 
-	s = _msc_skipspace(e);
+	s = e+1;
 	if( NULL == (t->title = _msc_fielddup( s, &e )))
 		goto clean2;
 
-	s = _msc_skipspace(e);
+	s = e+1;
 	t->artistid = strtol( s, &e, 10 );
 	if( s == e )
 		goto clean3;
 
-	s = _msc_skipspace(e);
+	s = e+1;
 	t->duration = strtol( s, &e, 10 );
 	if( s == e )
 		goto clean3;

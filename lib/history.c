@@ -13,23 +13,23 @@ static msc_history *_msc_history_parse( const char *line, char **end )
 
 	/* why isn't strtol's endptr defined as (const char*) ?
 	 * now we have to cast the const hackishly away */
-	(const char*)e = s = _msc_skipspace(line);
+	(const char*)e = s = line;
 
 	if( NULL == (n = malloc(sizeof(msc_track)))){
 		goto clean1;
 	}
 
-	s = _msc_skipspace(e);
+	s = e+1;
 	n->uid = strtol( s, &e, 10 );
 	if( s == e )
 		goto clean2;
 
-	s = _msc_skipspace(e);
+	s = e+1;
 	n->played = strtol( s, &e, 10 );
 	if( s == e )
 		goto clean2;
 
-	s = _msc_skipspace(e);
+	s = e+1;
 	if( NULL == ( n->_track = _msc_track_parse( s, &e )))
 		goto clean2;
 

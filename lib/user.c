@@ -11,7 +11,7 @@ static msc_client *_msc_client_parse( const char *line, char **end )
 	const char *s;
 	char *e;
 
-	(const char*)e = s = _msc_skipspace(line);
+	(const char*)e = s = line;
 
 	if( NULL == (c = malloc(sizeof(msc_client))))
 		goto clean1;
@@ -20,12 +20,12 @@ static msc_client *_msc_client_parse( const char *line, char **end )
 	if( s == e )
 		goto clean2;
 
-	s = _msc_skipspace(e);
+	s = e+1;
 	c->uid = strtol(s, &e, 10 );
 	if( s == e )
 		goto clean2;
 
-	s = _msc_skipspace(e);
+	s = e+1;
 	if( NULL == (c->addr = _msc_fielddup( s, &e )))
 		goto clean2;
 	
