@@ -5,6 +5,7 @@
 #define BUFLENTRACK 1024
 #define BUFLENQUEUE 1024
 #define BUFLENTAG 1024
+#define BUFLENUSER 1024
 
 #include <mservclient/command.h>
 
@@ -29,6 +30,10 @@ void dump_history( msc_it_history *it );
 const char *mktaghead( char *buf, unsigned int len );
 const char *mktag( char *buf, unsigned int len, msc_tag *q );
 void dump_tags( msc_it_tag *it );
+
+const char *mkuserhead( char *buf, unsigned int len );
+const char *mkuser( char *buf, unsigned int len, msc_user *q );
+void dump_users( msc_it_user *it );
 
 
 #endif

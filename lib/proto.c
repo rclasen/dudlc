@@ -80,7 +80,7 @@ int _msc_cmd_succ( mservclient *c, const char *fmt, ... )
 	if( _msc_rlast(c) )
 		return -1;
 
-	if( *_msc_rcode(c) == '2' )
+	if( *_msc_rcode(c) == '2' || *_msc_rcode(c) == '3' )
 		return 0;
 
 	return 1;

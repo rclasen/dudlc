@@ -5,8 +5,7 @@
 #include <mservclient/event.h>
 #include <mservclient/proto.h>
 
-mservclient *msc_new( const char *hostname, int port, 
-		const char *user, const char *pass )
+mservclient *msc_new( const char *hostname, int port )
 {
 	mservclient *p;
 
@@ -17,22 +16,14 @@ mservclient *msc_new( const char *hostname, int port,
 	p->line = NULL;
 	p->inreply = 0;
 	p->ev = NULL;
+	p->user = NULL;
+	p->pass = NULL;
 
 	if( NULL == (p->con = msc_sock_open( hostname, port )))
 		goto clean1;
 
-	if( NULL == (p->user = strdup( user )))
-		goto clean2;
-
-	if( NULL == (p->pass = strdup( pass )))
-		goto clean3;
-
 	return p;
 
-clean3:
-	free(p->user);
-clean2:
-	msc_sock_close(p->con);
 clean1:
 	free(p);
 	return NULL;
@@ -72,21 +63,14 @@ int msc_open( mservclient *p )
 	if( ! c || *c != '2' )
 		goto clean1;
 
-	if( _msc_cmd( p, "user %s", p->user ))
+	if( p->user && msc_cmd_auth( p ))
 		goto clean1;
 
-	c = _msc_rcode(p);
-	if( !c || *c != '3' )
-		goto clean1;
-
-	if( _msc_cmd_succ( p, "pass %s", p->pass ))
-		goto clean1;
 
 	_MSC_EVENT(p,connect,p);
 	return 0;
 
 clean1:
-	msc_sock_disconnect(p->con);
 	return -1;
 }
 
@@ -106,6 +90,44 @@ const char *msc_rmsg( mservclient *p )
 }
 
 
+int msc_setauth( mservclient *c, const char *user, const char *pass )
+{
+	if( c->user ){
+		free(c->user);
+		c->user = NULL;
+	}
+	if( c->pass ){
+		free(c->pass);
+		c->pass = NULL;
+	}
+
+	if( NULL == (c->user = strdup(user)))
+		return -1;
+
+	if( NULL == (c->pass = strdup(pass))){
+		free(c->user);
+		c->user = NULL;
+		return -1;
+	}
+
+	return 0;
+}
+
+int msc_cmd_auth( mservclient *c )
+{
+	if( ! c->user || ! c->pass )
+		return -1;
+
+	if( _msc_cmd_succ( c, "user %s", c->user ))
+		return -1;
+
+	if( _msc_cmd_succ( c, "pass %s", c->pass ))
+		return -1;
+
+	return 0;
+}
+
+		
 int msc_cmd_disconnect( mservclient *c, int id )
 {
 	return _msc_cmd_succ(c, "disconnect %u", id );

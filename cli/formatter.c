@@ -239,3 +239,41 @@ void dump_tags( msc_it_tag *it )
 	}
 }
 
+/************************************************************
+ * user
+ */
+
+const char *mkuserhead( char *buf, unsigned int len )
+{
+	unsigned int l;
+
+	l = snprintf( buf, len, "%4.4s %-20s %s", "id", "name", "right" );
+	if( l > len )
+		return NULL;
+
+	return buf;
+}
+
+const char *mkuser( char *buf, unsigned int len, msc_user *q )
+{
+	unsigned int l;
+
+	l = snprintf( buf, len, "%4d %-20s %2d", q->id, q->name, q->right );
+	if( l > len )
+		return NULL;
+
+	return buf;
+}
+
+void dump_users( msc_it_user *it )
+{
+	msc_user *t;
+	char buf[BUFLENUSER];
+
+	tty_msg( "%s\n\n", mkuserhead(buf, BUFLENUSER));
+	for( t = msc_it_user_cur(it); t; t = msc_it_user_next(it)){
+		tty_msg( "%s\n", mkuser(buf,BUFLENUSER,t));
+		msc_user_free(t);
+	}
+}
+

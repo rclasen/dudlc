@@ -110,7 +110,9 @@ CMD(cmd_quit)
 CMD(cmd_open)
 {
 	ARG_NONE;
-	msc_open( con );
+	if( msc_open( con ) ){
+		MSG_FAIL;
+	}
 }
 
 static char *cgen_cmd_raw( const char *text, int state )
@@ -223,6 +225,30 @@ CMD(cmd_disconnect)
  * commands: user
  */
 
+CMD(cmd_auth)
+{
+	char pass[20];
+
+	ARG_NEED("username");
+
+	printf("Password: ");
+	fflush(stdout);
+
+	// TODO: turn of echo when reading password
+	if( NULL == fgets(pass, 20, stdin ) ){
+		terminate++;
+		return;
+	}
+	
+	if( msc_setauth(con, line, pass)){
+		MSG_FAIL;
+		return;
+	}
+
+	/* disconnect - and let reconnect re-auth with new credentials */
+	msc_close(con);
+}
+
 CMD(cmd_who)
 {
 	msc_it_client *it;
@@ -241,17 +267,147 @@ CMD(cmd_who)
 // TODO: take username as argument, too
 CMD(cmd_kick)
 {
-	int num;
+	int uid;
 
 	ARG_NEED("userID");
 
-	num = atoi(line);
-	if( 0 == msc_cmd_kick( con, num ) ){
-		tty_msg( "kicked user #%d\n", num );
+	uid = atoi(line);
+	if( 0 == msc_cmd_kick( con, uid ) ){
+		tty_msg( "kicked user #%d\n", uid );
 	}
 	MSG_FAIL;
 }
 
+CMD(cmd_usergetname)
+{
+	int uid;
+	ARG_NEED("name");
+
+	if( 0 > ( uid = msc_cmd_usergetname(con, line))){
+		MSG_FAIL;
+		return;
+	}
+
+	tty_msg( "user has ID %d\n", uid );
+}
+
+CMD(cmd_userget)
+{
+	int uid;
+	msc_user *u;
+	char buf[BUFLENUSER];
+	char *end;
+
+	ARG_NEED("uid");
+
+	uid = strtol( line, &end, 10 );
+	if( *end ){
+		MSG_ARGMIS("uid");
+		return;
+	}
+
+	if( NULL == ( u = msc_cmd_userget( con, uid ))){
+		MSG_FAIL;
+		return;
+	}
+
+	tty_msg( "%s\n\n", mkuserhead(buf, BUFLENUSER));
+	tty_msg( "%s\n", mkuser(buf, BUFLENUSER, u));
+
+	msc_user_free(u);
+}
+
+CMD(cmd_users)
+{
+	msc_it_user *it;
+
+	ARG_NONE;
+	(void)line;
+
+	it = msc_cmd_users( con );
+	dump_users(it);
+	msc_it_user_done(it);
+}
+
+CMD(cmd_usersetpass)
+{
+	int uid;
+	char *end;
+
+	ARG_NEED("uid");
+
+	uid = strtol( line, &end, 10 );
+	if( line == end ){
+		MSG_ARGMIS("uid");
+		return;
+	}
+
+	end += strspn(end, "\t ");
+	if( msc_cmd_usersetpass(con, uid, end )){
+		MSG_FAIL;
+	}
+	tty_msg( "password changed\n");
+}
+
+CMD(cmd_usersetright)
+{
+	int uid;
+	int right;
+	char *end, *s;
+
+	ARG_NEED("uid");
+
+	uid = strtol( line, &end, 10 );
+	if( line == end ){
+		MSG_ARGMIS("uid");
+		return;
+	}
+
+	s = end + strspn( end, "\t ");
+	right = strtol( s, &end, 10 );
+	if( *end ){
+		MSG_ARGMIS("right");
+		return;
+	}
+
+	if( msc_cmd_usersetright( con, uid, right )){
+		MSG_FAIL;
+	}
+	tty_msg( "right changed\n");
+}
+
+CMD(cmd_useradd)
+{
+	int uid;
+	ARG_NEED("name");
+
+	if( 0 > (uid = msc_cmd_useradd(con, line))){
+		MSG_FAIL;
+		return;
+	}
+
+	tty_msg( "user added with id %d\n", uid);
+}
+
+CMD(cmd_userdel)
+{
+	int uid;
+	char *end;
+
+	ARG_NEED("uid");
+
+	uid = strtol( line, &end, 10 );
+	if( *end ){
+		MSG_ARGMIS("uid");
+		return;
+	}
+
+	if( msc_cmd_userdel(con, uid)){
+		MSG_FAIL;
+		return;
+	}
+	tty_msg("user deleted\n");
+}
 
 
 /************************************************************
@@ -1012,8 +1168,16 @@ static t_command commands[] = {
 	{ "raw", cgen_cmd_raw, cmd_raw },
 	{ "open", NULL, cmd_open },
 	{ "disconnect", NULL, cmd_disconnect },
+	{ "user", NULL, cmd_auth },
 	{ "who", NULL, cmd_who },
 	{ "kick", NULL, cmd_kick },
+	{ "usergetname", NULL, cmd_usergetname },
+	{ "userget", NULL, cmd_userget },
+	{ "users", NULL, cmd_users },
+	{ "usersetpass", NULL, cmd_usersetpass },
+	{ "usersetright", NULL, cmd_usersetright },
+	{ "useradd", NULL, cmd_useradd },
+	{ "userdel", NULL, cmd_userdel },
 	{ "play", NULL, cmd_play },
 	{ "stop", NULL, cmd_stop },
 	{ "next", NULL, cmd_next },

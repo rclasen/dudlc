@@ -19,10 +19,10 @@ typedef struct {
 } mservclient;
 
 
-mservclient *msc_new( const char *hostname, int port, 
-		const char *user, const char *pass );
+mservclient *msc_new( const char *hostname, int port);
 void msc_free( mservclient *p );
 
+int msc_setauth( mservclient *c, const char *user, const char *pass );
 int msc_open( mservclient *p );
 void msc_close( mservclient *p );
 
@@ -31,6 +31,7 @@ void msc_poll( mservclient *p );
 
 const char *msc_rmsg( mservclient *p );
 
+int msc_cmd_auth( mservclient *p );
 int msc_cmd_disconnect( mservclient *p, int id );
 
 #endif

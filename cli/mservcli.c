@@ -75,13 +75,16 @@ static void loop( void )
 
 int main( int argc, char **argv )
 {
+	char *user = "guest";
+	char *pass = "guest";
 
 	(void) argc;
 	(void) argv;
 
 	// TODO: getopt 
 
-	con = msc_new( "localhost", 4445, "ddd", "sss" );
+	con = msc_new( "localhost", 4445 );
+	msc_setauth( con, user, pass );
 
 	events_init(con);
 	

@@ -21,7 +21,9 @@ static void cb_bcast( mservclient *c, const char *line )
 static void cb_disc( mservclient *c )
 {
 	tty_msg( "disconnected, trying to reconnect\n");
-	msc_open(c);
+	if( msc_open(c)){
+		tty_msg( "reconnect failed\n" );
+	}
 }
 
 static void cb_conn( mservclient *c )
