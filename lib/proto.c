@@ -72,11 +72,9 @@ int _msc_cmd( mservclient *p, const char *fmt, ... )
 static void _msc_bcast( mservclient *p, const char *line )
 {
 	switch(line[1]){
-#ifdef todo_user
 		case '3':
 			_msc_bcast_user( p, line );
 			break;
-#endif
 
 		case '4':
 			_msc_bcast_player( p, line );

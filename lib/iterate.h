@@ -5,7 +5,6 @@
 
 typedef void *(*_msc_converter)( const char *line, char **end );
 
-/* TODO: itarator */
 typedef struct {
 	mservclient *con;
 	_msc_converter conv;

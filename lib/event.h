@@ -2,18 +2,23 @@
 #define _MSERVCLIENT_EVENT_H
 
 #include <mservclient/client.h>
+#include <mservclient/user.h>
 #include <mservclient/track.h>
 
 typedef void (*msc_ev_argnone)( mservclient *c );
 typedef void (*msc_ev_argstring)( mservclient *c, const char *s );
 typedef void (*msc_ev_argint)( mservclient *c, int i );
+typedef void (*msc_ev_argclient)( mservclient *c, msc_client *t );
 typedef void (*msc_ev_argtrack)( mservclient *c, msc_track *t );
 
 typedef struct {
+	/* my connection status */
 	msc_ev_argnone connect;
 	msc_ev_argnone disconnect;
 
-	/* TODO: user */
+	/* other users/clients */
+	msc_ev_argclient login;
+	msc_ev_argclient logout;
 
 	/* player */
 	msc_ev_argtrack nexttrack;

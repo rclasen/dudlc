@@ -6,6 +6,7 @@
 
 /* include all commands */
 
+#include <mservclient/user.h>
 #include <mservclient/track.h>
 #include <mservclient/player.h>
 
