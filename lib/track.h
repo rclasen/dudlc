@@ -11,7 +11,6 @@ typedef struct {
 	char *title;
 	int artistid;
 	int duration;
-	int _refs;
 } msc_track;
 
 #define msc_it_track	_msc_iter
@@ -23,6 +22,7 @@ msc_track *_msc_track_parse( const char *line, char **end );
 void msc_track_free( msc_track *t );
 
 int msc_cmd_tracks( mservclient *c );
+int msc_cmd_trackid( mservclient *c, int albumid, int nr );
 msc_track *msc_cmd_trackget( mservclient *c, int id );
 
 msc_it_track *msc_cmd_tracksearch( mservclient *c, const char *substr );
