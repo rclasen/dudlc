@@ -66,11 +66,25 @@ int msc_cmd_randomset( mservclient *c, int r )
 static void _msc_bcast_newtrack( mservclient *c, const char *line )
 {
 	msc_track *t;
-	
-	if( NULL == (t= _msc_track_parse(line+4,NULL)))
+	msc_artist *art;
+	msc_album *alb;
+	char *end;
+
+	if( NULL == (t= _msc_track_parse(line+4,&end)))
 		return;
 
-	_MSC_EVENT(c,nexttrack,c,t);
+	if( NULL == (art= _msc_artist_parse(end+1,&end)))
+		goto clean2;
+
+	if( NULL == (alb= _msc_album_parse(end+1,NULL)))
+		goto clean3;
+
+	_MSC_EVENT(c, nexttrack, c, t, art, alb);
+
+	msc_album_free(alb);
+clean3:
+	msc_artist_free(art);
+clean2:
 	msc_track_free(t);
 }
 
