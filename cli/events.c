@@ -66,8 +66,7 @@ static void cb_nexttrack( dudlc *c, duc_track *t,
 {
 	char buf[BUFLENTRACK];
 
-	tty_msg( "playing: \n\x1B[1m%s\x1B[0m\n", 
-			dfmt_rtrack(buf, BUFLENTRACK, t, ar, al ));
+	tty_msg( "%s\n", dfmt_rtrack(buf, BUFLENTRACK, t, ar, al ));
 	(void)c;
 	(void)ar;
 	(void)al;

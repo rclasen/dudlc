@@ -71,8 +71,7 @@ static void tty_executor( char *input )
 
 	/* execute action - if one is defined */
 	inprompt = 0;
-	if( duc_cmd( con, input ) )
-		terminate++;
+	duc_cmd( con, input );
 	inprompt = 1;
 
 	free(input);
