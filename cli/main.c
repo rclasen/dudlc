@@ -1,4 +1,5 @@
 
+#define _GNU_SOURCE
      
 #include <stdlib.h>
 #include <errno.h>
@@ -7,12 +8,17 @@
 #include <unistd.h>
 #include <signal.h>
 #include <stdio.h>
+#include <getopt.h>
+#include <string.h>
      
 #include "tty.h"
 #include "events.h"
 #include "main.h"
 
+// TODO: ~/.dudlc.conf
+
 dudlc *con = NULL;
+char *progname = NULL;
 
 int terminate = 0;
 
@@ -71,37 +77,112 @@ static void loop( void )
 	} while( ! terminate );
 }
 
+static void usage( void );
+
 int main( int argc, char **argv )
 {
+	char *host = "localhost";
+	int port = 4445;
 	char *user = "guest";
 	char *pass = "guest";
+	char *command = NULL;
+	int c;
+	int needhelp = 0;
+	struct option lopts[] = {
+		{"help", no_argument, NULL, 'h' },
+		{"host", required_argument, NULL, 'H' },
+		{"port", required_argument, NULL, 'P' },
+		{"user", required_argument, NULL, 'u' },
+		{"pass", required_argument, NULL, 'p' },
+		{"command", required_argument, NULL, 'c' },
+		{ 0,0,0,0 }
+	};
 
-	(void) argc;
-	(void) argv;
+	progname = argv[0];
+	while( -1 != ( c = getopt_long( argc, argv, "hH:P:u:p:c:",
+					lopts, NULL ))){
+		switch( c ){
+		  case 'h':
+			  usage();
+			  exit(0);
+			  break;
 
-	// TODO: getopt 
+		  case 'H':
+			  host = optarg;
+			  break;
+
+		  case 'P':
+			  port = atoi(optarg);
+			  break;
+
+		  case 'u':
+			  user = optarg;
+			  break;
+
+		  case 'p':
+			  pass = optarg;
+			  break;
+
+		  case 'c':
+			  command = optarg;
+			  break;
+
+		  default:
+			  needhelp++;
+		}
+	}
+
+	if( needhelp ){
+		fprintf( stderr, "use --help for usage info\n" );
+		exit(1);
+	}
+
 
 	dmsg_msg_cb = tty_vmsg;
 
-	con = duc_new( "localhost", 4445 );
+	con = duc_new( host, port );
 	duc_setauth( con, user, pass );
 
-	events_init(con);
-	
-	signal( SIGTERM, sig_term );
-	signal( SIGINT, sig_term );
-	signal( SIGPIPE, SIG_IGN );
 
-	tty_init( "dudlc", "> " );
+	if( command ){
+		if( duc_open( con ) ){
+			fprintf( stderr, "failed to connect: %s\n", 
+					strerror(errno) );
+			exit(1);
+		}
+		if( duc_cmd( con, command ) ){
+			exit(1);
+		}
 
-	duc_open(con);
+	} else {
+		signal( SIGTERM, sig_term );
+		signal( SIGINT, sig_term );
+		signal( SIGPIPE, SIG_IGN );
 
-	loop();
+		tty_init( progname, "> " );
 
-	tty_done();
+		events_init(con);
+		duc_open(con);
 
-	tty_msg( "bye.\n" );
+		loop();
+
+		tty_done();
+		tty_msg( "bye.\n" );
+	}
+
 	return 0;
 }
 
-
+static void usage( void )
+{
+	printf( "usage: %s [opts]\n", progname );
+	printf( 
+		" -h --help          this message\n"
+		" -H --host <host>   host running dudld\n"
+		" -P --port <port>   dudld port\n"
+		" -u --user <name>   dudld user\n"
+		" -p --pass <pass>   dudld password\n"
+		" -c --command <cmd> run specified command and "
+			"exit immediately\n"
+	      );
+}

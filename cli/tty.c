@@ -16,7 +16,7 @@
 #include "tty.h"     
 
 static int redisplay = 0;
-static int inprompt = 1;
+static int inprompt = 0;
 
 
 duc_cgen cgen = NULL;
@@ -109,6 +109,8 @@ static void tty_executor( char *input )
 
 void tty_init( const char *name, const char *prompt )
 {
+	inprompt = 1;
+
 	rl_readline_name = name;
 	rl_attempted_completion_function = tty_completer;
 	
