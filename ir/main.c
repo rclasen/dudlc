@@ -202,7 +202,7 @@ int main(int argc, char *argv[])
 	}
 
 	if( port == 0 ){
-		port = 4444;
+		port = 4445;
 	}
 
 	if( user == NULL ){
