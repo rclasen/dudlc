@@ -1,6 +1,7 @@
 
 CC		:= gcc
 LD		:= gcc
+AR		:= ar
 
 LIBS		:= -lreadline
 DEPFLAGS	:= -I.
@@ -14,27 +15,40 @@ CFLAGS		:= -g -W -Wall -Wunused -Wmissing-prototypes \
 all: x-all
 
 
-LNK	:=
+BLNK	:=
+LLNK	:=
 SRC	:=
 OBJ	:=
 
+
+
+############################################################
+# lib
+
+SRC_lib		:= sock.c \
+		client.c
+SRC_lib		:= $(patsubst %,mservclient/%,$(SRC_lib))
+OBJ_lib		:= $(patsubst %.c,%.o,$(SRC_lib))
+LLNK += libmservclient.a
+SRC += $(SRC_lib)
+OBJ += $(OBJ_lib)
+libmservclient.a: $(OBJ_lib)
 
 ############################################################
 # mservcli
 
 SRC_mservcli	:= \
-		server.c proto.c \
 		tty.c \
 		mservcli.c
 OBJ_mservcli	:= $(patsubst %.c,%.o,$(SRC_mservcli))
-LNK += mservcli
+BLNK += mservcli
 SRC += $(SRC_mservcli)
 OBJ += $(OBJ_mservcli)
-mservcli: $(OBJ_mservcli)
+mservcli:  $(OBJ_mservcli) libmservclient.a
 
 ############################################################
 
-x-all: $(LNK)
+x-all: $(LLNK) $(BLNK) 
 
 DEPS	:= $(OBJ:.o=.d)
 include $(DEPS)
@@ -48,7 +62,10 @@ include $(DEPS)
 .c.o:
 	$(CC) $(CFLAGS) -o $@ -c $<
 
-$(LNK):
+$(LLNK):
+	$(AR) -r $@ $^
+
+$(BLNK):
 	$(LD) $(LDFLADS) -o $@ $^ $(LIBS)
 
 todo:
@@ -56,7 +73,7 @@ todo:
 
 clean:
 	rm -f $(OBJ)
-	rm -f $(LNK)
+	rm -f $(LLNK) $(BLNK)
 	rm -f $(DEPS)
 
 
