@@ -7,7 +7,7 @@
 #define BUFLENTAG 1024
 #define BUFLENUSER 1024
 
-#include <mservclient/command.h>
+#include <dudlc.h>
 
 const char *mkclienthead( char *buf, unsigned int len );
 const char *mkclient( char *buf, unsigned int len, msc_client *c );

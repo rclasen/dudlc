@@ -1,8 +1,8 @@
 #include <stdlib.h>
 
-#include <mservclient/proto.h>
-#include <mservclient/event.h>
-#include <mservclient/player.h>
+#include "dudlc/proto.h"
+#include "dudlc/event.h"
+#include "dudlc/player.h"
 
 msc_playstatus msc_cmd_status( mservclient *c )
 {

@@ -1,8 +1,8 @@
 #include <stdlib.h>
 
-#include <mservclient/proto.h>
-#include <mservclient/event.h>
-#include <mservclient/user.h>
+#include "dudlc/proto.h"
+#include "dudlc/event.h"
+#include "dudlc/user.h"
 
 static msc_user *_msc_user_parse( const char *line, char **end )
 {

@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
-#include <mservclient/proto.h>
-#include <mservclient/iterate.h>
+#include "dudlc/proto.h"
+#include "dudlc/iterate.h"
 
 
 _msc_iter *_msc_iterate( mservclient *p, _msc_converter conv, 

@@ -5,8 +5,8 @@
 #include <stdarg.h>
 #include <ctype.h>
 
-#include <mservclient/event.h>
-#include <mservclient/proto.h>
+#include "dudlc/event.h"
+#include "dudlc/proto.h"
 
 #define BUFLENLINE	2048
 

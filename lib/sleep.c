@@ -1,7 +1,7 @@
 #include <stdlib.h>
 
-#include <mservclient/proto.h>
-#include <mservclient/sleep.h>
+#include "dudlc/proto.h"
+#include "dudlc/sleep.h"
 
 int msc_cmd_sleep( mservclient *c )
 {

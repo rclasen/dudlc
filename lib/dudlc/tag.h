@@ -1,7 +1,7 @@
 #ifndef _MSERVCLIENT_TAG_H
 #define _MSERVCLIENT_TAG_H
 
-#include <mservclient/session.h>
+#include "session.h"
 
 typedef struct {
 	int id;

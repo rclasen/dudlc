@@ -1,9 +1,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <mservclient/proto.h>
-#include <mservclient/event.h>
-#include <mservclient/tag.h>
+#include "dudlc/proto.h"
+#include "dudlc/event.h"
+#include "dudlc/tag.h"
 
 static msc_tag *_msc_tag_parse( const char *line, char **end )
 {

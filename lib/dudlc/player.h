@@ -1,9 +1,9 @@
 #ifndef _MSERVCLIENT_PLAYER_H
 #define _MSERVCLIENT_PLAYER_H
 
-#include <mservclient/session.h>
+#include "session.h"
 
-#include <mservclient/track.h>
+#include "track.h"
 
 
 typedef enum {

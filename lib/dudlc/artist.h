@@ -1,8 +1,8 @@
 #ifndef _MSERVCLIENT_ARTIST_H
 #define _MSERVCLIENT_ARTIST_H
 
-#include <mservclient/session.h>
-#include <mservclient/iterate.h>
+#include "session.h"
+#include "iterate.h"
 
 typedef struct {
 	int id;

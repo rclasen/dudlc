@@ -1,8 +1,8 @@
 #ifndef _MSERVCLIENT_QUEUE_H
 #define _MSERVCLIENT_QUEUE_H
 
-#include <mservclient/session.h>
-#include <mservclient/track.h>
+#include "session.h"
+#include "track.h"
 
 typedef struct {
 	int id;

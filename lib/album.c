@@ -1,9 +1,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <mservclient/proto.h>
-#include <mservclient/event.h>
-#include <mservclient/album.h>
+#include "dudlc/proto.h"
+#include "dudlc/event.h"
+#include "dudlc/album.h"
 
 msc_album *_msc_album_parse( const char *line, char **end )
 {

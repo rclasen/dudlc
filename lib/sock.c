@@ -8,7 +8,7 @@
 #include <sys/socket.h>
 
 
-#include <mservclient/sock.h>
+#include "dudlc/sock.h"
 
 t_msc_sock *msc_sock_open( const char *h, int p )
 {

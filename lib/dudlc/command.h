@@ -1,21 +1,21 @@
 #ifndef _MSERVCLIENT_COMMAND_H
 #define _MSERVCLIENT_COMMAND_H
 
-#include <mservclient/session.h>
-#include <mservclient/event.h>
+#include "session.h"
+#include "event.h"
 
 /* include all commands */
 
-#include <mservclient/client.h>
-#include <mservclient/user.h>
-#include <mservclient/track.h>
-#include <mservclient/player.h>
-#include <mservclient/random.h>
-#include <mservclient/queue.h>
-#include <mservclient/sleep.h>
-#include <mservclient/history.h>
-#include <mservclient/help.h>
-#include <mservclient/tag.h>
+#include "client.h"
+#include "user.h"
+#include "track.h"
+#include "player.h"
+#include "random.h"
+#include "queue.h"
+#include "sleep.h"
+#include "history.h"
+#include "help.h"
+#include "tag.h"
 
 
 #endif

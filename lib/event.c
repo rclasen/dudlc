@@ -1,6 +1,6 @@
 
-#include <mservclient/event.h>
-#include <mservclient/command.h>
+#include "dudlc/event.h"
+#include "dudlc/command.h"
 
 msc_events *msc_getevents( mservclient *c )
 {

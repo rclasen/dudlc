@@ -12,7 +12,7 @@
 #include <readline/history.h>
 
 #include "command.h"
-#include "mservcli.h"
+#include "main.h"
 #include "tty.h"     
 
 static int redisplay = 0;

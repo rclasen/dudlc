@@ -1,9 +1,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <mservclient/proto.h>
-#include <mservclient/event.h>
-#include <mservclient/queue.h>
+#include "dudlc/proto.h"
+#include "dudlc/event.h"
+#include "dudlc/queue.h"
 
 static msc_queue *_msc_queue_parse( const char *line, char **end )
 {

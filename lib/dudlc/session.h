@@ -1,7 +1,7 @@
 #ifndef _MSERVCLIENT_SESSION_H
 #define _MSERVCLIENT_SESSION_H
 
-#include <mservclient/sock.h>
+#include "sock.h"
 
 
 typedef struct {

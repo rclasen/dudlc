@@ -3,7 +3,7 @@
 
 #include <stdarg.h>
 
-#include <mservclient/session.h>
+#include "session.h"
 
 /************************************************************
  * internal protocol parsing functions

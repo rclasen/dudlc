@@ -1,14 +1,14 @@
 #ifndef _MSERVCLIENT_EVENT_H
 #define _MSERVCLIENT_EVENT_H
 
-#include <mservclient/session.h>
-#include <mservclient/client.h>
-#include <mservclient/user.h>
-#include <mservclient/track.h>
-#include <mservclient/queue.h>
-#include <mservclient/tag.h>
-#include <mservclient/artist.h>
-#include <mservclient/album.h>
+#include "session.h"
+#include "client.h"
+#include "user.h"
+#include "track.h"
+#include "queue.h"
+#include "tag.h"
+#include "artist.h"
+#include "album.h"
 
 typedef void (*msc_ev_argnone)( mservclient *c );
 typedef void (*msc_ev_argstring)( mservclient *c, const char *s );

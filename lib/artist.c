@@ -1,9 +1,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <mservclient/proto.h>
-#include <mservclient/event.h>
-#include <mservclient/artist.h>
+#include "dudlc/proto.h"
+#include "dudlc/event.h"
+#include "dudlc/artist.h"
 
 msc_artist *_msc_artist_parse( const char *line, char **end )
 {

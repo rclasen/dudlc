@@ -1,9 +1,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <mservclient/session.h>
-#include <mservclient/event.h>
-#include <mservclient/proto.h>
+#include "dudlc/session.h"
+#include "dudlc/event.h"
+#include "dudlc/proto.h"
 
 mservclient *msc_new( const char *hostname, int port )
 {

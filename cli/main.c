@@ -8,11 +8,11 @@
 #include <signal.h>
 #include <stdio.h>
      
-#include <mservclient/command.h>
+#include <dudlc.h>
 
 #include "tty.h"
 #include "events.h"
-#include "mservcli.h"
+#include "main.h"
 
 mservclient *con = NULL;
 
@@ -92,7 +92,7 @@ int main( int argc, char **argv )
 	signal( SIGINT, sig_term );
 	signal( SIGPIPE, SIG_IGN );
 
-	tty_init( "hmserv", "> " );
+	tty_init( "dudlc", "> " );
 
 	msc_open(con);
 

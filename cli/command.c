@@ -2,11 +2,11 @@
 #include <string.h>
 #include <stdio.h>
 
-#include <mservclient/command.h>
-#include <mservclient/proto.h>
+#include <dudlc.h>
+#include <dudlc/proto.h>
 
 #include "tty.h"
-#include "mservcli.h"
+#include "main.h"
 #include "formatter.h"
 #include "command.h"
 

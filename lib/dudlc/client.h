@@ -1,8 +1,8 @@
 #ifndef _MSERVCLIENT_CLIENT_H
 #define _MSERVCLIENT_CLIENT_H
 
-#include <mservclient/session.h>
-#include <mservclient/iterate.h>
+#include "session.h"
+#include "iterate.h"
 
 
 // TODO: make addr a number

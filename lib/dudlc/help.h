@@ -1,8 +1,8 @@
 #ifndef _MSERVCLIENT_HELP_H
 #define _MSERVCLIENT_HELP_H
 
-#include <mservclient/session.h>
-#include <mservclient/iterate.h>
+#include "session.h"
+#include "iterate.h"
 
 
 #define msc_it_help	_msc_iter

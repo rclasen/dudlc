@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <mservclient/proto.h>
-#include <mservclient/track.h>
+#include "dudlc/proto.h"
+#include "dudlc/track.h"
 
 msc_track *_msc_track_parse( const char *line, char **end )
 {
