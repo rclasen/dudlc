@@ -32,7 +32,7 @@ case "$1" in
   start)
 	echo -n "Starting $DESC: "
 	start-stop-daemon --start --quiet --pidfile /var/run/$NAME.pid \
-		--exec $DAEMON -- $flags "$conf"
+		--exec $DAEMON -- -l $flags "$conf"
 	echo "$NAME."
 	;;
   stop)
