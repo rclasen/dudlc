@@ -45,11 +45,27 @@ static char **tty_completer( const char *text, int start, int end )
 	return rl_completion_matches( text, tty_cgen );
 }
 
+static void cmd_user( char *input )
+{
+	char *pass;
+
+	if( NULL == ( pass = getpass("Password:" ) )){
+		tty_msg( "failed: %s\n", strerror(errno));
+		return;
+	}
+
+	if( duc_setauth( con, input, pass )){
+		tty_msg( "login failed\n" );
+	} else {
+		duc_close(con);
+	}
+}
 
 /* handler invoked by readline when input is submitted with enter */
 static void tty_executor( char *input )
 {
 	char *c;
+	int len;
 
 	/* readline got EOF */
 	if( ! input ){
@@ -71,7 +87,20 @@ static void tty_executor( char *input )
 
 	/* execute action - if one is defined */
 	inprompt = 0;
-	duc_cmd( con, input );
+
+	len = strcspn( input, "\t " );
+	if( 0 == strcasecmp( input, "quit" ) ){
+		terminate++;
+
+	} else if( 0 == strcasecmp( input, "exit" ) ){
+		terminate++;
+
+	} else if( len ==4 && 0 == strncasecmp( input, "user", 4 ) ){
+		cmd_user( input +4 );
+
+	} else {
+		duc_cmd( con, input );
+	}
 	inprompt = 1;
 
 	free(input);
