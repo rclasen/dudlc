@@ -22,6 +22,7 @@ void msc_queue_free( msc_queue *q );
 msc_it_queue *msc_cmd_queue( mservclient *c );
 msc_queue *msc_cmd_queueget( mservclient *c, int qid );
 
+int msc_cmd_queuealbum( mservclient *c, int id );
 int msc_cmd_queueadd( mservclient *c, int tid );
 int msc_cmd_queuedel( mservclient *c, int qid );
 int msc_cmd_queueclear( mservclient *c );

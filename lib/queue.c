@@ -79,6 +79,47 @@ int msc_cmd_queueadd( mservclient *c, int id )
 	return atoi(_msc_rline(c));
 }
 
+int msc_cmd_queuealbum( mservclient *c, int id )
+{
+	msc_it_track *it;
+	msc_track *t;
+	int *ids = NULL;
+	int total = 0;
+	int found = 0;
+	int i;
+
+	if( NULL == (it = msc_cmd_tracksalbum(c,id)))
+		return -1;
+
+	for( t = msc_it_track_cur(it); t; t = msc_it_track_next(it)){
+		if( found >= total ){
+			int *tmp;
+
+			total += 10;
+			tmp = realloc( ids, sizeof(int*) * total );
+			if( NULL == tmp ){
+				free(t);
+				break;
+			}
+			ids = tmp;
+
+		}
+		ids[found++] = t->id;
+		free(t);
+	}
+	msc_it_track_done(it);
+
+	for( i = 0; i < found; ++i ){
+		if( 0 > msc_cmd_queueadd(c, ids[i]) ){
+			free(ids);
+			return -1;
+		}
+	}
+
+	free(ids);
+	return 0;
+}
+
 int msc_cmd_queuedel( mservclient *c, int id )
 {
 	if( _msc_cmd( c, "queuedel %d", id ))

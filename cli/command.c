@@ -626,8 +626,7 @@ CMD(cmd_queueget)
 	msc_queue_free(q);
 }
 
-// TODO: queue specified album
-// TODO: queue current album
+// TODO: queue a specified list of tracks
 CMD(cmd_queueadd)
 {
 	int id;
@@ -644,7 +643,27 @@ CMD(cmd_queueadd)
 	}
 }
 
+// TODO: queue a specified list of albums
+// TODO: queue current album
+CMD(cmd_queuealbum)
+{
+	int id;
+
+	ARG_NEED("albumID");
+
+	if( 0 > (id = trackid(line, NULL))){
+		MSG_BADARG("trackID");
+		return;
+	}
+
+	if( 0 > msc_cmd_queuealbum(con, id)){
+		MSG_FAIL;
+	}
+}
+
+
 // TODO: unqueue range, by user, client, album, track
+// TODO: unqueue a list
 CMD(cmd_queuedel)
 {
 	int id;
@@ -793,6 +812,7 @@ static t_command commands[] = {
 	{ "queue", NULL, cmd_queue },
 	{ "queueget", NULL, cmd_queueget },
 	{ "queueadd", NULL, cmd_queueadd },
+	{ "queuealbum", NULL, cmd_queuealbum },
 	{ "queuedel", NULL, cmd_queuedel },
 	{ "queueclear", NULL, cmd_queueclear },
 	{ "sleep", NULL, cmd_sleep },
