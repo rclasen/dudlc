@@ -128,6 +128,17 @@ static void cb_queueclear( mservclient *c )
 }
 
 /************************************************************
+ * sleep
+ */
+
+static void cb_sleep( mservclient *c, int del )
+{
+	tty_msg( "falling asleep in %d sec\n", del );
+	(void)c;
+}
+
+
+/************************************************************
  * init
  */
 
@@ -158,6 +169,7 @@ void events_init( mservclient *c )
 	events.queuedel = cb_queuedel;
 	events.queueclear = cb_queueclear;
 
+	events.sleep = cb_sleep;
 }
 
 

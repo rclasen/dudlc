@@ -33,6 +33,9 @@ typedef struct {
 	/* random/filter */
 	msc_ev_argstring filter;
 
+	/* sleep */
+	msc_ev_argint sleep;
+
 	/* queue */
 	msc_ev_argqueue queuefetch;
 	msc_ev_argqueue queueadd;

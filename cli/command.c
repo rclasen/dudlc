@@ -554,6 +554,8 @@ CMD(cmd_queueget)
 	msc_queue_free(q);
 }
 
+// TODO: queue specified album
+// TODO: queue current album
 CMD(cmd_queueadd)
 {
 	int id;
@@ -570,6 +572,7 @@ CMD(cmd_queueadd)
 	}
 }
 
+// TODO: unqueue range, by user, client, album, track
 CMD(cmd_queuedel)
 {
 	int id;
@@ -591,6 +594,41 @@ CMD(cmd_queueclear)
 }
 
 /************************************************************
+ * commands: sleep
+ */
+
+CMD(cmd_sleep)
+{
+	int r;
+	ARG_NONE;
+
+	if( 0 > ( r = msc_cmd_sleep( con ))){
+		MSG_FAIL;
+		return;
+	}
+
+	tty_msg( "falling asleep in %d sek\n", r );
+}
+
+CMD(cmd_sleepset)
+{
+	int t;
+	char *end;
+
+	ARG_NEED("seconds");
+	t = strtol(line, &end, 10 );
+	if( *end ){
+		MSG_BADARG("seconds");
+		return;
+	}
+
+	if( msc_cmd_sleepset(con, t )){
+		MSG_FAIL;
+	}
+}
+
+
+/************************************************************
  * command list
  */
 
@@ -605,6 +643,7 @@ typedef struct _t_command {
 static t_command commands[] = {
 	{ "foo", cgen_cmd_foo, NULL },
 	{ "quit", NULL, cmd_quit },
+	{ "exit", NULL, cmd_quit },
 	{ "help", NULL, cmd_help },
 	{ "raw", NULL, cmd_raw },
 	{ "open", NULL, cmd_open },
@@ -636,6 +675,8 @@ static t_command commands[] = {
 	{ "queueadd", NULL, cmd_queueadd },
 	{ "queuedel", NULL, cmd_queuedel },
 	{ "queueclear", NULL, cmd_queueclear },
+	{ "sleep", NULL, cmd_sleep },
+	{ "sleepset", NULL, cmd_sleepset },
 
 	{ NULL, NULL, NULL }
 };

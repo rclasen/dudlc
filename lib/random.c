@@ -45,6 +45,10 @@ void _msc_bcast_random( mservclient *c, const char *line )
 			_MSC_EVENT(c,filter,c,line+4);
 			break;
 
+		case '1': /* sleeo changed - misplaced 621 */
+			_MSC_EVENT(c,sleep,c,atoi(line+4));
+			break;
+
 
 		default:
 			_MSC_EVENT(c,bcast,c,line);

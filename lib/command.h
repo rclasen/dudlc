@@ -11,6 +11,7 @@
 #include <mservclient/player.h>
 #include <mservclient/random.h>
 #include <mservclient/queue.h>
+#include <mservclient/sleep.h>
 
 
 #endif
