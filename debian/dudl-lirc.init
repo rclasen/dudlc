@@ -41,11 +41,10 @@ case "$1" in
 	echo "$NAME."
 	;;
   restart|force-reload)
-	echo  "Restarting $DESC: "
+	echo  "Restarting $DESC: ..."
 	$0 stop
 	sleep 1
 	$0 start
-	echo "$NAME."
 	;;
   *)
 	N=$0

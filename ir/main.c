@@ -11,6 +11,8 @@
 #include <netdb.h>
 #include <arpa/inet.h>
 #include <syslog.h>
+#include <fcntl.h>
+#include <signal.h>
 
 #include <libncc/pidfile.h>
 
@@ -18,8 +20,13 @@
 #include <dudlc.h>
 #include <dudlccmd.h>
 
+char *progname = NULL;
+char *lircfile = NULL;
 int dobeep = 0;
-dudlc *dudl;
+
+dudlc *dudl = NULL;
+int reread_config = 0;
+
 
 /*
  * print debugging message
@@ -34,6 +41,12 @@ dudlc *dudl;
 	fprintf( stderr, "%s: %s\n", progname, msg );
 
 static void usage( char *progname, FILE *out );
+
+static void sig_hup( int sig )
+{
+	signal( sig, sig_hup );
+	reread_config++;
+}
 
 static void beep( void )
 {
@@ -69,78 +82,145 @@ static int dudl_cmd( dudlc *con, char *cmd )
 /* 
  * execute lirc cmds as long as lircd is alive
  */
-static void loop_lirccmd( struct lirc_config *config )
+static void loop_lirccmd( struct lirc_config *config, char *code )
 {
-	char *code;
 	char *c;
-	int ret;
 
-	while (lirc_nextcode(&code) == 0) {
-		if (code == NULL)
+	/* lirc_code2char analyzes the string passed to it in the
+	 * second argument and sets the third argument to the
+	 * argument from the config.
+	 */
+	while ( !lirc_code2char(config, code, &c) && c != NULL ){
+
+		beep();
+
+		if( dudl_cmd( dudl, c ) ){
+			syslog( LOG_ERR, "duc_cmd failed for %s", c);
 			continue;
-
-		DPRINT( "loop_lirccmd(): got code" );
-		while ((ret = lirc_code2char(config, code, &c)) == 0 &&
-		    c != NULL) {
-
-			beep();
-
-			if( dudl_cmd( dudl, c ) ){
-				syslog( LOG_ERR, "duc_cmd failed for %s", c);
-				continue;
-			}
-
-			beep();
 		}
-		free(code);
 
-		if (ret == -1)
-			break;
+		beep();
 	}
 }
 
+static inline void setmax( int *max, int b )
+{
+	if( *max < b )
+		*max = b;
+}
 
 /* 
  * (re-)connect to lircd and execute commands
  */
-static void loop_lirc( char *conf, 
-		char *progname, 
-		int reconnect )
+static void loop_lirc( void )
 {
-	struct lirc_config *config;
+	int l_fd = -1;
+	struct lirc_config *l_conf = NULL;
 
 	while(1){
-		DPRINT( "loop_lirc() starting loop" );
-		if (lirc_init(progname, 1) == -1){
-			syslog( LOG_WARNING, "can't connect to lirc" );
-			goto cont;
+		int maxfd;
+		fd_set rfd;
+		struct timeval tv;
+		struct timeval *ptv;
+
+		/* re- open lirc connection */
+		if( -1 == l_fd ){
+			if( -1 == (l_fd = lirc_init(progname, 1) )){
+				syslog( LOG_ERR, "can't connect to lirc" );
+#if 0
+			} else {
+				if( -1 == fcntl( l_fd, F_SETFL, O_NONBLOCK ))
+					syslog( LOG_ERR, "fcntl failed: %m" );
+#endif
+			}
 		}
 
-		if (lirc_readconfig( conf, &config, NULL) != 0) {
-			syslog( LOG_WARNING, "can't read lirc config '%s'",
-				conf );
-			lirc_deinit();
-			goto cont;
+		/* re- read lirc config */
+		if( ! l_conf || reread_config ){
+			if( l_conf ){
+				lirc_freeconfig( l_conf );
+				l_conf = NULL;
+			}
+
+			if( lirc_readconfig( lircfile, &l_conf, NULL) ){
+				syslog( LOG_ERR, "can't read "
+						"lirc config '%s'", lircfile );
+			} else {
+				reread_config = 0;
+			}
 		}
 
-		loop_lirccmd( config );
+		/* wait for input */
 
-		lirc_freeconfig(config);
+		maxfd = 0;
+		FD_ZERO( &rfd );
 
-		lirc_deinit();
+		if( -1 != l_fd ){
+			setmax( &maxfd, l_fd );
+			FD_SET( l_fd, &rfd );
+		}
 
-cont:
-		DPRINT( "waiting %d seconds before reconnect", reconnect );
-		sleep( reconnect );
+		if( -1 != duc_fd( dudl )){
+			setmax( &maxfd, duc_fd( dudl ) );
+			FD_SET( duc_fd( dudl ), &rfd );
+		}
+
+		maxfd++;
+
+		/* set timeout for reconnect */
+		tv.tv_usec = 0;
+		tv.tv_sec = 60;
+		ptv = ( l_fd == -1 ) ? &tv : NULL;
+
+		if( 0 > select( maxfd, &rfd, NULL, NULL, ptv )){
+			if( errno == EINTR )
+				continue;
+
+			syslog( LOG_CRIT, "select failed: %m" );
+			exit(1);
+		}
+
+		/* process dudl input before reconnect can occur */
+		if( -1 != duc_fd( dudl ) && FD_ISSET( duc_fd( dudl ), &rfd ))
+			duc_poll( dudl );
+
+		/* process LIRC input */
+		if( -1 != l_fd && FD_ISSET( l_fd, &rfd ) ){
+			char *code = NULL;
+
+			/* lirc_nextcode tries to fetch a complete line
+			 * from lircd. The line is returned in the first
+			 * argument.
+			 *
+			 * it returns 0 on success and -1 on failure.
+			 * errno is not set by it - so it should be
+			 * untouched on failures
+			 *
+			 * it handles EAGAIN properly - the lirc fd can be
+			 * set to non-blocking.
+			 */
+			if( lirc_nextcode(&code) ) {
+				lirc_deinit();
+				l_fd = -1;
+
+			} else if( code && l_conf ){
+				loop_lirccmd( l_conf, code );
+			}
+
+			free(code);
+		}
 	}
+
+	if( -1 != l_fd )
+		lirc_deinit();
+	if( l_conf )
+		lirc_freeconfig( l_conf );
 }
 
 int main(int argc, char *argv[])
 {
-	char *progname;
 	int needhelp = 0;
 	int debug = 0;
-	char *conf = NULL;
 	int foreground = 0;
 	char *host = NULL;
 	int port = 0;
@@ -217,9 +297,13 @@ int main(int argc, char *argv[])
 	}
 
 	if( optind != argc ){
-		conf = argv[optind];
+		lircfile = argv[optind];
 	}
 
+	if( ! lircfile ){
+		eprintf( "missing config file" );
+		exit( EXIT_FAILURE );
+	}
 
 
 	/* set defaults */
@@ -268,8 +352,10 @@ int main(int argc, char *argv[])
 		exit( EXIT_FAILURE );
 	}
 
-	
-	loop_lirc( conf, progname, 60 );
+	signal( SIGHUP, sig_hup );
+	signal( SIGPIPE, SIG_IGN );
+
+	loop_lirc();
 
 
 
