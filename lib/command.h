@@ -9,6 +9,7 @@
 #include <mservclient/user.h>
 #include <mservclient/track.h>
 #include <mservclient/player.h>
+#include <mservclient/random.h>
 
 
 #endif

@@ -19,6 +19,7 @@ typedef struct {
 	/* other users/clients */
 	msc_ev_argclient login;
 	msc_ev_argclient logout;
+	msc_ev_argnone kicked;
 
 	/* player */
 	msc_ev_argtrack nexttrack;
@@ -26,6 +27,9 @@ typedef struct {
 	msc_ev_argnone paused;
 	msc_ev_argnone resumed;
 	msc_ev_argint random;
+
+	/* random/filter */
+	msc_ev_argstring filter;
 
 	// temporary:
 	msc_ev_argstring bcast;

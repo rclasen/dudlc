@@ -412,9 +412,41 @@ CMD(cmd_tracksartist)
 
 
 /************************************************************
- * commands: misc
+ * commands: random/filter
  */
 
+CMD(cmd_filter)
+{
+	char *f;
+
+	ARG_NONE;
+
+	if( NULL == (f = msc_cmd_filter( con ))){
+		MSG_FAIL;
+	}
+
+	tty_msg( "current filter: %s\n", f );
+	free(f);
+}
+
+CMD(cmd_filterset)
+{
+	if( msc_cmd_filterset(con, line)){
+		MSG_FAIL;
+	}
+}
+
+CMD(cmd_filterstat)
+{
+	int n;
+
+	ARG_NONE;
+	if( 0 > ( n = msc_cmd_filterstat(con))){
+		MSG_FAIL;
+	}
+
+	tty_msg( "tracks matching filter: %d\n", n );
+}
 
 /************************************************************
  * command list
@@ -453,6 +485,9 @@ static t_command commands[] = {
 	{ "tracksearch", NULL, cmd_tracksearch },
 	{ "tracksalbum", NULL, cmd_tracksalbum },
 	{ "tracksartist", NULL, cmd_tracksartist },
+	{ "filter", NULL, cmd_filter },
+	{ "filterset", NULL, cmd_filterset },
+	{ "filterstat", NULL, cmd_filterstat },
 
 	{ NULL, NULL, NULL }
 };

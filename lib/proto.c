@@ -80,6 +80,10 @@ static void _msc_bcast( mservclient *p, const char *line )
 			_msc_bcast_player( p, line );
 			break;
 			
+		case '5':
+			_msc_bcast_random( p, line );
+			break;
+			
 		default:
 			_MSC_EVENT(p,bcast,p,line);
 	}

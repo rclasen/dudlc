@@ -26,7 +26,7 @@ void dump_clients( msc_it_client *it )
 	char buf[BUFLENCLIENT];
 	msc_client *c;
 
-	tty_msg( "%s\n", mkclienthead(buf, BUFLENCLIENT));
+	tty_msg( "%s\n\n", mkclienthead(buf, BUFLENCLIENT));
 	for( c = msc_it_client_cur(it); c; c = msc_it_client_next(it)){
 		tty_msg( "%s\n", mkclient(buf, BUFLENCLIENT, c ));
 		msc_client_free(c);
@@ -58,7 +58,7 @@ void dump_tracks( msc_it_track *it )
 	msc_track *t;
 	char buf[BUFLENTRACK];
 
-	tty_msg( "%s\n", mktrackhead(buf, BUFLENTRACK));
+	tty_msg( "%s\n\n", mktrackhead(buf, BUFLENTRACK));
 	for( t = msc_it_track_cur(it); t; t = msc_it_track_next(it)){
 		tty_msg( "%s\n", mktrack(buf,BUFLENTRACK,t));
 		msc_track_free(t);
