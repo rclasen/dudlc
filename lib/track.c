@@ -31,7 +31,7 @@ msc_track *_msc_track_parse( const char *line, char **end )
 	s = e+1;
 	t->albumnr = strtol( s, &e, 10 );
 	if( s == e )
-		goto clean3;
+		goto clean2;
 
 	s = e+1;
 	if( NULL == (t->title = _msc_fielddup( s, &e )))
