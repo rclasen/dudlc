@@ -1,59 +1,9 @@
 
 #include <stdlib.h>
-#include <ctype.h>
 #include <string.h>
 
 #include <mservclient/proto.h>
 #include <mservclient/track.h>
-
-static const char *_msc_skipspace( const char *s )
-{
-	while( *s && isspace(*s))
-		s++;
-
-	return s;
-}
-
-static char *_msc_fielddup( const char *s, char **end )
-{
-	char *dup;
-	char *p;
-	int escape = 0;
-
-	/* alloc a string large enough for escaped string - the result
-	 * will be smaller */
-	if( NULL == (dup = malloc(1 + strcspn(s,"\t"))))
-		return NULL;
-
-	p = dup;
-	for(; *s && *s != '\t'; ++s ){
-		if( escape ){
-			switch( *s ){
-				case 't':
-					*p++ = '\t';
-					break;
-				case '\\':
-				default:
-					*p++ = *s;
-					break;
-			}
-			escape = 0;
-			continue;
-		} 
-
-		if( *s == '\\' ){
-			escape++;
-			continue;
-		}
-
-		*p++ = *s;
-	}
-	*p++= 0;
-
-	if( end ) (const char *)*end = s;
-
-	return dup;
-}
 
 msc_track *_msc_track_parse( const char *line, char **end )
 {
@@ -97,12 +47,6 @@ msc_track *_msc_track_parse( const char *line, char **end )
 	if( s == e )
 		goto clean3;
 
-	s = _msc_skipspace(e);
-	t->lastplay = strtol( s, &e, 10 );
-	if( s == e )
-		goto clean3;
-
-
 	return t;
 
 clean3:
@@ -138,7 +82,7 @@ int msc_cmd_tracks( mservclient *c )
 	return atoi(_msc_rline(c));
 }
 
-msc_track *msc_cmd_track_get( mservclient *c, int id )
+msc_track *msc_cmd_trackget( mservclient *c, int id )
 {
 	if( _msc_cmd( c, "trackget %d", id ))
 		return NULL;
@@ -149,19 +93,19 @@ msc_track *msc_cmd_track_get( mservclient *c, int id )
 	return _msc_track_parse(_msc_rline(c),NULL);
 }
 
-msc_it_track *msc_cmd_tracks_search( mservclient *c, const char *substr )
+msc_it_track *msc_cmd_tracksearch( mservclient *c, const char *substr )
 {
 	return _msc_iterate( c, (_msc_converter)_msc_track_parse, 
 			"tracksearch %s", substr );
 }
 
-msc_it_track *msc_cmd_tracks_albumid( mservclient *c, int id )
+msc_it_track *msc_cmd_tracksalbum( mservclient *c, int id )
 {
 	return _msc_iterate( c, (_msc_converter)_msc_track_parse, 
 			"tracksalbum %d", id );
 }
 
-msc_it_track *msc_cmd_tracks_artistid( mservclient *c, int id )
+msc_it_track *msc_cmd_tracksartist( mservclient *c, int id )
 {
 	return _msc_iterate( c, (_msc_converter)_msc_track_parse, 
 			"tracksartist %d", id );
