@@ -166,8 +166,10 @@ const char *msc_sock_getline( t_msc_sock *s )
 	if( s->llen == s->ilen ){
 		/* no linebreak found */
 
-		if( s->llen < BUFLENRCV -1 )
+		if( s->llen < BUFLENRCV -1 ){
+			s->llen = 0;
 			return NULL;
+		}
 
 		fprintf( stderr, "line too long for BUFLENRCV, " 
 				"truncating\n" );
