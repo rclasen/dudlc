@@ -8,4 +8,8 @@ include_HEADERS= dudlccmd.h
 
 libdudlccmd_la_SOURCES= formatter.c msg.c command.c 
 
-
+checklib:
+	make -C ../lib/commands.txt
+	while read cmd; do \
+		grep $$cmd command.c > /dev/null || echo $$cmd ; \
+	done < ../lib/commands.txt

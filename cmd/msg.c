@@ -92,3 +92,29 @@ void dmsg_dump_users( duc_it_user *it )
 	}
 }
 
+void dmsg_dump_albums( duc_it_album *it )
+{
+	duc_album *t;
+	char buf[BUFLENALBUM];
+
+	dmsg_msg( "%s\n\n", dfmt_albumhead(buf, BUFLENALBUM));
+	for( t = duc_it_album_cur(it); t; t = duc_it_album_next(it)){
+		dmsg_msg( "%s\n", dfmt_album(buf,BUFLENALBUM,t));
+		duc_album_free(t);
+	}
+}
+
+void dmsg_dump_artists( duc_it_artist *it )
+{
+	duc_artist *t;
+	char buf[BUFLENARTIST];
+
+	dmsg_msg( "%s\n\n", dfmt_artisthead(buf, BUFLENARTIST));
+	for( t = duc_it_artist_cur(it); t; t = duc_it_artist_next(it)){
+		dmsg_msg( "%s\n", dfmt_artist(buf,BUFLENARTIST,t));
+		duc_artist_free(t);
+	}
+}
+
+
+

@@ -25,6 +25,12 @@ const char *dfmt_tag( char *buf, unsigned int len, duc_tag *q );
 const char *dfmt_userhead( char *buf, unsigned int len );
 const char *dfmt_user( char *buf, unsigned int len, duc_user *q );
 
+const char *dfmt_albumhead( char *buf, unsigned int len );
+const char *dfmt_album( char *buf, unsigned int len, duc_album *q );
+
+const char *dfmt_artisthead( char *buf, unsigned int len );
+const char *dfmt_artist( char *buf, unsigned int len, duc_artist *q );
+
 
 
 #define BUFLENCLIENT 512
@@ -32,6 +38,8 @@ const char *dfmt_user( char *buf, unsigned int len, duc_user *q );
 #define BUFLENQUEUE 1024
 #define BUFLENTAG 1024
 #define BUFLENUSER 1024
+#define BUFLENALBUM 1024
+#define BUFLENARTIST 512
 
 typedef int (*t_dmsg)( const char *fmt, va_list ap );
 
@@ -44,6 +52,8 @@ void dmsg_dump_queue( duc_it_queue *it );
 void dmsg_dump_history( duc_it_history *it );
 void dmsg_dump_tags( duc_it_tag *it );
 void dmsg_dump_users( duc_it_user *it );
+void dmsg_dump_albums( duc_it_album *it );
+void dmsg_dump_artists( duc_it_artist *it );
 
 
 

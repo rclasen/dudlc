@@ -1220,8 +1220,114 @@ CMD(cmd_tracktagdel)
 	CMD_OK;
 }
 
-//TODO: album commands
-//TODO: artist commands
+/************************************************************
+ * commands: album
+ */
+
+CMD(cmd_albumget)
+{
+	int num;
+	duc_album *t;
+	char buf[BUFLENALBUM];
+
+	ARG_NEED("albumID");
+
+	num = atoi(line);
+	if( NULL == ( t = duc_cmd_albumget(con, num )))
+		CMD_FAIL;
+
+	dmsg_msg( "%s\n\n", dfmt_albumhead(buf, BUFLENALBUM));
+	dmsg_msg( "%s\n", dfmt_album(buf,BUFLENALBUM,t));
+	duc_album_free( t );
+	CMD_OK;
+}
+
+CMD(cmd_albumlist)
+{
+	duc_it_album *it;
+
+	ARG_NONE;
+
+	if( NULL == (it = duc_cmd_albumlist( con )))
+		CMD_FAIL;
+
+	dmsg_dump_albums(it);
+	duc_it_album_done(it);
+	CMD_OK;
+}
+
+CMD(cmd_albumsearch)
+{
+	duc_it_album *it;
+
+	ARG_NEED("substr");
+
+	if( NULL == (it = duc_cmd_albumsearch( con, line )))
+		CMD_FAIL;
+
+	dmsg_dump_albums(it);
+	duc_it_album_done(it);
+	CMD_OK;
+}
+
+// TODO: CMD(cmd_albumsetartist)
+// TODO: CMD(cmd_albumsetname)
+
+
+/************************************************************
+ * commands: artist
+ */
+
+// TODO: CMD(cmd_artistadd)
+// TODO: CMD(cmd_artistdel)
+
+CMD(cmd_artistget)
+{
+	int num;
+	duc_artist *t;
+	char buf[BUFLENARTIST];
+
+	ARG_NEED("artistID");
+
+	num = atoi(line);
+	if( NULL == ( t = duc_cmd_artistget(con, num )))
+		CMD_FAIL;
+
+	dmsg_msg( "%s\n\n", dfmt_artisthead(buf, BUFLENARTIST));
+	dmsg_msg( "%s\n", dfmt_artist(buf,BUFLENARTIST,t));
+	duc_artist_free( t );
+	CMD_OK;
+}
+
+CMD(cmd_artistlist)
+{
+	duc_it_artist *it;
+
+	ARG_NONE;
+
+	if( NULL == (it = duc_cmd_artistlist( con )))
+		CMD_FAIL;
+
+	dmsg_dump_artists(it);
+	duc_it_artist_done(it);
+	CMD_OK;
+}
+
+CMD(cmd_artistsearch)
+{
+	duc_it_artist *it;
+
+	ARG_NEED("substr");
+
+	if( NULL == (it = duc_cmd_artistsearch( con, line )))
+		CMD_FAIL;
+
+	dmsg_dump_artists(it);
+	duc_it_artist_done(it);
+	CMD_OK;
+}
+
+// TODO: CMD(cmd_artistsetname)
 
 /************************************************************
  * command list
@@ -1302,6 +1408,19 @@ static t_command commands[] = {
 	{ "tracktagged", NULL, cmd_tracktagged },
 	{ "tracktagset", NULL, cmd_tracktagset },
 	{ "tracktagdel", NULL, cmd_tracktagdel },
+
+	{ "albumget", NULL, cmd_albumget },
+	{ "albumlist", NULL, cmd_albumlist },
+	{ "albumsearch", NULL, cmd_albumsearch },
+	//{ "albumsetartist", NULL, cmd_albumsetartist },
+	//{ "albumsetname", NULL, cmd_albumsetname },
+
+	//{ "artistadd", NULL, cmd_artistadd },
+	//{ "artistdel", NULL, cmd_artistdel },
+	{ "artistget", NULL, cmd_artistget },
+	{ "artistlist", NULL, cmd_artistlist },
+	{ "artistsearch", NULL, cmd_artistsearch },
+	//{ "artistsetname", NULL, cmd_artistsetname },
 
 	{ NULL, NULL, NULL }
 };

@@ -8,6 +8,10 @@ cmd: uses hardcoded terminal control codes for bold output
 
 cli: put nexttrack bcast in current line, opening a new one
 
+lib: make all functions accept lists of track/artist/whatever IDs
+
+cli: parse lists and ranges of tracks/artist/whatever
+
 implement all lib commands
 
 implement all cli commands

@@ -239,3 +239,58 @@ const char *dfmt_user( char *buf, unsigned int len, duc_user *q )
 }
 
 
+/************************************************************
+ * album
+ */
+
+const char *dfmt_albumhead( char *buf, unsigned int len )
+{
+	unsigned int l;
+
+	l = snprintf( buf, len, "%4.4s %-25s %-20s", "id", "album", "artist" );
+	if( l > len )
+		return NULL;
+
+	return buf;
+}
+
+// TODO: lookup artist
+const char *dfmt_album( char *buf, unsigned int len, duc_album *q )
+{
+	unsigned int l;
+
+	l = snprintf( buf, len, "%4d %-25s %-20d", q->id, q->album, q->artistid);
+	if( l > len )
+		return NULL;
+
+	return buf;
+}
+
+
+/************************************************************
+ * artist
+ */
+
+const char *dfmt_artisthead( char *buf, unsigned int len )
+{
+	unsigned int l;
+
+	l = snprintf( buf, len, "%4.4s %-20s", "id", "artist" );
+	if( l > len )
+		return NULL;
+
+	return buf;
+}
+
+const char *dfmt_artist( char *buf, unsigned int len, duc_artist *q )
+{
+	unsigned int l;
+
+	l = snprintf( buf, len, "%4d %-20s", q->id, q->artist);
+	if( l > len )
+		return NULL;
+
+	return buf;
+}
+
+

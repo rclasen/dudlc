@@ -1,3 +1,9 @@
+dudlc (0.0.5) unstable; urgency=low
+
+  * added first set of artist and album commands
+
+ -- Rainer Clasen <bj@zuto.de>  Sat, 28 Aug 2004 17:45:41 +0200
+
 dudlc (0.0.4) unstable; urgency=low
 
   * lintian cleanup

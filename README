@@ -2,6 +2,8 @@ lib	libdudlc
 	Library for accessing a dudl daemon. Completely
 	encapuslates the protocol.
 
+lib/dudlc	libdudlc header files
+
 cmd	libdudlccmd
 	Library for clients submitting commands as string. Includes
 	functions to print output in text form. Uses libdudlc.

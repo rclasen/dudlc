@@ -26,3 +26,8 @@ libdudlc_la_SOURCES= album.c \
 	track.c \
 	user.c 
 
+all-am: commands.txt
+commands.txt:
+	grep duc_cmd_ dudlc/*.h  | \
+		sed -e 's/.*\(duc_cmd_[a-z]*\).*/\1/' | \
+		sort -u > $@
