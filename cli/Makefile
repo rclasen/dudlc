@@ -22,7 +22,9 @@ OBJ	:=
 ############################################################
 # mservcli
 
-SRC_mservcli	:= cmd.c input.c \
+SRC_mservcli	:= \
+		server.c proto.c \
+		tty.c \
 		mservcli.c
 OBJ_mservcli	:= $(patsubst %.c,%.o,$(SRC_mservcli))
 LNK += mservcli
