@@ -5,4 +5,4 @@ CFLAGS:= -g -Wall  -W -Wunused -Wmissing-prototypes -Wcast-qual \
 
 bin_PROGRAMS = irdudl
 irdudl_SOURCES = main.c
-irdudl_LDFLAGS=-L../lib -L../cmd -ldudlc -ldudlccmd -llirc_client
+irdudl_LDFLAGS=-L../lib -L../cmd -ldudlc -ldudlccmd -llirc_client -lncc

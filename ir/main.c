@@ -12,6 +12,8 @@
 #include <arpa/inet.h>
 #include <syslog.h>
 
+#include <libncc/pidfile.h>
+
 #include <lirc/lirc_client.h>
 #include <dudlc.h>
 #include <dudlccmd.h>
@@ -144,6 +146,8 @@ int main(int argc, char *argv[])
 	int port = 0;
 	char *user = NULL;
 	char *pass = NULL;
+	int pidfile = 0;
+	int rv;
 
 	progname = strrchr( argv[0], '/' );
 	if( NULL != progname ){
@@ -163,9 +167,12 @@ int main(int argc, char *argv[])
 			{"port", required_argument, NULL, 'P'},
 			{"user", required_argument, NULL, 'u'},
 			{"pass", required_argument, NULL, 'p'},
+			{"beep", no_argument, NULL, 'b'},
+			{"pidfile", no_argument, NULL, 'l'},
 			{0, 0, 0, 0}
 		};
-		c = getopt_long(argc, argv, "bhfDH:P:u:p:", long_options, NULL);
+		c = getopt_long(argc, argv, "bhfDlH:P:u:p:", 
+				long_options, NULL);
 		if (c == -1)
 			break;
 		switch (c) {
@@ -192,6 +199,9 @@ int main(int argc, char *argv[])
 			break;
 		case 'p':
 			pass = strdup(optarg);
+			break;
+		case 'l':
+			pidfile++;
 			break;
 		default:
 			needhelp++;
@@ -251,6 +261,13 @@ int main(int argc, char *argv[])
 		syslog_perror(progname);
 		exit(EXIT_FAILURE);
 	}
+
+	if( pidfile && PF_SUCCESS != (rv = pidfile_lock(progname, 1 ))){
+		syslog( LOG_ERR, "cannot create pidfile: %s", 
+				pidfile_errstr(rv));
+		exit( EXIT_FAILURE );
+	}
+
 	
 	loop_lirc( conf, progname, 60 );
 
@@ -258,6 +275,7 @@ int main(int argc, char *argv[])
 
 	/* cleanup */
 	duc_free( dudl );
+	pidfile_unlock( progname );
 
 	exit(EXIT_SUCCESS);
 }
@@ -273,6 +291,8 @@ void usage( char *progname, FILE *out )
 		"   -P --port <p>    dudld port\n"
 		"   -u --user <u>    dudld user\n"
 		"   -p --pass <p>    dudld password\n"
+		"   -l --pidfile     create and check a pidfile\n"
+		"   -b --beep        enable beeps\n"
 		);
 }
 
