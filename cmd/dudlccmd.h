@@ -33,10 +33,10 @@ const char *dfmt_user( char *buf, unsigned int len, duc_user *q );
 #define BUFLENTAG 1024
 #define BUFLENUSER 1024
 
-typedef int (*t_dmsg)( char *fmt, va_list ap );
+typedef int (*t_dmsg)( const char *fmt, va_list ap );
 
 extern t_dmsg dmsg_msg_cb;
-int dmsg_msg( char *fmt, ... );
+int dmsg_msg( const char *fmt, ... );
 
 void dmsg_dump_clients( duc_it_client *it );
 void dmsg_dump_tracks( duc_it_track *it );

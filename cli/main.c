@@ -8,8 +8,6 @@
 #include <signal.h>
 #include <stdio.h>
      
-#include <dudlc.h>
-
 #include "tty.h"
 #include "events.h"
 #include "main.h"
@@ -82,6 +80,8 @@ int main( int argc, char **argv )
 	(void) argv;
 
 	// TODO: getopt 
+
+	dmsg_msg_cb = tty_vmsg;
 
 	con = duc_new( "localhost", 4445 );
 	duc_setauth( con, user, pass );

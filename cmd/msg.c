@@ -7,7 +7,7 @@
 
 t_dmsg dmsg_msg_cb = NULL;
 
-int dmsg_msg( char *fmt, ... )
+int dmsg_msg( const char *fmt, ... )
 {
 	va_list ap;
 
@@ -15,7 +15,7 @@ int dmsg_msg( char *fmt, ... )
 		return 0;
 
 	va_start( ap, fmt );
-	return (*dmsg_msg)(fmt, ap );
+	return (*dmsg_msg_cb)(fmt, ap );
 }
 
 void dmsg_dump_clients( duc_it_client *it )
