@@ -1,19 +1,23 @@
 #ifndef _MSERVCLIENT_EVENT_H
 #define _MSERVCLIENT_EVENT_H
 
+#include <mservclient/session.h>
 #include <mservclient/client.h>
 #include <mservclient/user.h>
 #include <mservclient/track.h>
 #include <mservclient/queue.h>
 #include <mservclient/tag.h>
+#include <mservclient/artist.h>
+#include <mservclient/album.h>
 
 typedef void (*msc_ev_argnone)( mservclient *c );
 typedef void (*msc_ev_argstring)( mservclient *c, const char *s );
 typedef void (*msc_ev_argint)( mservclient *c, int i );
 typedef void (*msc_ev_argclient)( mservclient *c, msc_client *t );
-typedef void (*msc_ev_argtrack)( mservclient *c, msc_track *t );
 typedef void (*msc_ev_argqueue)( mservclient *c, msc_queue *t );
 typedef void (*msc_ev_argtag)( mservclient *c, msc_tag *t );
+typedef void (*msc_ev_argntrack)( mservclient *c, 
+		msc_track *t, msc_artist *ar, msc_album *al );
 
 typedef struct {
 	/* my connection status */
@@ -26,7 +30,7 @@ typedef struct {
 	msc_ev_argnone kicked;
 
 	/* player */
-	msc_ev_argtrack nexttrack;
+	msc_ev_argntrack nexttrack;
 	msc_ev_argnone stopped;
 	msc_ev_argnone paused;
 	msc_ev_argnone resumed;
@@ -64,4 +68,5 @@ msc_events *msc_setevents( mservclient *p, msc_events *e );
 
 #endif
 
+void _msc_bcast( mservclient *p, const char *line );
 

@@ -5,7 +5,6 @@
 #include <stdarg.h>
 #include <ctype.h>
 
-#include <mservclient/command.h>
 #include <mservclient/event.h>
 #include <mservclient/proto.h>
 
@@ -147,34 +146,6 @@ void *_msc_cmd_conv( mservclient *c, _msc_converter conv,
 	return  NULL;
 }
 
-
-static void _msc_bcast( mservclient *p, const char *line )
-{
-	switch(line[1]){
-		case '3':
-			_msc_bcast_user( p, line );
-			break;
-
-		case '4':
-			_msc_bcast_player( p, line );
-			break;
-			
-		case '5':
-			_msc_bcast_random( p, line );
-			break;
-			
-		case '6':
-			_msc_bcast_queue( p, line );
-			break;
-			
-		case '7':
-			_msc_bcast_tag( p, line );
-			break;
-			
-		default:
-			_MSC_EVENT(p,bcast,p,line);
-	}
-}
 
 int _msc_rnext( mservclient *p )
 {
