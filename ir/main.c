@@ -65,14 +65,21 @@ static void loop_lirccmd( struct lirc_config *config )
 
 		DPRINT( "loop_lirccmd(): got code" );
 		while ((ret = lirc_code2char(config, code, &c)) == 0 &&
-		       c != NULL) {
+		    c != NULL) {
+
 			beep();
-			if( duc_cmd( dudl, c ) ){
-				syslog( LOG_WARNING, "duc_cmd failed for %s",
-					c);
-			} else {
-				beep();
+
+			if( duc_open( dudl ) ) {
+				syslog( LOG_ERR, "reconnect to dudld failed" );
+				continue;
 			}
+
+			if( duc_cmd( dudl, c ) ){
+				syslog( LOG_ERR, "duc_cmd failed for %s", c);
+				continue;
+			}
+
+			beep();
 		}
 		free(code);
 
