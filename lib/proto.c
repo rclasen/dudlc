@@ -247,7 +247,7 @@ void duc_poll( dudlc *p )
 		}
 
 		if( *l != '6' ){
-			fprintf( stderr, "found unprocessed input\n");
+			fprintf( stderr, "found unprocessed input: %s\n", l );
 			continue;
 		}
 
