@@ -15,6 +15,17 @@ static size_t isotime( char *s, size_t max, time_t time )
 }
 
 
+static size_t minutes( char *s, size_t max, time_t time )
+{
+	struct tm *t;
+
+	t = localtime( &time );
+	return strftime( s, max, "%M:%S", t );
+	/*                        MM:SS */
+	/*                        5 */
+}
+
+
 static size_t isotimestamp( char *s, size_t max, time_t time )
 {
 	struct tm *t;
@@ -78,16 +89,34 @@ const char *mktrackid( int albumid, int nr )
 
 const char *mktrackhead( char *buf, unsigned int len )
 {
-	snprintf( buf, len, "%7.7s %-20.20s %s",
-			"alb/nr", "artist", "title" );
+	snprintf( buf, len, "%7.7s %-18.18s %-5.5s %-16.16s %-29.29s",
+			"alb/nr", "album", "dur", "artist", "title" );
+	return buf;
+}
+
+const char *mkrtrack( char *buf, unsigned int len, 
+		msc_track *t, msc_artist *ar, msc_album *al )
+{
+	char tim[10];
+
+	minutes(tim, 10, t->duration);
+	snprintf( buf, len, "%7s %-18.18s %-5.5s %-16.16s %-29.29s",
+			mktrackid(t->albumid, t->albumnr), 
+			al->album, tim, ar->artist, t->title );
+
 	return buf;
 }
 
 // TODO: lookup artist and album name
+// TODO: include duration
 const char *mktrack( char *buf, unsigned int len, msc_track *t )
 {
-	snprintf( buf, len, "%7s %-20d %s",
-			mktrackid(t->albumid, t->albumnr), 
+	char tim[10];
+
+	minutes(tim, 10, t->duration);
+	snprintf( buf, len, "%7s %-18s %5s %-16d %-29.29s",
+			mktrackid(t->albumid, t->albumnr), "",
+			tim,
 			t->artistid, t->title );
 
 	return buf;

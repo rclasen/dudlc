@@ -15,6 +15,8 @@ void dump_clients( msc_it_client *it );
 
 const char *mktrackid( int albumid, int nr );
 
+const char *mkrtrack( char *buf, unsigned int len, 
+		msc_track *t, msc_artist *ar, msc_album *al );
 const char *mktrackhead( char *buf, unsigned int len );
 const char *mktrack( char *buf, unsigned int len, msc_track *t );
 void dump_tracks( msc_it_track *it );
