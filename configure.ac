@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 AC_INIT
-AM_INIT_AUTOMAKE(dudlc,0.0.1)
+AM_INIT_AUTOMAKE(dudlc,0.0.2)
 AM_CONFIG_HEADER(lib/dudlc/config.h)
 
 # Checks for programs.
