@@ -6,13 +6,9 @@
 
 
 #include <mservclient/client.h>
+#include <mservclient/proto.h>
 
 #define BUFLENLINE	2048
-
-#define EVENT(c,name,arg...)	\
-	if( (c)->ev && ((msc_events*)(c)->ev)->name ){ \
-		(*((msc_events*)(c)->ev)->name)(arg); \
-	}
 
 mservclient *msc_new( const char *hostname, int port, 
 		const char *user, const char *pass )
@@ -127,7 +123,7 @@ static void msc_restart( mservclient *p )
 	*p->code = 0;
 
 	msc_sock_disconnect( p->con );
-	EVENT(p,disconnect,p);
+	MSC_EVENT(p,disconnect,p);
 }
 
 int _msc_send( mservclient *p, const char *msg )
@@ -182,7 +178,7 @@ int _msc_fsend( mservclient *p, const char *fmt, ... )
 
 static void _msc_bcast( mservclient *p, const char *line )
 {
-	EVENT(p,bcast,p,line);
+	MSC_EVENT(p,bcast,p,line);
 
 	// TODO: bcast
 	(void) p;

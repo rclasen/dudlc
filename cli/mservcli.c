@@ -8,7 +8,7 @@
 #include <signal.h>
 #include <stdio.h>
      
-#include <mservclient/client.h>
+#include <mservclient/command.h>
 
 #include "tty.h"
 

@@ -11,7 +11,8 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
-#include <mservclient/client.h>
+#include <mservclient/command.h>
+#include <mservclient/proto.h>
 
 #include "tty.h"     
 
