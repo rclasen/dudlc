@@ -15,7 +15,7 @@ static msc_queue *_msc_queue_parse( const char *line, char **end )
 	 * now we have to cast the const hackishly away */
 	(const char*)e = s = line;
 
-	if( NULL == (n = malloc(sizeof(msc_track)))){
+	if( NULL == (n = malloc(sizeof(msc_queue)))){
 		goto clean1;
 	}
 
@@ -56,9 +56,10 @@ void msc_queue_free( msc_queue *q )
 	free(q);
 }
 
-msc_it_queue *msc_cmd_queue( mservclient *c )
+msc_it_queue *msc_cmd_queuelist( mservclient *c )
 {
-	return _msc_iterate( c, (_msc_converter)_msc_queue_parse, "queue" );
+	return _msc_iterate( c, (_msc_converter)_msc_queue_parse, 
+			"queuelist" );
 }
 
 msc_queue *msc_cmd_queueget( mservclient *c, int qid )

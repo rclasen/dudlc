@@ -1,7 +1,7 @@
 #ifndef _MSERVCLIENT_QUEUE_H
 #define _MSERVCLIENT_QUEUE_H
 
-#include <mservclient/client.h>
+#include <mservclient/session.h>
 #include <mservclient/track.h>
 
 typedef struct {
@@ -19,7 +19,7 @@ void msc_queue_free( msc_queue *q );
 #define msc_it_queue_done(x)	_msc_it_done((_msc_iter*)x)
 
 
-msc_it_queue *msc_cmd_queue( mservclient *c );
+msc_it_queue *msc_cmd_queuelist( mservclient *c );
 msc_queue *msc_cmd_queueget( mservclient *c, int qid );
 
 int msc_cmd_queuealbum( mservclient *c, int id );
