@@ -6,12 +6,13 @@
 
 
 typedef struct {
+	void *ev;
+
 	char *user;
 	char *pass;
 
-	void *ev;
-
 	t_msc_sock *con;
+
 	int inreply;
 	char code[4];
 	const char *line;
@@ -32,8 +33,10 @@ typedef struct {
 
 mservclient *msc_new( const char *hostname, int port, 
 		const char *user, const char *pass );
-int msc_open( mservclient *p );
 void msc_free( mservclient *p );
+
+int msc_open( mservclient *p );
+void msc_close( mservclient *p );
 
 int msc_fd( mservclient *p );
 void msc_poll( mservclient *p );
@@ -41,4 +44,7 @@ void msc_poll( mservclient *p );
 msc_events *msc_getevents( mservclient *p );
 msc_events *msc_setevents( mservclient *p, msc_events *e );
 
+const char *msc_rmsg( mservclient *p );
+
 #endif
+

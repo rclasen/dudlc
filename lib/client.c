@@ -1,14 +1,8 @@
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <stdarg.h>
-
 
 #include <mservclient/client.h>
 #include <mservclient/proto.h>
-
-#define BUFLENLINE	2048
 
 mservclient *msc_new( const char *hostname, int port, 
 		const char *user, const char *pass )
@@ -84,25 +78,21 @@ int msc_open( mservclient *p )
 	/* we are waiting for the hello message, but we are only
 	 * interested in the reply code */
 	p->inreply = 1;
-	if( _msc_last(p) )
+	if( _msc_rlast(p) )
 		goto clean1;
 
 	c = _msc_rcode(p);
 	if( ! c || *c != '2' )
 		goto clean1;
 
-	if( _msc_fsend( p, "user %s", p->user ))
-		return 1;
-	if( _msc_last(p) )
+	if( _msc_cmd( p, "user %s", p->user ))
 		goto clean1;
 
 	c = _msc_rcode(p);
 	if( !c || *c != '3' )
 		goto clean1;
 
-	if( _msc_fsend( p, "pass %s", p->pass ))
-		return 1;
-	if( _msc_last(p) )
+	if( _msc_cmd( p, "pass %s", p->pass ))
 		goto clean1;
 
 	c = _msc_rcode(p);
@@ -116,7 +106,7 @@ clean1:
 	return 1;
 }
 
-static void msc_restart( mservclient *p )
+void msc_close( mservclient *p )
 {
 	p->line = NULL;
 	p->inreply = 0;
@@ -126,171 +116,9 @@ static void msc_restart( mservclient *p )
 	MSC_EVENT(p,disconnect,p);
 }
 
-int _msc_send( mservclient *p, const char *msg )
+const char *msc_rmsg( mservclient *p )
 {
-	if( p->inreply )
-		return 1;
-
-	if( msg[strlen(msg)-1] != '\n' )
-		return 1;
-
-	if( msc_open(p) )
-		return 1;
-
-	*p->code = 0;
-	p->line = NULL;
-	if( ! msc_sock_send( p->con, msg ) ){
-		p->inreply = 1;
-		return 0;
-	}
-
-	msc_restart( p );
-	return 1;
-}
-
-static int _msc_vsend( mservclient *p, const char *fmt, va_list ap )
-{
-	char buf[BUFLENLINE];
-	int len;
-
-	len = vsnprintf( buf, BUFLENLINE -1, fmt, ap );
-	if( len < 0 || len > BUFLENLINE -1 )
-		return 1;
-
-	buf[len++] = '\n';
-	buf[len++] = 0;
-
-	return _msc_send( p, buf );
-}
-
-int _msc_fsend( mservclient *p, const char *fmt, ... )
-{
-	va_list ap;
-	int r;
-
-	va_start( ap, fmt );
-	r = _msc_vsend( p, fmt, ap );
-	va_end( ap );
-
-	return r;
-}
-
-
-static void _msc_bcast( mservclient *p, const char *line )
-{
-	MSC_EVENT(p,bcast,p,line);
-
-	// TODO: bcast
-	(void) p;
-	(void)line;
-}
-
-int _msc_nextline( mservclient *p )
-{
-	const char *l = NULL;
-
-	if( ! p->inreply )
-		return 1;
-
-	while( 1 ){
-
-		/* process next line */
-		if( NULL != (l = msc_sock_getline(p->con)) ){
-			if( strlen(l) < 4 ){
-				msc_restart( p );
-				return -1;
-			}
-
-			/* leave this loop for non-broadcasts */
-			if( *l != '6' ){
-				break;
-			}
-
-			_msc_bcast( p, l );
-			continue;
-		} 
-		
-		/* or fetch next input from server */
-		if( msc_sock_recv( p->con)){
-			msc_restart( p );
-			return -1;
-		}
-	}
-
-	p->line = l + 4;
-
-	if( *p->code ){
-		if( strncmp(p->code, l, 3) ){
-			msc_restart( p );
-			return -1;
-		}
-	} else {
-		strncpy( p->code, l, 3 );
-		p->code[3] = 0;
-	}
-
-	p->inreply = (l[3] == '-');
-
-	return 0;
-}
-
-int _msc_last( mservclient *p )
-{
-	int r;
-
-	/* read everything up to the last line */
-	while( (r = _msc_nextline(p)));
-
-	if( r < 0 )
-		return 1;
-
-	return 0;
-}
-
-int _msc_rend( mservclient *p )
-{
-	return ! p->inreply;
-}
-
-const char *_msc_rcode( mservclient *p )
-{
-	if( ! *p->code )
-		return NULL;
-
-	return p->code;
-}
-
-const char *_msc_rline( mservclient *p )
-{
-	if( ! p->line )
-		return NULL;
-
-	return p->line;
-}
-
-void msc_poll( mservclient *p )
-{
-	const char *l;
-
-	if( msc_open(p) )
-		return;
-
-	if( msc_sock_recv(p->con) )
-		msc_restart( p );
-
-	while( NULL != (l = msc_sock_getline(p->con))){
-		if( strlen(l) < 4 ){
-			msc_restart( p );
-			return;
-		}
-
-		if( *l != '6' ){
-			fprintf( stderr, "found unprocessed input\n");
-			continue;
-		}
-
-		_msc_bcast( p, l );
-	}
+	return _msc_rline( p );
 }
 
 
