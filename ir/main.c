@@ -147,6 +147,9 @@ static void loop_lirc( void )
 			}
 		}
 
+		/* re- connect to server */
+		duc_open(dudl);
+
 		/* wait for input */
 
 		maxfd = 0;
@@ -167,7 +170,7 @@ static void loop_lirc( void )
 		/* set timeout for reconnect */
 		tv.tv_usec = 0;
 		tv.tv_sec = 60;
-		ptv = ( l_fd == -1 ) ? &tv : NULL;
+		ptv = ( l_fd == -1 || -1 == duc_fd( dudl )) ? &tv : NULL;
 
 		if( 0 > select( maxfd, &rfd, NULL, NULL, ptv )){
 			if( errno == EINTR )
@@ -340,7 +343,6 @@ int main(int argc, char *argv[])
 		exit( EXIT_FAILURE );
 	}
 	duc_setauth( dudl, user, pass );
-	duc_open( dudl );
 
 
 	/* start work */
