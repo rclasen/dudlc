@@ -34,9 +34,6 @@ int reread_config = 0;
 #define DPRINT( fmt... ) \
 	syslog( LOG_DEBUG, "DEBUG: " fmt )
 
-#define syslog_perror( msg ) \
-	syslog( LOG_ERR, "%s: %s", msg, strerror(errno) )
-
 #define eprintf( msg ) \
 	fprintf( stderr, "%s: %s\n", progname, msg );
 
@@ -125,18 +122,18 @@ static void loop_lirc( void )
 
 		/* re- open lirc connection */
 		if( -1 == l_fd ){
+			syslog(LOG_NOTICE, "(re-)connecting to lircd" );
 			if( -1 == (l_fd = lirc_init(progname, 1) )){
 				syslog( LOG_ERR, "can't connect to lirc" );
-#if 0
 			} else {
 				if( -1 == fcntl( l_fd, F_SETFL, O_NONBLOCK ))
 					syslog( LOG_ERR, "fcntl failed: %m" );
-#endif
 			}
 		}
 
 		/* re- read lirc config */
 		if( ! l_conf || reread_config ){
+			syslog(LOG_NOTICE, "(re-)reading config %s", lircfile );
 			if( l_conf ){
 				lirc_freeconfig( l_conf );
 				l_conf = NULL;
@@ -204,6 +201,7 @@ static void loop_lirc( void )
 				l_fd = -1;
 
 			} else if( code && l_conf ){
+				DPRINT( "got lirc input..." );
 				loop_lirccmd( l_conf, code );
 			}
 
@@ -342,7 +340,7 @@ int main(int argc, char *argv[])
 	/* start work */
 	if (!foreground && daemon(0, 0) == -1) {
 		eprintf( "can't daemonize" );
-		syslog_perror(progname);
+		syslog(LOG_ERR, "daemonize failed: %m" );
 		exit(EXIT_FAILURE);
 	}
 
