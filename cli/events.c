@@ -38,7 +38,7 @@ static void cb_nexttrack( mservclient *c, msc_track *t )
 {
 	char buf[BUFLENTRACK];
 
-	tty_msg( "playing: \x1B[1m%s\x1B[0m\n", mktrack(buf, BUFLENTRACK, t));
+	tty_msg( "playing: \n\x1B[1m%s\x1B[0m\n", mktrack(buf, BUFLENTRACK, t));
 	(void)c;
 }
 
@@ -60,6 +60,11 @@ static void cb_resumed( mservclient *c )
 	(void)c;
 }
 
+static void cb_random( mservclient *c, int r ){
+	tty_msg( "random mode turned %s\n", r ? "on": "off" );
+	(void)c;
+}
+
 void events_init( mservclient *c )
 {
 	memset(&events, 0, sizeof(events));
@@ -74,6 +79,7 @@ void events_init( mservclient *c )
 	events.stopped = cb_stopped;
 	events.paused = cb_paused;
 	events.resumed = cb_resumed;
+	events.random = cb_random;
 }
 
 

@@ -10,6 +10,43 @@
 #include "formatter.h"
 #include "command.h"
 
+static int atobool( const char *in )
+{
+	if( 0 == strcasecmp( in, "on" ) ){
+		return 1;
+	} 
+	
+	if( 0 == strcasecmp( in, "off" )){
+		return 0;
+	} 
+	
+	if( 0 == strcasecmp( in, "true" )){
+		return 1;
+	} 
+	
+	if( 0 == strcasecmp( in, "false" )){
+		return 0;
+	} 
+	
+	if( 0 == strcasecmp( in , "yes" )){
+		return 1;
+	} 
+	
+	if( 0 == strcasecmp( in , "no" )){
+		return 0;
+	} 
+	
+	if( 0 == strcmp( in, "1" )){
+		return 1;
+	} 
+	
+	if( 0 == strcmp( in, "0" )){
+		return 0;
+	} 
+
+	return -1;
+}
+
 /************************************************************
  * sample command completer
  */
@@ -29,6 +66,7 @@ static char *cgen_cmd_foo( const char *line, int state )
 
 #define CMD(n)		static void n(const char *line )
 
+#define MSG_BADARG(a,v)	tty_msg( "bad argument for %s: %s\n", a, v )
 #define MSG_ARGMIS(a)	tty_msg( "missing argument: %s\n",a )
 #define MSG_ARGMANY	tty_msg( "too many arguments\n" )
 #define MSG_FAIL	\
@@ -101,7 +139,7 @@ CMD(cmd_disconnect)
 
 	num = atoi(line);
 	if( 0 == msc_cmd_disconnect( con, num ) ){
-		tty_msg( "disconnected %d", num );
+		tty_msg( "disconnected client #%d\n", num );
 		return;
 	}
 	MSG_FAIL;
@@ -111,21 +149,16 @@ CMD(cmd_disconnect)
  * commands: user
  */
 
-#ifdef todo_user
 CMD(cmd_who)
 {
 	msc_it_client *it;
-	msc_client *c;
 
 	ARG_NONE;
 
-	if( NULL == (it = msc_cmd_client(con))){
+	if( NULL == (it = msc_cmd_who(con))){
 		MSG_FAIL;
 	}
-	for( c = msc_it_client_cur(it); c; c = msc_it_client_next(it)){
-		tty_msg( "%s\n", mkclient(buf, c ));
-		msc_client_free(c);
-	}
+	dump_clients(it);
 	msc_it_client_done(it);
 }
 
@@ -139,11 +172,10 @@ CMD(cmd_kick)
 
 	num = atoi(line);
 	if( 0 == msc_cmd_kick( con, num ) ){
-		tty_msg( "kicked %d", num );
+		tty_msg( "kicked user #%d\n", num );
 	}
 	MSG_FAIL;
 }
-#endif
 
 
 
@@ -225,7 +257,7 @@ CMD(cmd_curtrack)
 		MSG_FAIL;
 	}
 
-	tty_msg( "%s\n", mktrackhead(buf, BUFLENTRACK));
+	tty_msg( "%s\n\n", mktrackhead(buf, BUFLENTRACK));
 	tty_msg( "%s\n", mktrack(buf, BUFLENTRACK, t));
 	msc_track_free(t);
 }
@@ -242,11 +274,54 @@ CMD(cmd_gap)
 	tty_msg( "delay (gap) before starting next track: %d sec\n", gap );
 }
 
-#ifdef todo_player
 CMD(cmd_gapset)
+{
+	int gap;
+	char *end;
+
+	ARG_NEED("seconds");
+
+	gap = strtol(line, &end, 10 );
+	if( *end ){
+		MSG_BADARG("seconds",line);
+		return;
+	}
+
+	if( msc_cmd_gapset(con, gap )){
+		MSG_FAIL;
+	}
+
+	tty_msg( "delay (gap) set to %d sec\n", gap );
+}
+
 CMD(cmd_random)
+{
+	int random;
+
+	ARG_NONE;
+	if( 0 > (random = msc_cmd_random(con))){
+		MSG_FAIL;
+	}
+
+	tty_msg( "random play (when queue is empty) is %s\n", 
+			random ? "on" : "off" );
+}
+
 CMD(cmd_randomset)
-#endif
+{
+	int random = 0;
+
+	ARG_NEED("random_status");
+
+	if( -1 == ( random = atobool( line ))){
+		MSG_BADARG("random_status", line );
+		return;
+	}
+
+	if( msc_cmd_randomset(con, random)){
+		MSG_FAIL;
+	}
+}
 
 /************************************************************
  * commands: track
@@ -262,7 +337,7 @@ CMD(cmd_tracks)
 		MSG_FAIL;
 	}
 
-	tty_msg( "tracks: %d\n", num );
+	tty_msg( "available tracks: %d\n", num );
 }
 
 CMD(cmd_trackget)
@@ -278,7 +353,7 @@ CMD(cmd_trackget)
 		MSG_FAIL;
 	}
 
-	tty_msg( "%s\n", mktrackhead(buf, BUFLENTRACK));
+	tty_msg( "%s\n\n", mktrackhead(buf, BUFLENTRACK));
 	tty_msg( "%s\n", mktrack(buf,BUFLENTRACK,t));
 	msc_track_free( t );
 }
@@ -360,6 +435,8 @@ static t_command commands[] = {
 	{ "raw", NULL, cmd_raw },
 	{ "open", NULL, cmd_open },
 	{ "disconnect", NULL, cmd_disconnect },
+	{ "who", NULL, cmd_who },
+	{ "kick", NULL, cmd_kick },
 	{ "play", NULL, cmd_play },
 	{ "stop", NULL, cmd_stop },
 	{ "next", NULL, cmd_next },
@@ -368,6 +445,9 @@ static t_command commands[] = {
 	{ "status", NULL, cmd_status },
 	{ "curtrack", NULL, cmd_curtrack },
 	{ "gap", NULL, cmd_gap },
+	{ "gapset", NULL, cmd_gapset },
+	{ "random", NULL, cmd_random },
+	{ "randomset", NULL, cmd_randomset },
 	{ "tracks", NULL, cmd_tracks },
 	{ "trackget", NULL, cmd_trackget },
 	{ "tracksearch", NULL, cmd_tracksearch },
