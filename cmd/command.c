@@ -5,10 +5,9 @@
 #include <dudlc.h>
 #include <dudlc/proto.h>
 
-#include "tty.h"
-#include "main.h"
-#include "formatter.h"
-#include "command.h"
+#include "dudlccmd.h"
+
+int terminate = 0;
 
 static int atobool( const char *in )
 {
@@ -47,7 +46,7 @@ static int atobool( const char *in )
 	return -1;
 }
 
-static int track2id( const char *in, char **end )
+static int track2id( dudlc *con, const char *in, char **end )
 {
 	int a;
 	int b;
@@ -85,7 +84,7 @@ static int track2id( const char *in, char **end )
 	return duc_cmd_track2id(con, a, b );
 }
 
-static int tag2id( const char *in, char **end )
+static int tag2id( dudlc *con, const char *in, char **end )
 {
 	int id;
 	char *e;
@@ -115,28 +114,31 @@ static int tag2id( const char *in, char **end )
 }
 
 // TODO: user2id
-static int user2id( const char *in, char **end )
+static int user2id( dudlc *con, const char *in, char **end )
 {
+	(void) con;
 	return strtol( in, end, 10 );
 }
 
 // TODO: right2id
-static int right2id( const char *in, char **end )
+static int right2id( dudlc *con, const char *in, char **end )
 {
+	(void) con;
 	return strtol( in, end, 10 );
 }
 
 
-#define CMD(n)		static void n(const char *line )
-
-#define MSG_BADARG(a)	tty_msg( "bad argument for argument %s\n", a)
-#define MSG_ARGMIS(a)	tty_msg( "missing argument: %s\n",a )
-#define MSG_ARGMANY	tty_msg( "too many arguments\n" )
+#define CMD(n)		static void n(dudlc *con, const char *line )
+#define CGEN(n)		static char *n( dudlc *con, const char *text, \
+				int state )
+#define MSG_BADARG(a)	dmsg_msg( "bad argument for argument %s\n", a)
+#define MSG_ARGMIS(a)	dmsg_msg( "missing argument: %s\n",a )
+#define MSG_ARGMANY	dmsg_msg( "too many arguments\n" )
 #define MSG_FAIL	\
 	if( 0 > duc_fd(con) ){\
-		tty_msg( "failed: connection error\n"); \
+		dmsg_msg( "failed: connection error\n"); \
 	} else {\
-		tty_msg( "failed: %s\n", duc_rmsg(con)); \
+		dmsg_msg( "failed: %s\n", duc_rmsg(con)); \
 	}
 
 
@@ -158,6 +160,7 @@ static int right2id( const char *in, char **end )
 CMD(cmd_quit)
 {
 	(void) line; /* shut up gcc */
+	(void) con;
 	terminate++;
 }
 
@@ -167,9 +170,37 @@ CMD(cmd_open)
 	if( duc_open( con ) ){
 		MSG_FAIL;
 	}
+	(void) con;
 }
 
-static char *cgen_cmd_raw( const char *text, int state )
+
+CMD(cmd_help)
+{
+	ARG_NONE;
+	// TODO: remote help
+	dmsg_msg( "not yet implemented\n" );
+	(void) con;
+}
+
+CMD(cmd_raw)
+{
+	ARG_NEED("raw_command" );
+
+	// TODO: make this a lib function
+	_duc_send( con, line );
+	if( _duc_rnext(con) ){
+		dmsg_msg( "connection error\n" );
+		return;
+	}
+
+	dmsg_msg( "code: %s\n", _duc_rcode(con));
+	do {
+		dmsg_msg( " %s\n", _duc_rline(con));
+	} while( ! _duc_rnext(con));
+	(void) con;
+}
+
+CGEN(cgen_raw)
 {
 	static char **helpv = NULL;
 	static int last = 0;
@@ -235,30 +266,6 @@ static char *cgen_cmd_raw( const char *text, int state )
 }
 
 
-CMD(cmd_help)
-{
-	ARG_NONE;
-	// TODO: remote help
-	tty_msg( "not yet working\n" );
-}
-
-CMD(cmd_raw)
-{
-	ARG_NEED("raw_command" );
-
-	// TODO: make this a lib function
-	_duc_send( con, line );
-	if( _duc_rnext(con) ){
-		tty_msg( "connection error\n" );
-		return;
-	}
-
-	tty_msg( "code: %s\n", _duc_rcode(con));
-	do {
-		tty_msg( " %s\n", _duc_rline(con));
-	} while( ! _duc_rnext(con));
-}
-
 /************************************************************
  * commands: user
  */
@@ -297,7 +304,7 @@ CMD(cmd_clientlist)
 		MSG_FAIL;
 		return;
 	}
-	dump_clients(it);
+	dmsg_dump_clients(it);
 	duc_it_client_done(it);
 }
 
@@ -310,7 +317,7 @@ CMD(cmd_clientclose)
 
 	num = atoi(line);
 	if( 0 == duc_cmd_clientclose( con, num ) ){
-		tty_msg( "disconnected client #%d\n", num );
+		dmsg_msg( "disconnected client #%d\n", num );
 		return;
 	}
 	MSG_FAIL;
@@ -324,14 +331,14 @@ CMD(cmd_clientcloseuser)
 
 	ARG_NEED("userID");
 
-	uid = user2id(line, &end);
+	uid = user2id(con, line, &end);
 	if( *end ){
 		MSG_ARGMIS("uid");
 		return;
 	}
 
 	if( 0 == duc_cmd_clientcloseuser( con, uid ) ){
-		tty_msg( "kicked user #%d\n", uid );
+		dmsg_msg( "kicked user #%d\n", uid );
 	}
 	MSG_FAIL;
 }
@@ -347,7 +354,7 @@ CMD(cmd_user2id)
 		return;
 	}
 
-	tty_msg( "user has ID %d\n", uid );
+	dmsg_msg( "user has ID %d\n", uid );
 }
 
 CMD(cmd_userget)
@@ -359,7 +366,7 @@ CMD(cmd_userget)
 
 	ARG_NEED("uid");
 
-	uid = user2id( line, &end );
+	uid = user2id( con, line, &end );
 	if( *end ){
 		MSG_ARGMIS("uid");
 		return;
@@ -370,8 +377,8 @@ CMD(cmd_userget)
 		return;
 	}
 
-	tty_msg( "%s\n\n", mkuserhead(buf, BUFLENUSER));
-	tty_msg( "%s\n", mkuser(buf, BUFLENUSER, u));
+	dmsg_msg( "%s\n\n", dfmt_userhead(buf, BUFLENUSER));
+	dmsg_msg( "%s\n", dfmt_user(buf, BUFLENUSER, u));
 
 	duc_user_free(u);
 }
@@ -384,7 +391,7 @@ CMD(cmd_userlist)
 	(void)line;
 
 	it = duc_cmd_userlist( con );
-	dump_users(it);
+	dmsg_dump_users(it);
 	duc_it_user_done(it);
 }
 
@@ -395,7 +402,7 @@ CMD(cmd_usersetpass)
 
 	ARG_NEED("uid");
 
-	uid = user2id( line, &end );
+	uid = user2id( con, line, &end );
 	if( line == end ){
 		MSG_ARGMIS("uid");
 		return;
@@ -405,7 +412,7 @@ CMD(cmd_usersetpass)
 	if( duc_cmd_usersetpass(con, uid, end )){
 		MSG_FAIL;
 	}
-	tty_msg( "password changed\n");
+	dmsg_msg( "password changed\n");
 }
 
 CMD(cmd_usersetright)
@@ -416,14 +423,14 @@ CMD(cmd_usersetright)
 
 	ARG_NEED("uid");
 
-	uid = user2id( line, &end );
+	uid = user2id( con, line, &end );
 	if( line == end ){
 		MSG_ARGMIS("uid");
 		return;
 	}
 
 	s = end + strspn( end, "\t ");
-	right = right2id( s, &end );
+	right = right2id( con, s, &end );
 	if( *end ){
 		MSG_ARGMIS("right");
 		return;
@@ -432,7 +439,7 @@ CMD(cmd_usersetright)
 	if( duc_cmd_usersetright( con, uid, right )){
 		MSG_FAIL;
 	}
-	tty_msg( "right changed\n");
+	dmsg_msg( "right changed\n");
 }
 
 CMD(cmd_useradd)
@@ -445,7 +452,7 @@ CMD(cmd_useradd)
 		return;
 	}
 
-	tty_msg( "user added with id %d\n", uid);
+	dmsg_msg( "user added with id %d\n", uid);
 }
 
 CMD(cmd_userdel)
@@ -455,7 +462,7 @@ CMD(cmd_userdel)
 
 	ARG_NEED("uid");
 
-	uid = user2id( line, &end );
+	uid = user2id( con, line, &end );
 	if( *end ){
 		MSG_ARGMIS("uid");
 		return;
@@ -465,7 +472,7 @@ CMD(cmd_userdel)
 		MSG_FAIL;
 		return;
 	}
-	tty_msg("user deleted\n");
+	dmsg_msg("user deleted\n");
 }
 
 
@@ -524,15 +531,15 @@ CMD(cmd_status)
 	}
 	switch(stat){
 		case 0:
-			tty_msg("stopped\n");
+			dmsg_msg("stopped\n");
 			break;
 
 		case 1:
-			tty_msg("playing\n");
+			dmsg_msg("playing\n");
 			break;
 
 		case 2:
-			tty_msg("paused\n");
+			dmsg_msg("paused\n");
 			break;
 
 	}
@@ -550,8 +557,8 @@ CMD(cmd_curtrack)
 		return;
 	}
 
-	tty_msg( "%s\n\n", mktrackhead(buf, BUFLENTRACK));
-	tty_msg( "%s\n", mktrack(buf, BUFLENTRACK, t));
+	dmsg_msg( "%s\n\n", dfmt_trackhead(buf, BUFLENTRACK));
+	dmsg_msg( "%s\n", dfmt_track(buf, BUFLENTRACK, t));
 	duc_track_free(t);
 }
 
@@ -565,7 +572,7 @@ CMD(cmd_gap)
 		return;
 	}
 
-	tty_msg( "delay (gap) before starting next track: %d sec\n", gap );
+	dmsg_msg( "delay (gap) before starting next track: %d sec\n", gap );
 }
 
 CMD(cmd_gapset)
@@ -586,7 +593,7 @@ CMD(cmd_gapset)
 		return;
 	}
 
-	tty_msg( "delay (gap) set to %d sec\n", gap );
+	dmsg_msg( "delay (gap) set to %d sec\n", gap );
 }
 
 CMD(cmd_random)
@@ -599,7 +606,7 @@ CMD(cmd_random)
 		return;
 	}
 
-	tty_msg( "random play (when queue is empty) is %s\n", 
+	dmsg_msg( "random play (when queue is empty) is %s\n", 
 			random ? "on" : "off" );
 }
 
@@ -634,7 +641,7 @@ CMD(cmd_trackcount)
 		return;
 	}
 
-	tty_msg( "available tracks: %d\n", num );
+	dmsg_msg( "available tracks: %d\n", num );
 }
 
 // TODO: remove track2id cmd
@@ -663,11 +670,11 @@ CMD(cmd_track2id)
 	}
 
 	if( 0 > (id = duc_cmd_track2id( con, albumid, num))){
-		tty_msg( "track not found" );
+		dmsg_msg( "track not found" );
 		return;
 	}
 
-	tty_msg( "track %s has ID: %d\n", mktrackid(albumid, num), id );
+	dmsg_msg( "track %s has ID: %d\n", dfmt_trackid(albumid, num), id );
 }
 
 
@@ -679,7 +686,7 @@ CMD(cmd_trackget)
 
 	ARG_NEED("trackID");
 
-	if( 0 > (num = track2id( line, NULL ))){
+	if( 0 > (num = track2id( con, line, NULL ))){
 		MSG_BADARG( "trackID" );
 	}
 	if( NULL == ( t = duc_cmd_trackget(con, num ))){
@@ -687,8 +694,8 @@ CMD(cmd_trackget)
 		return;
 	}
 
-	tty_msg( "%s\n\n", mktrackhead(buf, BUFLENTRACK));
-	tty_msg( "%s\n", mktrack(buf,BUFLENTRACK,t));
+	dmsg_msg( "%s\n\n", dfmt_trackhead(buf, BUFLENTRACK));
+	dmsg_msg( "%s\n", dfmt_track(buf,BUFLENTRACK,t));
 	duc_track_free( t );
 }
 
@@ -703,7 +710,7 @@ CMD(cmd_tracksearch)
 		return;
 	}
 
-	dump_tracks(it);
+	dmsg_dump_tracks(it);
 	duc_it_track_done(it);
 }
 
@@ -722,7 +729,7 @@ CMD(cmd_tracksalbum)
 		return;
 	}
 
-	dump_tracks(it);
+	dmsg_dump_tracks(it);
 	duc_it_track_done(it);
 }
 
@@ -741,7 +748,7 @@ CMD(cmd_tracksartist)
 		return;
 	}
 
-	dump_tracks(it);
+	dmsg_dump_tracks(it);
 	duc_it_track_done(it);
 }
 
@@ -763,7 +770,7 @@ CMD(cmd_filter)
 		return;
 	}
 
-	tty_msg( "current filter: %s\n", f );
+	dmsg_msg( "current filter: %s\n", f );
 	free(f);
 }
 
@@ -784,7 +791,7 @@ CMD(cmd_filterstat)
 		return;
 	}
 
-	tty_msg( "tracks matching filter: %d\n", n );
+	dmsg_msg( "tracks matching filter: %d\n", n );
 }
 
 CMD(cmd_randomtop)
@@ -806,7 +813,7 @@ CMD(cmd_randomtop)
 		return;
 	}
 
-	dump_tracks(it);
+	dmsg_dump_tracks(it);
 	duc_it_track_done(it);
 }
 
@@ -825,7 +832,7 @@ CMD(cmd_queuelist)
 		MSG_FAIL;
 		return;
 	}
-	dump_queue(it);
+	dmsg_dump_queue(it);
 	duc_it_queue_done(it);
 }
 
@@ -842,8 +849,8 @@ CMD(cmd_queueget)
 		return;
 	}
 
-	tty_msg("%s\n\n", mkqueuehead(buf, BUFLENTRACK));
-	tty_msg("%s\n", mkqueue(buf, BUFLENTRACK,q));
+	dmsg_msg("%s\n\n", dfmt_queuehead(buf, BUFLENTRACK));
+	dmsg_msg("%s\n", dfmt_queue(buf, BUFLENTRACK,q));
 	duc_queue_free(q);
 }
 
@@ -854,7 +861,7 @@ CMD(cmd_queueadd)
 
 	ARG_NEED("trackID");
 
-	if( 0 > (id = track2id(line, NULL))){
+	if( 0 > (id = track2id(con, line, NULL))){
 		MSG_BADARG("trackID");
 		return;
 	}
@@ -872,7 +879,7 @@ CMD(cmd_queuealbum)
 
 	ARG_NEED("albumID");
 
-	if( 0 > (id = track2id(line, NULL))){
+	if( 0 > (id = track2id(con, line, NULL))){
 		MSG_BADARG("trackID");
 		return;
 	}
@@ -919,7 +926,7 @@ CMD(cmd_sleep)
 		return;
 	}
 
-	tty_msg( "falling asleep in %d sek\n", r );
+	dmsg_msg( "falling asleep in %d sek\n", r );
 }
 
 CMD(cmd_sleepset)
@@ -959,7 +966,7 @@ CMD(cmd_history)
 	}
 
 	it = duc_cmd_history(con, num );
-	dump_history(it);
+	dmsg_dump_history(it);
 	duc_it_history_done(it);
 }
 
@@ -970,7 +977,7 @@ CMD(cmd_historytrack)
 	duc_it_history *it;
 	char *end;
 
-	if( 0 > (id = track2id(line, &end))){
+	if( 0 > (id = track2id(con, line, &end))){
 		MSG_BADARG("trackID");
 		return;
 	}
@@ -984,7 +991,7 @@ CMD(cmd_historytrack)
 	}
 
 	it = duc_cmd_historytrack(con, id, num );
-	dump_history(it);
+	dmsg_dump_history(it);
 	duc_it_history_done(it);
 }
 
@@ -1003,7 +1010,7 @@ CMD(cmd_tag2id)
 		return;
 	}
 
-	tty_msg( "tag has ID %d\n", id );
+	dmsg_msg( "tag has ID %d\n", id );
 }
 
 CMD(cmd_tagget)
@@ -1014,7 +1021,7 @@ CMD(cmd_tagget)
 	char buf[BUFLENTAG];
 
 	ARG_NEED("tagID");
-	id = tag2id( line, &e );
+	id = tag2id( con, line, &e );
 	if( *e ){
 		MSG_BADARG("tagID");
 		return;
@@ -1025,8 +1032,8 @@ CMD(cmd_tagget)
 		return;
 	}
 
-	tty_msg( "%s\n\n", mktaghead(buf,BUFLENTAG));
-	tty_msg( "%s\n", mktag(buf,BUFLENTAG, t));
+	dmsg_msg( "%s\n\n", dfmt_taghead(buf,BUFLENTAG));
+	dmsg_msg( "%s\n", dfmt_tag(buf,BUFLENTAG, t));
 
 	duc_tag_free(t);
 }
@@ -1037,7 +1044,7 @@ CMD(cmd_taglist)
 
 	ARG_NONE;
 	it = duc_cmd_taglist( con );
-	dump_tags( it );
+	dmsg_dump_tags( it );
 	duc_it_tag_done( it );
 }
 
@@ -1051,7 +1058,7 @@ CMD(cmd_tagadd)
 		return;
 	}
 
-	tty_msg( "added with id %d\n", id );
+	dmsg_msg( "added with id %d\n", id );
 }
 
 CMD(cmd_tagsetname)
@@ -1061,7 +1068,7 @@ CMD(cmd_tagsetname)
 
 
 	ARG_NEED("tagID");
-	id = tag2id( line, &e );
+	id = tag2id( con, line, &e );
 	if( line == e ){
 		MSG_BADARG("tagID");
 		return;
@@ -1080,7 +1087,7 @@ CMD(cmd_tagsetdesc)
 
 
 	ARG_NEED("tagID");
-	id = tag2id( line, &e );
+	id = tag2id( con, line, &e );
 	if( line == e ){
 		MSG_BADARG("tagID");
 		return;
@@ -1098,7 +1105,7 @@ CMD(cmd_tagdel)
 	char *e;
 
 	ARG_NEED("tagID");
-	id = tag2id( line, &e );
+	id = tag2id( con, line, &e );
 	if( *e ){
 		MSG_BADARG("tagID");
 		return;
@@ -1116,14 +1123,14 @@ CMD(cmd_tracktaglist)
 	duc_it_tag *it;
 
 	ARG_NEED("trackID");
-	id = track2id( line, &e );
+	id = track2id( con, line, &e );
 	if( *e ){
 		MSG_BADARG("trackID");
 		return;
 	}
 
 	it = duc_cmd_tracktaglist( con, id );
-	dump_tags( it );
+	dmsg_dump_tags( it );
 	duc_it_tag_done( it );
 }
 
@@ -1134,14 +1141,14 @@ CMD(cmd_tracktagged)
 	int r;
 
 	ARG_NEED("trackID");
-	trid = track2id( line, &e );
+	trid = track2id( con, line, &e );
 	if( e == line ){
 		MSG_BADARG("trackID");
 		return;
 	}
 
 	s = e += strspn( e, "\t " );
-	tid = tag2id(s, &e );
+	tid = tag2id(con, s, &e );
 	if( *e ){
 		MSG_BADARG("tagID");
 		return;
@@ -1152,7 +1159,7 @@ CMD(cmd_tracktagged)
 		return;
 	}
 
-	tty_msg( "tag is%s set for this track\n", r ? "": " not" );
+	dmsg_msg( "tag is%s set for this track\n", r ? "": " not" );
 }
 
 CMD(cmd_tracktagset)
@@ -1161,14 +1168,14 @@ CMD(cmd_tracktagset)
 	char *s, *e;
 
 	ARG_NEED("trackID");
-	trid = track2id( line, &e );
+	trid = track2id( con, line, &e );
 	if( e == line ){
 		MSG_BADARG("trackID");
 		return;
 	}
 
 	s = e += strspn( e, "\t " );
-	tid = tag2id(s, &e );
+	tid = tag2id(con, s, &e );
 	if( *e ){
 		MSG_BADARG("tagID");
 		return;
@@ -1178,7 +1185,7 @@ CMD(cmd_tracktagset)
 		MSG_FAIL;
 		return;
 	}
-	tty_msg( "set tag\n");
+	dmsg_msg( "set tag\n");
 }
 
 CMD(cmd_tracktagdel)
@@ -1187,14 +1194,14 @@ CMD(cmd_tracktagdel)
 	char *s, *e;
 
 	ARG_NEED("trackID");
-	trid = track2id( line, &e );
+	trid = track2id( con, line, &e );
 	if( e == line ){
 		MSG_BADARG("trackID");
 		return;
 	}
 
 	s = e += strspn( e, "\t " );
-	tid = tag2id(s, &e );
+	tid = tag2id(con, s, &e );
 	if( *e ){
 		MSG_BADARG("tagID");
 		return;
@@ -1205,7 +1212,7 @@ CMD(cmd_tracktagdel)
 		return;
 	}
 
-	tty_msg( "tag deleted\n");
+	dmsg_msg( "tag deleted\n");
 }
 
 
@@ -1213,11 +1220,11 @@ CMD(cmd_tracktagdel)
  * command list
  */
 
-typedef void (*t_action)( const char *line );
+typedef void (*t_action)( dudlc *dudl, const char *line );
 
 typedef struct _t_command {
 	char *name;
-	t_generator gen;
+	duc_cgen gen;
 	t_action action;
 } t_command;
 
@@ -1225,7 +1232,7 @@ static t_command commands[] = {
 	{ "quit", NULL, cmd_quit },
 	{ "exit", NULL, cmd_quit },
 	{ "help", NULL, cmd_help },
-	{ "raw", cgen_cmd_raw, cmd_raw },
+	{ "raw", cgen_raw, cmd_raw },
 	{ "open", NULL, cmd_open },
 	{ "user", NULL, cmd_user },
 
@@ -1295,8 +1302,47 @@ static t_command commands[] = {
 };
 
 
+static t_command *command_nfind( const char *cmd, unsigned int len )
+{
+	int c;
+
+	for( c = 0; commands[c].name; ++c ){
+		if( len != strlen(commands[c].name))
+			continue;
+
+		if( 0 == strncasecmp(cmd, commands[c].name, len )){
+			return &commands[c];
+		}
+	}
+
+	return NULL;
+}
+
+#define WSPACE	"\t "
+int duc_cmd( dudlc *con, const char *line )
+{
+	int len;
+	int skip;
+	t_command *cmd;
+
+	/* skip leading whitespace */
+	line += strspn( line, WSPACE );
+
+	len = strcspn( line, WSPACE );
+	if( NULL != (cmd = command_nfind( line, len ))){
+		skip = strspn( line + len, WSPACE );
+		if( cmd->action )
+			cmd->action( con, line + len + skip );
+
+		return terminate;
+	}
+
+	dmsg_msg( "no such command - try to send it with 'raw'?\n" );
+	return terminate;
+}
+
 /* toplevel completer */
-static char *cgen_top( const char *text, int state )
+CGEN(cgen_top)
 {
 	static int c;
 	static unsigned int len;
@@ -1316,30 +1362,15 @@ static char *cgen_top( const char *text, int state )
 	}
 
 	return NULL;
+	(void) con;
 }
 
-static t_command *command_nfind( const char *cmd, unsigned int len )
-{
-	int c;
-
-	for( c = 0; commands[c].name; ++c ){
-		if( len != strlen(commands[c].name))
-			continue;
-
-		if( 0 == strncasecmp(cmd, commands[c].name, len )){
-			return &commands[c];
-		}
-	}
-
-	return NULL;
-}
-
-#define WSPACE	"\t "
-
-t_generator command_completer( const char *line, unsigned int pos )
+duc_cgen duc_cgen_find( dudlc *con, const char *line, unsigned int pos )
 {
 	int len;
 	t_command *cmd;
+
+	(void)con;
 
 	/* skip leading whitespace */
 	len = strspn( line, WSPACE );
@@ -1359,24 +1390,4 @@ t_generator command_completer( const char *line, unsigned int pos )
 	return NULL;
 }
 
-void command_action( const char *line )
-{
-	int len;
-	int skip;
-	t_command *cmd;
-
-	/* skip leading whitespace */
-	line += strspn( line, WSPACE );
-
-	len = strcspn( line, WSPACE );
-	if( NULL != (cmd = command_nfind( line, len ))){
-		skip = strspn( line + len, WSPACE );
-		if( cmd->action )
-			cmd->action( line + len + skip );
-
-		return;
-	}
-
-	tty_msg( "no such command - try to send it with 'raw'?\n" );
-}
 

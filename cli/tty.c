@@ -18,19 +18,31 @@
 static int redisplay = 0;
 static int inprompt = 1;
 
+
+duc_cgen cgen = NULL;
+
+static char *tty_cgen( const char *text, int state )
+{
+	if( NULL == cgen )
+		return NULL;
+	return( (*cgen)( con, text, state ));
+}
+
 /* handler invoked by readline to get a list of complettions */
 static char **tty_completer( const char *text, int start, int end )
 {
-	t_generator gen;
+	duc_cgen gen;
 
 	(void) end; /* shut up gcc */
+	(void) start;
 
 	rl_attempted_completion_over = 1;
 
-	if( NULL == (gen = command_completer(rl_line_buffer, start )))
+	if( NULL == (gen = duc_cgen_find(con, rl_line_buffer, start )))
 		return NULL;
 
-	return rl_completion_matches( text, gen );
+	cgen = gen;
+	return rl_completion_matches( text, tty_cgen );
 }
 
 
@@ -59,7 +71,8 @@ static void tty_executor( char *input )
 
 	/* execute action - if one is defined */
 	inprompt = 0;
-	command_action( input );
+	if( duc_cmd( con, input ) )
+		terminate++;
 	inprompt = 1;
 
 	free(input);

@@ -1,7 +1,6 @@
 #include <stdlib.h>
 
 #include "tty.h"
-#include "formatter.h"
 #include "events.h"
 
 
@@ -40,7 +39,7 @@ static void cb_login( dudlc *c, duc_client *u )
 {
 	char buf[BUFLENCLIENT];
 
-	tty_msg( "login: %s\n", mkclient(buf,BUFLENTRACK, u));
+	tty_msg( "login: %s\n", dfmt_client(buf,BUFLENTRACK, u));
 	(void)c;
 }
 
@@ -48,7 +47,7 @@ static void cb_logout( dudlc *c, duc_client *u )
 {
 	char buf[BUFLENCLIENT];
 
-	tty_msg( "logout: %s\n", mkclient(buf,BUFLENTRACK, u));
+	tty_msg( "logout: %s\n", dfmt_client(buf,BUFLENTRACK, u));
 	(void)c;
 }
 
@@ -68,7 +67,7 @@ static void cb_nexttrack( dudlc *c, duc_track *t,
 	char buf[BUFLENTRACK];
 
 	tty_msg( "playing: \n\x1B[1m%s\x1B[0m\n", 
-			mkrtrack(buf, BUFLENTRACK, t, ar, al ));
+			dfmt_rtrack(buf, BUFLENTRACK, t, ar, al ));
 	(void)c;
 	(void)ar;
 	(void)al;
@@ -115,7 +114,7 @@ static void cb_filter( dudlc *c, const char *f )
 static void cb_queueadd( dudlc *c, duc_queue *q )
 {
 	char buf[BUFLENQUEUE];
-	tty_msg( "queued: %s\n", mkqueue(buf, BUFLENQUEUE,q ));
+	tty_msg( "queued: %s\n", dfmt_queue(buf, BUFLENQUEUE,q ));
 	(void)c;
 }
 
@@ -123,7 +122,7 @@ static void cb_queuedel( dudlc *c, duc_queue *q )
 {
 	char buf[BUFLENQUEUE];
 
-	tty_msg( "unqueued: %s\n", mkqueue(buf, BUFLENQUEUE, q ));
+	tty_msg( "unqueued: %s\n", dfmt_queue(buf, BUFLENQUEUE, q ));
 	(void)c;
 }
 
@@ -151,7 +150,7 @@ static void cb_tagchange( dudlc *c, duc_tag *q )
 {
 	char buf[BUFLENTAG];
 
-	tty_msg( "changed tag: %s\n", mktag(buf, BUFLENTAG, q ));
+	tty_msg( "changed tag: %s\n", dfmt_tag(buf, BUFLENTAG, q ));
 	(void)c;
 }
 
@@ -159,7 +158,7 @@ static void cb_tagdel( dudlc *c, duc_tag *q )
 {
 	char buf[BUFLENTAG];
 
-	tty_msg( "deleted tag: %s\n", mktag(buf, BUFLENTAG, q ));
+	tty_msg( "deleted tag: %s\n", dfmt_tag(buf, BUFLENTAG, q ));
 	(void)c;
 }
 
