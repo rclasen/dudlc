@@ -12,6 +12,7 @@
 #include <mservclient/random.h>
 #include <mservclient/queue.h>
 #include <mservclient/sleep.h>
+#include <mservclient/history.h>
 
 
 #endif

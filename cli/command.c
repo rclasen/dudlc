@@ -386,7 +386,7 @@ CMD(cmd_trackid)
 		return;
 	}
 
-	s = e + strspn(e, "\t ");
+	s = e + strspn(e, "\t /");
 	num = strtol(s, &e, 10 );
 	if( s==e || *e ){
 		MSG_BADARG( "trackNr" );
@@ -518,6 +518,30 @@ CMD(cmd_filterstat)
 	tty_msg( "tracks matching filter: %d\n", n );
 }
 
+CMD(cmd_randomtop)
+{
+	int num = 20;
+	char *end;
+	msc_it_track *it;
+
+	if( *line ){
+		num = strtol(line, &end, 10 );
+		if( *end ){
+			MSG_BADARG("maxnumber");
+			return;
+		}
+	}
+
+	if( NULL == (it = msc_cmd_randomtop( con, num ))){
+		MSG_FAIL;
+		return;
+	}
+
+	dump_tracks(it);
+	msc_it_track_done(it);
+}
+
+
 /************************************************************
  * commands: queue 
  */
@@ -629,6 +653,54 @@ CMD(cmd_sleepset)
 
 
 /************************************************************
+ * commands: history
+ */
+
+CMD(cmd_history)
+{
+	int num = 20;
+	char *end;
+	msc_it_history *it;
+
+	if( *line ){
+		num = strtol(line, &end, 10 );
+		if( *end ){
+			MSG_BADARG("maxnumber");
+			return;
+		}
+	}
+
+	it = msc_cmd_history(con, num );
+	dump_history(it);
+	msc_it_history_done(it);
+}
+
+CMD(cmd_historytrack)
+{
+	int num = 20;
+	int id;
+	msc_it_history *it;
+	char *end;
+
+	if( 0 > (id = trackid(line, &end))){
+		MSG_BADARG("trackID");
+		return;
+	}
+
+	if( *end ){
+		num = strtol(end, &end, 10 );
+		if( *end ){
+			MSG_BADARG("maxnumber");
+			return;
+		}
+	}
+
+	it = msc_cmd_historytrack(con, id, num );
+	dump_history(it);
+	msc_it_history_done(it);
+}
+
+/************************************************************
  * command list
  */
 
@@ -670,6 +742,7 @@ static t_command commands[] = {
 	{ "filter", NULL, cmd_filter },
 	{ "filterset", NULL, cmd_filterset },
 	{ "filterstat", NULL, cmd_filterstat },
+	{ "randomtop", NULL, cmd_randomtop },
 	{ "queue", NULL, cmd_queue },
 	{ "queueget", NULL, cmd_queueget },
 	{ "queueadd", NULL, cmd_queueadd },
@@ -677,6 +750,8 @@ static t_command commands[] = {
 	{ "queueclear", NULL, cmd_queueclear },
 	{ "sleep", NULL, cmd_sleep },
 	{ "sleepset", NULL, cmd_sleepset },
+	{ "history", NULL, cmd_history },
+	{ "historytrack", NULL, cmd_historytrack },
 
 	{ NULL, NULL, NULL }
 };

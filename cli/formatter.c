@@ -15,17 +15,17 @@ static size_t isotime( char *s, size_t max, time_t time )
 }
 
 
-#if 0
 static size_t isotimestamp( char *s, size_t max, time_t time )
 {
 	struct tm *t;
 
 	t = localtime( &time );
-	return strftime( s, max, "%Y-%m-%d %H:%M:%S%z", t );
-	/*                      YYYY-mm-dd HH:MM:SS+zzzz */
-	/*                      10         13 */
+	return strftime( s, max, "%Y-%m-%d %H:%M:%S", t );
+	/*                      YYYY-mm-dd HH:MM:SS */
+	/*                      10         8 */
 }
 
+#if 0
 static size_t isodate( char *s, size_t max, time_t time )
 {
 	struct tm *t;
@@ -106,7 +106,7 @@ void dump_tracks( msc_it_track *it )
 }
 
 /************************************************************
- * track
+ * queue
  */
 
 const char *mkqueuehead( char *buf, unsigned int len )
@@ -149,6 +149,54 @@ void dump_queue( msc_it_queue *it )
 	for( t = msc_it_queue_cur(it); t; t = msc_it_queue_next(it)){
 		tty_msg( "%s\n", mkqueue(buf,BUFLENQUEUE,t));
 		msc_queue_free(t);
+	}
+}
+
+
+/************************************************************
+ * history
+ */
+
+const char *mkhistoryhead( char *buf, unsigned int len )
+{
+	unsigned int l;
+
+	l = snprintf( buf, len, "%4.4s %-19.19s ", "uid", "played" );
+	if( l > len )
+		return NULL;
+
+	mktrackhead( buf+l, len-l );
+	return buf;
+}
+
+const char *mkhistory( char *buf, unsigned int len, msc_history *q )
+{
+	unsigned int l;
+
+	l = snprintf( buf, len, "%4d ", q->uid );
+	if( l > len )
+		return NULL;
+
+	l += isotimestamp( buf+l, len -l, q->played );
+	if( l +2 > len )
+		return NULL;
+
+	buf[l++] = ' ';
+	buf[l] = 0;
+
+	mktrack( buf+l, len-l, q->_track );
+	return buf;
+}
+
+void dump_history( msc_it_history *it )
+{
+	msc_history *t;
+	char buf[BUFLENQUEUE];
+
+	tty_msg( "%s\n\n", mkhistoryhead(buf, BUFLENQUEUE));
+	for( t = msc_it_history_cur(it); t; t = msc_it_history_next(it)){
+		tty_msg( "%s\n", mkhistory(buf,BUFLENQUEUE,t));
+		msc_history_free(t);
 	}
 }
 

@@ -21,4 +21,8 @@ const char *mkqueuehead( char *buf, unsigned int len );
 const char *mkqueue( char *buf, unsigned int len, msc_queue *q );
 void dump_queue( msc_it_queue *it );
 
+const char *mkhistoryhead( char *buf, unsigned int len );
+const char *mkhistory( char *buf, unsigned int len, msc_history *q );
+void dump_history( msc_it_history *it );
+
 #endif
