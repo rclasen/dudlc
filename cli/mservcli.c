@@ -8,10 +8,13 @@
 #include <signal.h>
 #include <stdio.h>
      
-#include "proto.h"
+#include <mservclient/client.h>
+
 #include "tty.h"
 
-t_proto *con = NULL;
+mservclient *con = NULL;
+
+msc_events cb;
 
 static int terminate = 0;
 
@@ -27,24 +30,11 @@ static inline void largest( int *a, int b)
 		*a = b;
 }
 
-int main( int argc, char **argv )
+static void loop( void )
 {
 	fd_set rfds;
 	int maxfd;
 	int r;
-
-	(void) argc;
-	(void) argv;
-
-	// TODO: getopt 
-
-	con = proto_new( "localhost", 4445, "ddd", "sss" );
-	
-	signal( SIGTERM, sig_term );
-	signal( SIGINT, sig_term );
-	signal( SIGPIPE, SIG_IGN );
-
-	tty_init( "hmserv", "> " );
 
 	do {
 		FD_ZERO(&rfds);
@@ -53,9 +43,9 @@ int main( int argc, char **argv )
 		FD_SET(0,&rfds);
 		largest( &maxfd, 0 );
 
-		if( -1 != proto_fd(con)){
-			FD_SET( proto_fd(con), &rfds );
-			largest( &maxfd, proto_fd(con));
+		if( -1 != msc_fd(con)){
+			FD_SET( msc_fd(con), &rfds );
+			largest( &maxfd, msc_fd(con));
 		}
 
 		maxfd++;
@@ -70,13 +60,48 @@ int main( int argc, char **argv )
 			exit( 1 );
 		}
 		
-		if( FD_ISSET(0,&rfds) && tty_poll() )
-			terminate ++;
+		if( -1 != msc_fd(con) && FD_ISSET(msc_fd(con), &rfds)){
+			msc_poll(con);
+			tty_redraw();
+		}
 
-		if( -1 != proto_fd(con) && FD_ISSET(proto_fd(con), &rfds))
-			proto_poll(con);
+		if( FD_ISSET(0,&rfds) ){
+			if( tty_poll() )
+				terminate ++;
+			tty_redraw();
+		}
 
 	} while( ! terminate );
+}
+
+static void bcast( mservclient *c, const char *line )
+{
+	tty_msg( "%s\n", line );
+	(void)c;
+}
+
+int main( int argc, char **argv )
+{
+
+	(void) argc;
+	(void) argv;
+
+	// TODO: getopt 
+
+	con = msc_new( "localhost", 4445, "ddd", "sss" );
+
+	memset(&cb, 0, sizeof(cb));
+	cb.bcast = bcast;
+	msc_setevents( con, &cb );
+
+	
+	signal( SIGTERM, sig_term );
+	signal( SIGINT, sig_term );
+	signal( SIGPIPE, SIG_IGN );
+
+	tty_init( "hmserv", "> " );
+
+	loop();
 
 	tty_done();
 
