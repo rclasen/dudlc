@@ -13,6 +13,7 @@
 #include <mservclient/queue.h>
 #include <mservclient/sleep.h>
 #include <mservclient/history.h>
+#include <mservclient/help.h>
 
 
 #endif
