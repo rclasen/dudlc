@@ -15,7 +15,7 @@ static msc_history *_msc_history_parse( const char *line, char **end )
 	 * now we have to cast the const hackishly away */
 	(const char*)e = s = line;
 
-	if( NULL == (n = malloc(sizeof(msc_track)))){
+	if( NULL == (n = malloc(sizeof(msc_history)))){
 		goto clean1;
 	}
 
