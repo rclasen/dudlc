@@ -47,13 +47,25 @@ static int atobool( const char *in )
 	return -1;
 }
 
-static int trackid( const char *in, char **end )
+static int track2id( const char *in, char **end )
 {
 	int a;
 	int b;
 	char *s, *e;
+	msc_track *t;
 
 	if( end ) (const char*) *end = in;
+
+	if( *in == 'c' ){
+		if(NULL == (t = msc_cmd_curtrack(con))){
+			return -1;
+		}
+		a = t->id;
+		msc_track_free(t);
+
+		if( end ) (*end)++;
+		return a;
+	}
 
 	a = strtol( in, &e, 10 );
 	if( e == in )
@@ -70,8 +82,50 @@ static int trackid( const char *in, char **end )
 		return -1;
 
 	if( end ) *end = e;
-	return msc_cmd_trackid(con, a, b );
+	return msc_cmd_track2id(con, a, b );
 }
+
+static int tag2id( const char *in, char **end )
+{
+	int id;
+	char *e;
+	char tag[10];
+	int len;
+
+	if( end ) (const char*) *end = in;
+
+	id = strtol( in, &e, 10 );
+	if( in != e ){
+		if( end ) *end = e;
+		return id;
+	}
+
+	len = strcspn(in, "\t ");
+	if( len >= 10  )
+		return -1;
+
+	(const char*) e = in +len;
+	strncpy( tag, in, len );
+	if( 0 > ( id = msc_cmd_tag2id( con, tag ))){
+		return -1;
+	}
+
+	if( end ) *end = e;
+	return id;
+}
+
+// TODO: user2id
+static int user2id( const char *in, char **end )
+{
+	return strtol( in, end, 10 );
+}
+
+// TODO: right2id
+static int right2id( const char *in, char **end )
+{
+	return strtol( in, end, 10 );
+}
+
 
 #define CMD(n)		static void n(const char *line )
 
@@ -181,7 +235,6 @@ static char *cgen_cmd_raw( const char *text, int state )
 }
 
 
-
 CMD(cmd_help)
 {
 	ARG_NONE;
@@ -206,26 +259,11 @@ CMD(cmd_raw)
 	} while( ! _msc_rnext(con));
 }
 
-// TODO: client ID completer using who output
-CMD(cmd_disconnect)
-{
-	int num;
-
-	ARG_NEED("conID");
-
-	num = atoi(line);
-	if( 0 == msc_cmd_disconnect( con, num ) ){
-		tty_msg( "disconnected client #%d\n", num );
-		return;
-	}
-	MSG_FAIL;
-}
-
 /************************************************************
  * commands: user
  */
 
-CMD(cmd_auth)
+CMD(cmd_user)
 {
 	char pass[20];
 
@@ -249,13 +287,13 @@ CMD(cmd_auth)
 	msc_close(con);
 }
 
-CMD(cmd_who)
+CMD(cmd_clientlist)
 {
 	msc_it_client *it;
 
 	ARG_NONE;
 
-	if( NULL == (it = msc_cmd_who(con))){
+	if( NULL == (it = msc_cmd_clientlist(con))){
 		MSG_FAIL;
 		return;
 	}
@@ -263,22 +301,43 @@ CMD(cmd_who)
 	msc_it_client_done(it);
 }
 
+// TODO: client ID completer using who output
+CMD(cmd_clientclose)
+{
+	int num;
+
+	ARG_NEED("conID");
+
+	num = atoi(line);
+	if( 0 == msc_cmd_clientclose( con, num ) ){
+		tty_msg( "disconnected client #%d\n", num );
+		return;
+	}
+	MSG_FAIL;
+}
+
 // TODO: user ID completer using who output
-// TODO: take username as argument, too
-CMD(cmd_kick)
+CMD(cmd_clientcloseuser)
 {
 	int uid;
+	char *end;
 
 	ARG_NEED("userID");
 
-	uid = atoi(line);
-	if( 0 == msc_cmd_kick( con, uid ) ){
+	uid = user2id(line, &end);
+	if( *end ){
+		MSG_ARGMIS("uid");
+		return;
+	}
+
+	if( 0 == msc_cmd_clientcloseuser( con, uid ) ){
 		tty_msg( "kicked user #%d\n", uid );
 	}
 	MSG_FAIL;
 }
 
-CMD(cmd_usergetname)
+// TODO: remove user2id cmd
+CMD(cmd_user2id)
 {
 	int uid;
 	ARG_NEED("name");
@@ -300,7 +359,7 @@ CMD(cmd_userget)
 
 	ARG_NEED("uid");
 
-	uid = strtol( line, &end, 10 );
+	uid = user2id( line, &end );
 	if( *end ){
 		MSG_ARGMIS("uid");
 		return;
@@ -317,14 +376,14 @@ CMD(cmd_userget)
 	msc_user_free(u);
 }
 
-CMD(cmd_users)
+CMD(cmd_userlist)
 {
 	msc_it_user *it;
 
 	ARG_NONE;
 	(void)line;
 
-	it = msc_cmd_users( con );
+	it = msc_cmd_userlist( con );
 	dump_users(it);
 	msc_it_user_done(it);
 }
@@ -336,7 +395,7 @@ CMD(cmd_usersetpass)
 
 	ARG_NEED("uid");
 
-	uid = strtol( line, &end, 10 );
+	uid = user2id( line, &end );
 	if( line == end ){
 		MSG_ARGMIS("uid");
 		return;
@@ -357,14 +416,14 @@ CMD(cmd_usersetright)
 
 	ARG_NEED("uid");
 
-	uid = strtol( line, &end, 10 );
+	uid = user2id( line, &end );
 	if( line == end ){
 		MSG_ARGMIS("uid");
 		return;
 	}
 
 	s = end + strspn( end, "\t ");
-	right = strtol( s, &end, 10 );
+	right = right2id( s, &end );
 	if( *end ){
 		MSG_ARGMIS("right");
 		return;
@@ -396,7 +455,7 @@ CMD(cmd_userdel)
 
 	ARG_NEED("uid");
 
-	uid = strtol( line, &end, 10 );
+	uid = user2id( line, &end );
 	if( *end ){
 		MSG_ARGMIS("uid");
 		return;
@@ -479,6 +538,7 @@ CMD(cmd_status)
 	}
 }
 
+// TODO: remove curtrack cmd
 CMD(cmd_curtrack)
 {
 	msc_track *t;
@@ -563,7 +623,7 @@ CMD(cmd_randomset)
  * commands: track
  */
 
-CMD(cmd_tracks)
+CMD(cmd_trackcount)
 {
 	int num;
 
@@ -577,13 +637,16 @@ CMD(cmd_tracks)
 	tty_msg( "available tracks: %d\n", num );
 }
 
-CMD(cmd_trackid)
+// TODO: remove track2id cmd
+CMD(cmd_track2id)
 {
 	char *s;
 	char *e;
 	int albumid;
 	int num;
 	int id;
+
+	// TODO: deal with special "c" track
 
 	(const char *)s = line;
 	albumid = strtol(s, &e, 10 );
@@ -599,7 +662,7 @@ CMD(cmd_trackid)
 		return;
 	}
 
-	if( 0 > (id = msc_cmd_trackid( con, albumid, num))){
+	if( 0 > (id = msc_cmd_track2id( con, albumid, num))){
 		tty_msg( "track not found" );
 		return;
 	}
@@ -616,7 +679,7 @@ CMD(cmd_trackget)
 
 	ARG_NEED("trackID");
 
-	if( 0 > (num = trackid( line, NULL ))){
+	if( 0 > (num = track2id( line, NULL ))){
 		MSG_BADARG( "trackID" );
 	}
 	if( NULL == ( t = msc_cmd_trackget(con, num ))){
@@ -752,13 +815,13 @@ CMD(cmd_randomtop)
  * commands: queue 
  */
 
-CMD(cmd_queue)
+CMD(cmd_queuelist)
 {
 	msc_it_queue *it;
 
 	ARG_NONE;
 
-	if( NULL == (it = msc_cmd_queue( con ))){
+	if( NULL == (it = msc_cmd_queuelist( con ))){
 		MSG_FAIL;
 		return;
 	}
@@ -791,7 +854,7 @@ CMD(cmd_queueadd)
 
 	ARG_NEED("trackID");
 
-	if( 0 > (id = trackid(line, NULL))){
+	if( 0 > (id = track2id(line, NULL))){
 		MSG_BADARG("trackID");
 		return;
 	}
@@ -809,7 +872,7 @@ CMD(cmd_queuealbum)
 
 	ARG_NEED("albumID");
 
-	if( 0 > (id = trackid(line, NULL))){
+	if( 0 > (id = track2id(line, NULL))){
 		MSG_BADARG("trackID");
 		return;
 	}
@@ -907,7 +970,7 @@ CMD(cmd_historytrack)
 	msc_it_history *it;
 	char *end;
 
-	if( 0 > (id = trackid(line, &end))){
+	if( 0 > (id = track2id(line, &end))){
 		MSG_BADARG("trackID");
 		return;
 	}
@@ -929,14 +992,18 @@ CMD(cmd_historytrack)
  * commands: tag
  */
 
-CMD(cmd_taglist)
+// TODO: remove tag2id cmd
+CMD(cmd_tag2id)
 {
-	msc_it_tag *it;
+	int id;
 
-	ARG_NONE;
-	it = msc_cmd_taglist( con );
-	dump_tags( it );
-	msc_it_tag_done( it );
+	ARG_NEED("tagName");
+	if( 0 > (id = msc_cmd_tag2id(con, line))){
+		MSG_FAIL;
+		return;
+	}
+
+	tty_msg( "tag has ID %d\n", id );
 }
 
 CMD(cmd_tagget)
@@ -947,7 +1014,7 @@ CMD(cmd_tagget)
 	char buf[BUFLENTAG];
 
 	ARG_NEED("tagID");
-	id = strtol( line, &e, 10 );
+	id = tag2id( line, &e );
 	if( *e ){
 		MSG_BADARG("tagID");
 		return;
@@ -964,21 +1031,14 @@ CMD(cmd_tagget)
 	msc_tag_free(t);
 }
 
-CMD(cmd_tagname)
+CMD(cmd_taglist)
 {
-	msc_tag *t;
-	char buf[BUFLENTAG];
+	msc_it_tag *it;
 
-	ARG_NEED("tagName");
-	if( NULL == (t= msc_cmd_tagname(con, line))){
-		MSG_FAIL;
-		return;
-	}
-
-	tty_msg( "%s\n\n", mktaghead(buf,BUFLENTAG));
-	tty_msg( "%s\n", mktag(buf,BUFLENTAG, t));
-
-	msc_tag_free(t);
+	ARG_NONE;
+	it = msc_cmd_taglist( con );
+	dump_tags( it );
+	msc_it_tag_done( it );
 }
 
 CMD(cmd_tagadd)
@@ -1001,7 +1061,7 @@ CMD(cmd_tagsetname)
 
 
 	ARG_NEED("tagID");
-	id = strtol( line, &e, 10 );
+	id = tag2id( line, &e );
 	if( line == e ){
 		MSG_BADARG("tagID");
 		return;
@@ -1020,7 +1080,7 @@ CMD(cmd_tagsetdesc)
 
 
 	ARG_NEED("tagID");
-	id = strtol( line, &e, 10 );
+	id = tag2id( line, &e );
 	if( line == e ){
 		MSG_BADARG("tagID");
 		return;
@@ -1038,7 +1098,7 @@ CMD(cmd_tagdel)
 	char *e;
 
 	ARG_NEED("tagID");
-	id = strtol( line, &e, 10 );
+	id = tag2id( line, &e );
 	if( *e ){
 		MSG_BADARG("tagID");
 		return;
@@ -1049,45 +1109,45 @@ CMD(cmd_tagdel)
 	}
 }
 
-CMD(cmd_tracktags)
+CMD(cmd_tracktaglist)
 {
 	int id;
 	char *e;
 	msc_it_tag *it;
 
 	ARG_NEED("trackID");
-	id = strtol( line, &e, 10 );
+	id = track2id( line, &e );
 	if( *e ){
 		MSG_BADARG("trackID");
 		return;
 	}
 
-	it = msc_cmd_tracktags( con, id );
+	it = msc_cmd_tracktaglist( con, id );
 	dump_tags( it );
 	msc_it_tag_done( it );
 }
 
 CMD(cmd_tracktagged)
 {
-	int tagid, trid;
+	int tid, trid;
 	char *s, *e;
 	int r;
 
 	ARG_NEED("trackID");
-	trid = trackid( line, &e );
+	trid = track2id( line, &e );
 	if( e == line ){
 		MSG_BADARG("trackID");
 		return;
 	}
 
 	s = e += strspn( e, "\t " );
-	tagid = strtol(s, &e, 10 );
+	tid = tag2id(s, &e );
 	if( *e ){
-		MSG_BADARG("trackID");
+		MSG_BADARG("tagID");
 		return;
 	}
 
-	if( 0 > (r = msc_cmd_tracktagged( con, trid, tagid ))){
+	if( 0 > (r = msc_cmd_tracktagged( con, trid, tid ))){
 		MSG_FAIL;
 		return;
 	}
@@ -1097,24 +1157,24 @@ CMD(cmd_tracktagged)
 
 CMD(cmd_tracktagset)
 {
-	int tagid, trid;
+	int tid, trid;
 	char *s, *e;
 
 	ARG_NEED("trackID");
-	trid = trackid( line, &e );
+	trid = track2id( line, &e );
 	if( e == line ){
 		MSG_BADARG("trackID");
 		return;
 	}
 
 	s = e += strspn( e, "\t " );
-	tagid = strtol(s, &e, 10 );
+	tid = tag2id(s, &e );
 	if( *e ){
-		MSG_BADARG("trackID");
+		MSG_BADARG("tagID");
 		return;
 	}
 
-	if( msc_cmd_tracktagset( con, trid, tagid )){
+	if( msc_cmd_tracktagset( con, trid, tid )){
 		MSG_FAIL;
 		return;
 	}
@@ -1123,24 +1183,24 @@ CMD(cmd_tracktagset)
 
 CMD(cmd_tracktagdel)
 {
-	int tagid, trid;
+	int tid, trid;
 	char *s, *e;
 
 	ARG_NEED("trackID");
-	trid = trackid( line, &e );
+	trid = track2id( line, &e );
 	if( e == line ){
 		MSG_BADARG("trackID");
 		return;
 	}
 
 	s = e += strspn( e, "\t " );
-	tagid = strtol(s, &e, 10 );
+	tid = tag2id(s, &e );
 	if( *e ){
-		MSG_BADARG("trackID");
+		MSG_BADARG("tagID");
 		return;
 	}
 
-	if( msc_cmd_tracktagdel( con, trid, tagid )){
+	if( msc_cmd_tracktagdel( con, trid, tid )){
 		MSG_FAIL;
 		return;
 	}
@@ -1167,17 +1227,20 @@ static t_command commands[] = {
 	{ "help", NULL, cmd_help },
 	{ "raw", cgen_cmd_raw, cmd_raw },
 	{ "open", NULL, cmd_open },
-	{ "disconnect", NULL, cmd_disconnect },
-	{ "user", NULL, cmd_auth },
-	{ "who", NULL, cmd_who },
-	{ "kick", NULL, cmd_kick },
-	{ "usergetname", NULL, cmd_usergetname },
+	{ "user", NULL, cmd_user },
+
+	{ "clientlist", NULL, cmd_clientlist },
+	{ "clientclose", NULL, cmd_clientclose },
+	{ "clientcloseuser", NULL, cmd_clientcloseuser },
+
+	{ "user2id", NULL, cmd_user2id },
 	{ "userget", NULL, cmd_userget },
-	{ "users", NULL, cmd_users },
+	{ "userlist", NULL, cmd_userlist },
 	{ "usersetpass", NULL, cmd_usersetpass },
 	{ "usersetright", NULL, cmd_usersetright },
 	{ "useradd", NULL, cmd_useradd },
 	{ "userdel", NULL, cmd_userdel },
+
 	{ "play", NULL, cmd_play },
 	{ "stop", NULL, cmd_stop },
 	{ "next", NULL, cmd_next },
@@ -1189,34 +1252,41 @@ static t_command commands[] = {
 	{ "gapset", NULL, cmd_gapset },
 	{ "random", NULL, cmd_random },
 	{ "randomset", NULL, cmd_randomset },
-	{ "tracks", NULL, cmd_tracks },
-	{ "trackid", NULL, cmd_trackid },
+
+	{ "trackcount", NULL, cmd_trackcount },
+	{ "track2id", NULL, cmd_track2id },
 	{ "trackget", NULL, cmd_trackget },
 	{ "tracksearch", NULL, cmd_tracksearch },
 	{ "tracksalbum", NULL, cmd_tracksalbum },
 	{ "tracksartist", NULL, cmd_tracksartist },
+
 	{ "filter", NULL, cmd_filter },
 	{ "filterset", NULL, cmd_filterset },
 	{ "filterstat", NULL, cmd_filterstat },
 	{ "randomtop", NULL, cmd_randomtop },
-	{ "queue", NULL, cmd_queue },
+
 	{ "queueget", NULL, cmd_queueget },
+	{ "queuelist", NULL, cmd_queuelist },
 	{ "queueadd", NULL, cmd_queueadd },
 	{ "queuealbum", NULL, cmd_queuealbum },
 	{ "queuedel", NULL, cmd_queuedel },
 	{ "queueclear", NULL, cmd_queueclear },
+
 	{ "sleep", NULL, cmd_sleep },
 	{ "sleepset", NULL, cmd_sleepset },
+
 	{ "history", NULL, cmd_history },
 	{ "historytrack", NULL, cmd_historytrack },
-	{ "taglist", NULL, cmd_taglist },
+
+	{ "tag2id", NULL, cmd_tag2id },
 	{ "tagget", NULL, cmd_tagget },
-	{ "tagname", NULL, cmd_tagname },
+	{ "taglist", NULL, cmd_taglist },
 	{ "tagadd", NULL, cmd_tagadd },
 	{ "tagsetname", NULL, cmd_tagsetname },
 	{ "tagsetdesc", NULL, cmd_tagsetdesc },
 	{ "tagdel", NULL, cmd_tagdel },
-	{ "tracktags", NULL, cmd_tracktags },
+
+	{ "tracktaglist", NULL, cmd_tracktaglist },
 	{ "tracktagged", NULL, cmd_tracktagged },
 	{ "tracktagset", NULL, cmd_tracktagset },
 	{ "tracktagdel", NULL, cmd_tracktagdel },
