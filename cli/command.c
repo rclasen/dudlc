@@ -73,23 +73,6 @@ static int trackid( const char *in, char **end )
 	return msc_cmd_trackid(con, a, b );
 }
 
-/************************************************************
- * sample command completer
- */
-
-static char *cgen_cmd_foo( const char *line, int state )
-{
-	(void) line; /* shut up gcc */
-
-	if( state == 0 )
-		return strdup( "bar" );
-
-	if( state == 1 )
-		return strdup( "baz" );
-
-	return 0;
-}
-
 #define CMD(n)		static void n(const char *line )
 
 #define MSG_BADARG(a)	tty_msg( "bad argument for argument %s\n", a)
@@ -129,6 +112,71 @@ CMD(cmd_open)
 	ARG_NONE;
 	msc_open( con );
 }
+
+static char *cgen_cmd_raw( const char *text, int state )
+{
+	static char **helpv = NULL;
+	static int last = 0;
+
+	if( state == 0 ){
+		msc_it_help *it;
+		char *s;
+		unsigned int len;
+		int total = 0;
+		int used = 0;
+
+		it = msc_cmd_help(con);
+		for( s = msc_it_help_cur(it); s; 
+				s = msc_it_help_next(it) ){
+
+			if( 0 != strncasecmp( s, text, len) ){
+				free(s);
+				continue;
+			}
+
+			if( used >= total ){
+				char **tmp;
+
+				total += 10;
+				tmp = realloc( helpv, sizeof(char*) * 
+						(total +1) );
+				if( tmp == NULL ){
+					free(s);
+					break;
+				}
+
+				helpv = tmp;
+			}
+
+			helpv[used++] = s;
+		}
+		msc_it_help_done(it);
+
+		if( helpv ){
+			helpv[used] = NULL;
+			last = 0;
+			return *helpv;
+		
+		}
+
+		last = 0;
+		return NULL;
+	}
+
+	if( ! helpv )
+		return NULL;
+
+	if( ! helpv[++last] ){
+		free(helpv);
+		helpv = NULL;
+		last = 0;
+		return NULL;
+	}
+
+	return helpv[last];
+}
+
+
 
 CMD(cmd_help)
 {
@@ -713,11 +761,10 @@ typedef struct _t_command {
 } t_command;
 
 static t_command commands[] = {
-	{ "foo", cgen_cmd_foo, NULL },
 	{ "quit", NULL, cmd_quit },
 	{ "exit", NULL, cmd_quit },
 	{ "help", NULL, cmd_help },
-	{ "raw", NULL, cmd_raw },
+	{ "raw", cgen_cmd_raw, cmd_raw },
 	{ "open", NULL, cmd_open },
 	{ "disconnect", NULL, cmd_disconnect },
 	{ "who", NULL, cmd_who },
