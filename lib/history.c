@@ -19,7 +19,6 @@ static msc_history *_msc_history_parse( const char *line, char **end )
 		goto clean1;
 	}
 
-	s = e+1;
 	n->uid = strtol( s, &e, 10 );
 	if( s == e )
 		goto clean2;
