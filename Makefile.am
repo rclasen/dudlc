@@ -1,4 +1,4 @@
 
 AUTOMAKE_OPTIONS=foreign
 
-SUBDIRS=lib cli
+SUBDIRS=lib cmd cli ir

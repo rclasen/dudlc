@@ -28,5 +28,6 @@ AC_CHECK_FUNCS([gethostbyname memmove memset select socket strcasecmp strcspn st
 
 AM_MAINTAINER_MODE
 
-AC_CONFIG_FILES([Makefile lib/Makefile lib/dudlc/Makefile cli/Makefile])
+AC_CONFIG_FILES([Makefile lib/Makefile lib/dudlc/Makefile
+	cmd/Makefile cli/Makefile ir/Makefile])
 AC_OUTPUT
