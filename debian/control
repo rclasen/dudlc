@@ -8,27 +8,42 @@ Package: libdudlc-dev
 Section: devel
 Architecture: any
 Depends: libdudlc0 (= ${Source-Version})
-Description: <insert up to 60 chars description>
- <insert long description, indented with spaces>
+Description: dudl jukebox client library - development files
+ The dudl jukebox is a network oriented MP3 server you can connect to with
+ multiple clients. 
+ .
+ This package contains files to build your own client using the dudl
+ client library.
 
 Package: libdudlc0
 Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}
-Description: <insert up to 60 chars description>
- <insert long description, indented with spaces>
+Description: dudl jukebox client library
+ The dudl jukebox is a network oriented MP3 server you can connect to with
+ multiple clients. 
+ .
+ This package contains the client library that implements a C api for the
+ network protocol.
 
 Package: dudl-client
 Section: sound
 Architecture: any
 Depends: ${shlibs:Depends}
-Description: <insert up to 60 chars description>
- <insert long description, indented with spaces>
+Description: command line client for dudl jukebox
+ The dudl jukebox is a network oriented MP3 server you can connect to with
+ multiple clients. 
+ .
+ This client uses readline to implement a comfortable textmode client for
+ the dudl jukebox.
 
 Package: dudl-lirc
 Section: sound
 Architecture: any
 Depends: ${shlibs:Depends}
-Description: <insert up to 60 chars description>
- <insert long description, indented with spaces>
-
+Description: lirc client for dudl jukebox
+ The dudl jukebox is a network oriented MP3 server you can connect to with
+ multiple clients. 
+ .
+ This client uses LIRC to decode commands from a remote control and
+ interface with the dudl jukebox.

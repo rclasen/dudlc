@@ -1,3 +1,9 @@
+dudlc (0.0.4) unstable; urgency=low
+
+  * lintian cleanup
+
+ -- Rainer Clasen <bj@zuto.de>  Thu,  1 Aug 2002 20:37:25 +0200
+
 dudlc (0.0.3) unstable; urgency=low
 
   * irdudl now uses select to flush dudl bcast messages
