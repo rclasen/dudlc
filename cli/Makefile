@@ -26,7 +26,7 @@ OBJ	:=
 # lib
 
 SRC_lib		:= sock.c client.c proto.c iterate.c \
-		track.c
+		track.c player.c
 SRC_lib		:= $(patsubst %,mservclient/%,$(SRC_lib))
 OBJ_lib		:= $(patsubst %.c,%.o,$(SRC_lib))
 LLNK += libmservclient.a
@@ -38,7 +38,7 @@ libmservclient.a: $(OBJ_lib)
 # mservcli
 
 SRC_mservcli	:= \
-		tty.c \
+		tty.c command.c \
 		mservcli.c
 OBJ_mservcli	:= $(patsubst %.c,%.o,$(SRC_mservcli))
 BLNK += mservcli
