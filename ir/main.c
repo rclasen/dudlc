@@ -217,6 +217,7 @@ static void loop_lirc( void )
 
 int main(int argc, char *argv[])
 {
+	int pid;
 	int needhelp = 0;
 	int debug = 0;
 	int foreground = 0;
@@ -225,7 +226,6 @@ int main(int argc, char *argv[])
 	char *user = NULL;
 	char *pass = NULL;
 	int pidfile = 0;
-	int rv;
 
 	progname = strrchr( argv[0], '/' );
 	if( NULL != progname ){
@@ -233,6 +233,7 @@ int main(int argc, char *argv[])
 	} else {
 		progname = argv[0];
 	}
+	pid = getpid();
 
 	while (1) {
 		int c;
@@ -327,6 +328,11 @@ int main(int argc, char *argv[])
 		setlogmask( LOG_UPTO(LOG_INFO) );
 	}
 
+	if( pidfile && pidfile_lock(progname)){
+		syslog( LOG_ERR, "cannot create pidfile: %m"); 
+		exit( EXIT_FAILURE );
+	}
+
 	/* initialize dudl connection */
 	dudl = duc_new( host, port );
 	if( dudl == NULL ){
@@ -344,9 +350,8 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	if( pidfile && PF_SUCCESS != (rv = pidfile_lock(progname, 1 ))){
-		syslog( LOG_ERR, "cannot create pidfile: %s", 
-				pidfile_errstr(rv));
+	if( pidfile && pidfile_take(progname, pid)){
+		syslog( LOG_ERR, "cannot update pidfile: %m"); 
 		exit( EXIT_FAILURE );
 	}
 
