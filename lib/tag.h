@@ -1,7 +1,7 @@
 #ifndef _MSERVCLIENT_TAG_H
 #define _MSERVCLIENT_TAG_H
 
-#include <mservclient/client.h>
+#include <mservclient/session.h>
 
 typedef struct {
 	int id;
@@ -17,7 +17,7 @@ typedef struct {
 void msc_tag_free( msc_tag *t );
 
 msc_tag *msc_cmd_tagget( mservclient *c, int id );
-msc_tag *msc_cmd_tagname( mservclient *c, const char *name );
+int msc_cmd_tag2id( mservclient *c, const char *name );
 
 msc_it_tag *msc_cmd_taglist( mservclient *c );
 
@@ -26,7 +26,7 @@ int msc_cmd_tagsetname( mservclient *c, int id, const char *name );
 int msc_cmd_tagsetdesc( mservclient *c, int id, const char *desc );
 int msc_cmd_tagdel( mservclient *c, int id );
 
-msc_it_tag *msc_cmd_tracktags( mservclient *c, int tid );
+msc_it_tag *msc_cmd_tracktaglist( mservclient *c, int tid );
 int msc_cmd_tracktagged( mservclient *c, int tid, int id );
 
 int msc_cmd_tracktagset( mservclient *c, int tid, int id );

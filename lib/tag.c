@@ -59,10 +59,9 @@ msc_tag *msc_cmd_tagget( mservclient *c, int id )
 			"tagget %d", id );
 }
 
-msc_tag *msc_cmd_tagname( mservclient *c, const char *name )
+int msc_cmd_tag2id( mservclient *c, const char *name )
 {
-	return _msc_cmd_conv(c, (_msc_converter)_msc_tag_parse, 
-			"tagname %s", name );
+	return _msc_cmd_int(c, "tag2id %s", name );
 }
 
 
@@ -92,10 +91,10 @@ int msc_cmd_tagdel( mservclient *c, int id )
 }
 
 
-msc_it_tag *msc_cmd_tracktags( mservclient *c, int tid )
+msc_it_tag *msc_cmd_tracktaglist( mservclient *c, int tid )
 {
 	return _msc_iterate(c, (_msc_converter)_msc_tag_parse, 
-			"tracktags %d", tid );
+			"tracktaglist %d", tid );
 }
 
 int msc_cmd_tracktagged( mservclient *c, int tid, int id )

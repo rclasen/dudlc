@@ -72,12 +72,12 @@ void msc_track_free( msc_track *t )
 
 int msc_cmd_tracks( mservclient *c )
 {
-	return _msc_cmd_int( c, "tracks" );
+	return _msc_cmd_int( c, "trackcount" );
 }
 
-int msc_cmd_trackid( mservclient *c, int albumid, int nr )
+int msc_cmd_track2id( mservclient *c, int albumid, int nr )
 {
-	return _msc_cmd_int( c, "trackid %d %d", albumid, nr );
+	return _msc_cmd_int( c, "track2id %d %d", albumid, nr );
 }
 
 msc_track *msc_cmd_trackget( mservclient *c, int id )
