@@ -16,7 +16,7 @@ mservclient *con = NULL;
 
 msc_events cb;
 
-static int terminate = 0;
+int terminate = 0;
 
 static void sig_term( int sig )
 {
@@ -66,13 +66,25 @@ static void loop( void )
 		}
 
 		if( FD_ISSET(0,&rfds) ){
-			if( tty_poll() )
-				terminate ++;
+			tty_poll();
 			tty_redraw();
 		}
 
 	} while( ! terminate );
 }
+
+static void cb_disc( mservclient *c )
+{
+	tty_msg( "disconnected, trying to reconnect\n");
+	msc_open(c);
+}
+
+static void cb_conn( mservclient *c )
+{
+	tty_msg( "connected\n");
+	(void)c;
+}
+
 
 static void bcast( mservclient *c, const char *line )
 {
@@ -91,6 +103,8 @@ int main( int argc, char **argv )
 	con = msc_new( "localhost", 4445, "ddd", "sss" );
 
 	memset(&cb, 0, sizeof(cb));
+	cb.connect = cb_conn;
+	cb.disconnect = cb_disc;
 	cb.bcast = bcast;
 	msc_setevents( con, &cb );
 
@@ -100,6 +114,8 @@ int main( int argc, char **argv )
 	signal( SIGPIPE, SIG_IGN );
 
 	tty_init( "hmserv", "> " );
+
+	msc_open(con);
 
 	loop();
 
