@@ -9,17 +9,23 @@
 
 #define BUFLENLINE	2048
 
-t_mservclient *msc_new( const char *hostname, int port, 
+#define EVENT(c,name,arg...)	\
+	if( (c)->ev && ((msc_events*)(c)->ev)->name ){ \
+		(*((msc_events*)(c)->ev)->name)(arg); \
+	}
+
+mservclient *msc_new( const char *hostname, int port, 
 		const char *user, const char *pass )
 {
-	t_mservclient *p;
+	mservclient *p;
 
-	if( NULL == (p = malloc(sizeof(t_mservclient))))
+	if( NULL == (p = malloc(sizeof(mservclient))))
 		return NULL;
 
 	*p->code = 0;
 	p->line = NULL;
 	p->inreply = 0;
+	p->ev = NULL;
 
 	if( NULL == (p->con = msc_sock_open( hostname, port )))
 		goto clean1;
@@ -41,7 +47,7 @@ clean1:
 	return NULL;
 }
 
-void msc_free( t_mservclient *p )
+void msc_free( mservclient *p )
 {
 	if( ! p )
 		return;
@@ -50,12 +56,26 @@ void msc_free( t_mservclient *p )
 	free(p);
 }
 
-int msc_fd( t_mservclient *p )
+int msc_fd( mservclient *p )
 {
 	return msc_sock_fd( p->con );
 }
 
-int msc_open( t_mservclient *p )
+msc_events *msc_getevents( mservclient *c )
+{
+	return c->ev;
+}
+
+msc_events *msc_setevents( mservclient *c, msc_events *e )
+{
+	msc_events *old;
+
+	old = c->ev;
+	c->ev = e;
+	return old;
+}
+
+int msc_open( mservclient *p )
 {
 	const char *c;
 
@@ -100,18 +120,17 @@ clean1:
 	return 1;
 }
 
-static void msc_restart( t_mservclient *p )
+static void msc_restart( mservclient *p )
 {
 	p->line = NULL;
 	p->inreply = 0;
 	*p->code = 0;
 
 	msc_sock_disconnect( p->con );
-	if( cb_disconnect )
-		(*cb_disconnect)( p );
+	EVENT(p,disconnect,p);
 }
 
-int _msc_send( t_mservclient *p, const char *msg )
+int _msc_send( mservclient *p, const char *msg )
 {
 	if( p->inreply )
 		return 1;
@@ -133,7 +152,7 @@ int _msc_send( t_mservclient *p, const char *msg )
 	return 1;
 }
 
-static int _msc_vsend( t_mservclient *p, const char *fmt, va_list ap )
+static int _msc_vsend( mservclient *p, const char *fmt, va_list ap )
 {
 	char buf[BUFLENLINE];
 	int len;
@@ -148,7 +167,7 @@ static int _msc_vsend( t_mservclient *p, const char *fmt, va_list ap )
 	return _msc_send( p, buf );
 }
 
-int _msc_fsend( t_mservclient *p, const char *fmt, ... )
+int _msc_fsend( mservclient *p, const char *fmt, ... )
 {
 	va_list ap;
 	int r;
@@ -161,17 +180,16 @@ int _msc_fsend( t_mservclient *p, const char *fmt, ... )
 }
 
 
-static void _msc_bcast( t_mservclient *p, const char *line )
+static void _msc_bcast( mservclient *p, const char *line )
 {
-	if( cb_bcast )
-		(*cb_bcast)(line);
+	EVENT(p,bcast,p,line);
 
 	// TODO: bcast
 	(void) p;
 	(void)line;
 }
 
-int _msc_nextline( t_mservclient *p )
+int _msc_nextline( mservclient *p )
 {
 	const char *l = NULL;
 
@@ -220,7 +238,7 @@ int _msc_nextline( t_mservclient *p )
 	return 0;
 }
 
-int _msc_last( t_mservclient *p )
+int _msc_last( mservclient *p )
 {
 	int r;
 
@@ -233,12 +251,12 @@ int _msc_last( t_mservclient *p )
 	return 0;
 }
 
-int _msc_rend( t_mservclient *p )
+int _msc_rend( mservclient *p )
 {
 	return ! p->inreply;
 }
 
-const char *_msc_rcode( t_mservclient *p )
+const char *_msc_rcode( mservclient *p )
 {
 	if( ! *p->code )
 		return NULL;
@@ -246,7 +264,7 @@ const char *_msc_rcode( t_mservclient *p )
 	return p->code;
 }
 
-const char *_msc_rline( t_mservclient *p )
+const char *_msc_rline( mservclient *p )
 {
 	if( ! p->line )
 		return NULL;
@@ -254,7 +272,7 @@ const char *_msc_rline( t_mservclient *p )
 	return p->line;
 }
 
-void msc_poll( t_mservclient *p )
+void msc_poll( mservclient *p )
 {
 	const char *l;
 

@@ -3,37 +3,55 @@
 
 #include <mservclient/sock.h>
 
+
+
 typedef struct {
 	char *user;
 	char *pass;
+
+	void *ev;
 
 	t_msc_sock *con;
 	int inreply;
 	char code[4];
 	const char *line;
-} t_mservclient;
+} mservclient;
 
-typedef void (*t_proto_bcast_msg)(const char *c);
-typedef void (*t_proto_func_disconnect)( t_mservclient *p );
+typedef void (*msc_ev_argnone)( mservclient *c );
+typedef void (*msc_ev_argstring)( mservclient *c, const char *s );
 
-extern t_proto_func_disconnect cb_disconnect;
-extern t_proto_bcast_msg cb_bcast;
+typedef struct {
+	msc_ev_argnone connect;
+	msc_ev_argnone disconnect;
 
-t_mservclient *msc_new( const char *hostname, int port, 
+	// temporary:
+	msc_ev_argstring bcast;
+} msc_events;
+
+
+
+mservclient *msc_new( const char *hostname, int port, 
 		const char *user, const char *pass );
-void msc_free( t_mservclient *p );
-int msc_open( t_mservclient *p );
+int msc_open( mservclient *p );
+void msc_free( mservclient *p );
 
-int msc_fd( t_mservclient *p );
-void msc_poll( t_mservclient *p );
+int msc_fd( mservclient *p );
+void msc_poll( mservclient *p );
 
-int _msc_send( t_mservclient *p, const char *msg );
-int _msc_fsend( t_mservclient *p, const char *fmt, ... );
+msc_events *msc_getevents( mservclient *p );
+msc_events *msc_setevents( mservclient *p, msc_events *e );
 
-int _msc_last( t_mservclient *p );
-int _msc_nextline( t_mservclient *p );
-int _msc_rend( t_mservclient *p );
-const char *_msc_rcode( t_mservclient *p );
-const char *_msc_rline( t_mservclient *p );
+/************************************************************
+ * internal protocol parsing functions
+ ************************************************************/
+
+int _msc_send( mservclient *p, const char *msg );
+int _msc_fsend( mservclient *p, const char *fmt, ... );
+
+int _msc_last( mservclient *p );
+int _msc_nextline( mservclient *p );
+int _msc_rend( mservclient *p );
+const char *_msc_rcode( mservclient *p );
+const char *_msc_rline( mservclient *p );
 
 #endif
