@@ -11,10 +11,11 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
-#include "proto.h"
+#include <mservclient/client.h>
+
 #include "tty.h"     
 
-extern t_proto *con;
+extern mservclient *con;
 
 /* types */
 
@@ -30,6 +31,7 @@ typedef struct _t_command {
 
 static int redisplay = 0;
 static int terminate = 0;
+static int inprompt = 1;
 
 /************************************************************
  * command completer
@@ -61,16 +63,16 @@ static void cmd_quit( const char *text )
 
 static void cmd_misc( const char *text )
 {
-	proto_fsend( con, text );
-	if( proto_nextline(con) ){
+	_msc_fsend( con, text );
+	if( _msc_nextline(con) ){
 		tty_msg( "connection error\n" );
 		return;
 	}
 
-	tty_msg( "code: %s\n", proto_rcode(con));
+	tty_msg( "code: %s\n", _msc_rcode(con));
 	do {
-		tty_msg( " %s\n", proto_rline(con));
-	} while( ! proto_nextline(con));
+		tty_msg( " %s\n", _msc_rline(con));
+	} while( ! _msc_nextline(con));
 }
 
 /************************************************************
@@ -181,11 +183,13 @@ static void command_handler( char *input )
 	add_history(input);
 
 	/* execute action - if one is defined */
+	inprompt = 0;
 	c = command_len(input);
 	if( NULL != (cmd = command_nfind( input, c )) && cmd->action )
 		cmd->action( input+c );
 	else 
 		cmd_misc( input );
+	inprompt = 1;
 
 	free(input);
 }
@@ -199,32 +203,36 @@ void tty_init( const char *name, const char *prompt )
 	rl_callback_handler_install( prompt, command_handler );
 }
 
-int tty_poll( void )
+void tty_redraw( void )
 {
 	if( redisplay ){
 		rl_forced_update_display();
 		redisplay = 0;
 	}
+}
 
+int tty_poll( void )
+{
 	rl_callback_read_char();
 
 	return terminate;
 }
 
-int tty_vmsg( char *fmt, va_list ap )
+int tty_vmsg( const char *fmt, va_list ap )
 {
 	int r;
 
-	if( ! redisplay )
+	if( ! redisplay && inprompt )
 		printf( "\n" );
 
 	r = vprintf( fmt, ap );
-	redisplay++;
+	if( inprompt )
+		redisplay++;
 
 	return r;
 }
 
-int tty_msg( char * fmt, ... )
+int tty_msg( const char * fmt, ... )
 {
 	va_list ap;
 	int r;
