@@ -98,7 +98,7 @@ int msc_cmd_random( mservclient *c )
 
 int msc_cmd_randomset( mservclient *c, int r )
 {
-	if( _msc_cmd(c, "randomset %s", r ))
+	if( _msc_cmd(c, "randomset %d", r ))
 		return -1;
 	if( *_msc_rcode(c) != '2' )
 		return -1;
