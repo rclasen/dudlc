@@ -12,7 +12,6 @@
 #include <readline/history.h>
 
 #include "proto.h"
-#include "cmd.h"
 #include "tty.h"     
 
 extern t_proto *con;
