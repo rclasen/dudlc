@@ -1,0 +1,34 @@
+Source: dudlc
+Priority: optional
+Maintainer: Rainer Clasen <bj@zuto.de>
+Build-Depends: debhelper (>> 3.0.0), liblircclient-dev, libreadline4-dev
+Standards-Version: 3.5.2
+
+Package: libdudlc-dev
+Section: devel
+Architecture: any
+Depends: libdudlc0 (= ${Source-Version})
+Description: <insert up to 60 chars description>
+ <insert long description, indented with spaces>
+
+Package: libdudlc0
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}
+Description: <insert up to 60 chars description>
+ <insert long description, indented with spaces>
+
+Package: dudl-client
+Section: sound
+Architecture: any
+Depends: ${shlibs:Depends}
+Description: <insert up to 60 chars description>
+ <insert long description, indented with spaces>
+
+Package: dudl-lirc
+Section: sound
+Architecture: any
+Depends: ${shlibs:Depends}
+Description: <insert up to 60 chars description>
+ <insert long description, indented with spaces>
+
