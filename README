@@ -1,0 +1,13 @@
+lib	libdudlc 
+	Library for accessing a dudl daemon. Completely
+	encapuslates the protocol.
+
+cmd	libdudlccmd
+	Library for clients submitting commands as string. Includes
+	functions to print output in text form. Uses libdudlc.
+
+cli	dudlc
+	command-line client using readline. Uses libdudlccmd.
+
+ir	irdudl
+	LIRC controlled client. Uses libdudlccmd.
