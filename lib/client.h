@@ -1,38 +1,31 @@
 #ifndef _MSERVCLIENT_CLIENT_H
 #define _MSERVCLIENT_CLIENT_H
 
-#include <mservclient/sock.h>
+#include <mservclient/session.h>
+#include <mservclient/iterate.h>
 
 
-
+// TODO: make addr a number
 typedef struct {
-	void *ev;
+	int id;
+	int uid;
+	char *addr;
+} msc_client;
 
-	char *user;
-	char *pass;
+void msc_client_free( msc_client *c );
 
-	t_msc_sock *con;
+#define msc_it_client	_msc_iter
+#define msc_it_client_cur(x)	(msc_client*)_msc_it_cur((_msc_iter*)x)
+#define msc_it_client_next(x)	(msc_client*)_msc_it_next((_msc_iter*)x)
+#define msc_it_client_done(x)	_msc_it_done((_msc_iter*)x)
 
-	int inreply;
-	char code[4];
-	const char *line;
-} mservclient;
+msc_it_client *msc_cmd_clientlist( mservclient *p );
 
+int msc_cmd_clientcloseuser( mservclient *p, int uid );
 
-mservclient *msc_new( const char *hostname, int port);
-void msc_free( mservclient *p );
+int msc_cmd_clientclose( mservclient *p, int id );
 
-int msc_setauth( mservclient *c, const char *user, const char *pass );
-int msc_open( mservclient *p );
-void msc_close( mservclient *p );
-
-int msc_fd( mservclient *p );
-void msc_poll( mservclient *p );
-
-const char *msc_rmsg( mservclient *p );
-
-int msc_cmd_auth( mservclient *p );
-int msc_cmd_disconnect( mservclient *p, int id );
+void _msc_bcast_client( mservclient *c, const char *line );
 
 #endif
 

@@ -3,7 +3,7 @@
 
 #include <stdarg.h>
 
-#include <mservclient/client.h>
+#include <mservclient/session.h>
 
 /************************************************************
  * internal protocol parsing functions
@@ -19,6 +19,8 @@ int _msc_rnext( mservclient *p );
 int _msc_rend( mservclient *p );
 const char *_msc_rcode( mservclient *p );
 const char *_msc_rline( mservclient *p );
+
+#define msc_rmsg _msc_rline
 
 /* convenience pack for single-line responses: */
 int _msc_cmd( mservclient *p, const char *fmt, ... );

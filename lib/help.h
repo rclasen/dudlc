@@ -1,7 +1,7 @@
 #ifndef _MSERVCLIENT_HELP_H
 #define _MSERVCLIENT_HELP_H
 
-#include <mservclient/client.h>
+#include <mservclient/session.h>
 #include <mservclient/iterate.h>
 
 

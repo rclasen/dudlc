@@ -1,7 +1,7 @@
 #ifndef _MSERVCLIENT_HISTORY_H
 #define _MSERVCLIENT_HISTORY_H
 
-#include <mservclient/client.h>
+#include <mservclient/session.h>
 #include <mservclient/track.h>
 
 typedef struct {

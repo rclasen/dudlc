@@ -1,7 +1,7 @@
 #ifndef _MSERVCLIENT_PLAYER_H
 #define _MSERVCLIENT_PLAYER_H
 
-#include <mservclient/client.h>
+#include <mservclient/session.h>
 
 #include <mservclient/track.h>
 

@@ -1,7 +1,7 @@
 #ifndef _MSERVCLIENT_ITERATE_H
 #define _MSERVCLIENT_ITERATE_H
 
-#include <mservclient/client.h>
+#include <mservclient/session.h>
 #include <mservclient/proto.h>
 
 typedef struct {

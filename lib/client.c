@@ -1,136 +1,93 @@
 #include <stdlib.h>
-#include <string.h>
 
-#include <mservclient/client.h>
-#include <mservclient/event.h>
 #include <mservclient/proto.h>
+#include <mservclient/event.h>
+#include <mservclient/client.h>
 
-mservclient *msc_new( const char *hostname, int port )
+static msc_client *_msc_client_parse( const char *line, char **end )
 {
-	mservclient *p;
+	msc_client *c;
 
-	if( NULL == (p = malloc(sizeof(mservclient))))
-		return NULL;
+	const char *s;
+	char *e;
 
-	*p->code = 0;
-	p->line = NULL;
-	p->inreply = 0;
-	p->ev = NULL;
-	p->user = NULL;
-	p->pass = NULL;
+	(const char*)e = s = line;
 
-	if( NULL == (p->con = msc_sock_open( hostname, port )))
+	if( NULL == (c = malloc(sizeof(msc_client))))
 		goto clean1;
 
-	return p;
+	c->id = strtol(s, &e, 10 );
+	if( s == e )
+		goto clean2;
 
+	s = e+1;
+	c->uid = strtol(s, &e, 10 );
+	if( s == e )
+		goto clean2;
+
+	s = e+1;
+	if( NULL == (c->addr = _msc_fielddup( s, &e )))
+		goto clean2;
+	
+	if( end ) *end = e;
+	return c;
+clean2:
+	free(c);
 clean1:
-	free(p);
+	if( end ) (const char *)*end = line;
 	return NULL;
 }
 
-void msc_free( mservclient *p )
+void msc_client_free( msc_client *c )
 {
-	if( ! p )
+	if( ! c )
 		return;
 
-	msc_sock_close( p->con );
-	free(p);
+	free( c->addr);
+	free(c);
 }
 
-int msc_fd( mservclient *p )
+msc_it_client *msc_cmd_clientlist( mservclient *c )
 {
-	return msc_sock_fd( p->con );
+	return _msc_iterate( c, (_msc_converter)_msc_client_parse, 
+			"clientlist" );
 }
 
-int msc_open( mservclient *p )
+int msc_cmd_clientclose( mservclient *c, int id )
 {
-	const char *c;
-
-	if( -1 != msc_sock_fd(p->con))
-		return 0;
-
-	if( msc_sock_connect(p->con) )
-		return -1;
-
-	/* we are waiting for the hello message, but we are only
-	 * interested in the reply code */
-	p->inreply = 1;
-	if( _msc_rlast(p) )
-		goto clean1;
-
-	c = _msc_rcode(p);
-	if( ! c || *c != '2' )
-		goto clean1;
-
-	if( p->user && msc_cmd_auth( p ))
-		goto clean1;
-
-
-	_MSC_EVENT(p,connect,p);
-	return 0;
-
-clean1:
-	return -1;
+	return _msc_cmd_succ(c, "clientclose %u", id );
 }
 
-void msc_close( mservclient *p )
+int msc_cmd_clientcloseuser( mservclient *c, int uid )
 {
-	p->line = NULL;
-	p->inreply = 0;
-	*p->code = 0;
-
-	msc_sock_disconnect( p->con );
-	_MSC_EVENT(p,disconnect,p);
+	return _msc_cmd_succ(c, "clientcloseuser %d", uid );
 }
 
-const char *msc_rmsg( mservclient *p )
+void _msc_bcast_client( mservclient *c, const char *line )
 {
-	return _msc_rline( p );
-}
+	msc_client *u;
 
+	switch(line[2]){
+		case '0': /* login */
+			if( NULL != (u = _msc_client_parse( line+4, NULL ))){
+				_MSC_EVENT(c,login,c,u);
+				msc_client_free(u);
+			}
+			break;
 
-int msc_setauth( mservclient *c, const char *user, const char *pass )
-{
-	if( c->user ){
-		free(c->user);
-		c->user = NULL;
+		case '1': /* logout */
+			if( NULL != (u = _msc_client_parse( line+4, NULL ))){
+				_MSC_EVENT(c,logout,c,u);
+				msc_client_free(u);
+			}
+			break;
+
+		case '2': /* I was kicked */
+			_MSC_EVENT(c,kicked,c);
+			break;
+
+		default:
+			_MSC_EVENT(c,bcast,c,line);
 	}
-	if( c->pass ){
-		free(c->pass);
-		c->pass = NULL;
-	}
-
-	if( NULL == (c->user = strdup(user)))
-		return -1;
-
-	if( NULL == (c->pass = strdup(pass))){
-		free(c->user);
-		c->user = NULL;
-		return -1;
-	}
-
-	return 0;
+	(void)c;
 }
-
-int msc_cmd_auth( mservclient *c )
-{
-	if( ! c->user || ! c->pass )
-		return -1;
-
-	if( _msc_cmd_succ( c, "user %s", c->user ))
-		return -1;
-
-	if( _msc_cmd_succ( c, "pass %s", c->pass ))
-		return -1;
-
-	return 0;
-}
-
-		
-int msc_cmd_disconnect( mservclient *c, int id )
-{
-	return _msc_cmd_succ(c, "disconnect %u", id );
-}
-
-

@@ -1,7 +1,7 @@
 #ifndef _MSERVCLIENT_RANDOM_H
 #define _MSERVCLIENT_RANDOM_H
 
-#include <mservclient/client.h>
+#include <mservclient/session.h>
 #include <mservclient/track.h>
 
 char *msc_cmd_filter( mservclient *c );
