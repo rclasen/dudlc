@@ -51,20 +51,20 @@ int msc_sock_connect( t_msc_sock *s )
 	struct sockaddr_in sa;
 
 	if( ! s )
-		return 1;
+		return -1;
 
 	/* already open? */
 	if( s->fd != -1 )
 		return 0;
 
 	if( NULL == (prot = getprotobyname("IP") ))
-		return 1;
+		return -1;
 
 	if( NULL == (he = gethostbyname(s->host)))
-		return 1;
+		return -1;
 
 	if( 0 > (s->fd = socket( PF_INET, SOCK_STREAM, prot->p_proto)))
-		return 1;
+		return -1;
 
 	sa.sin_family = AF_INET;
 	sa.sin_port = htons(s->port);
@@ -73,7 +73,7 @@ int msc_sock_connect( t_msc_sock *s )
 	if( 0 > connect( s->fd, (const struct sockaddr*)&sa, 
 				sizeof(struct sockaddr_in))){
 		msc_sock_disconnect( s );
-		return 1;
+		return -1;
 	}
 
 	return 0;
@@ -111,11 +111,11 @@ int msc_sock_send( t_msc_sock *s, const char *cmd )
 	int len;
 
 	if( s->fd == -1 )
-		return 1;
+		return -1;
 
 	len = strlen(cmd);
 	if( 0 > send(s->fd, cmd, len, MSG_DONTWAIT )){
-		return 1;
+		return -1;
 	}
 
 	return 0;
@@ -137,11 +137,16 @@ int msc_sock_recv( t_msc_sock *s )
 	int len;
 
 	if( s->fd == -1 )
-		return 1;
+		return -1;
 
 	if( 0 > (len = recv( s->fd, s->buf + s->ilen, 
 					BUFLENRCV - s->ilen-1, 0 ))){
-		return 1;
+		return -1;
+	}
+
+	if( ! len ){
+		msc_sock_disconnect( s );
+		return -1;
 	}
 
 	s->ilen += len;
