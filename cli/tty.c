@@ -62,10 +62,79 @@ static void cmd_quit( const char *text )
 	terminate++;
 }
 
+static void cmd_tracks( const char *text )
+{
+	int num;
+
+	if( *text ){
+		tty_msg( "invalid arguments\n" );
+		return;
+	}
+
+	if( 0 > ( num = msc_cmd_tracks(con))){
+		tty_msg( "failed: %s", msc_rmsg(con));
+		return;
+	}
+
+	tty_msg( "tracks: %d\n", num );
+}
+
+static const char *mktrack( char *buf, int len, msc_track *t )
+{
+	snprintf( buf, len, "%5d %4d %2d %4d %s",
+			t->id, t->albumid, t->albumnr, t->artistid, t->title );
+
+	return buf;
+}
+
+static void cmd_trackget( const char *text )
+{
+	int num;
+	msc_track *t;
+	char buf[1024];
+
+	if( ! *text ){
+		tty_msg( "missing arguments\n" );
+		return;
+	}
+
+	num = atoi(text);
+	if( NULL == ( t = msc_cmd_track_get(con, num ))){
+		tty_msg( "failed: %s", msc_rmsg(con));
+		return;
+	}
+
+	tty_msg( "%s\n", mktrack(buf,1024,t));
+	msc_track_free( t );
+}
+
+static void cmd_tracksearch( const char *text )
+{
+	msc_it_track *it;
+	msc_track *t;
+	char buf[1024];
+
+	if( ! *text ){
+		tty_msg( "missing arguments\n" );
+		return;
+	}
+
+	if( NULL == (it = msc_cmd_tracks_search( con, text ))){
+		tty_msg( "failed: %s", msc_rmsg(con));
+		return;
+	}
+
+	for( t = msc_it_track_cur(it); t; t = msc_it_track_next(it)){
+		tty_msg( "%s\n", mktrack(buf,1024,t));
+		msc_track_free(t);
+	}
+	msc_it_track_done(it);
+}
+
 static void cmd_misc( const char *text )
 {
-	_msc_fsend( con, text );
-	if( _msc_nextline(con) ){
+	_msc_send( con, text );
+	if( _msc_rnext(con) ){
 		tty_msg( "connection error\n" );
 		return;
 	}
@@ -73,7 +142,7 @@ static void cmd_misc( const char *text )
 	tty_msg( "code: %s\n", _msc_rcode(con));
 	do {
 		tty_msg( " %s\n", _msc_rline(con));
-	} while( ! _msc_nextline(con));
+	} while( ! _msc_rnext(con));
 }
 
 /************************************************************
@@ -84,6 +153,9 @@ static t_command commands[] = {
 	{ "quit", NULL, cmd_quit },
 	{ "help", NULL, NULL },
 	{ "foo", gencomp_cmd_foo, NULL },
+	{ "tracks", NULL, cmd_tracks },
+	{ "trackget", NULL, cmd_trackget },
+	{ "tracksearch", NULL, cmd_tracksearch },
 
 	{ NULL, NULL, NULL }
 };

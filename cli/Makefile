@@ -25,8 +25,8 @@ OBJ	:=
 ############################################################
 # lib
 
-SRC_lib		:= sock.c \
-		client.c
+SRC_lib		:= sock.c client.c proto.c iterate.c \
+		track.c
 SRC_lib		:= $(patsubst %,mservclient/%,$(SRC_lib))
 OBJ_lib		:= $(patsubst %.c,%.o,$(SRC_lib))
 LLNK += libmservclient.a
