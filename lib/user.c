@@ -79,6 +79,9 @@ void _msc_bcast_user( mservclient *c, const char *line )
 			}
 			break;
 
+		case '2': /* I was kicked */
+			_MSC_EVENT(c,kicked,c);
+			break;
 
 		default:
 			_MSC_EVENT(c,bcast,c,line);
