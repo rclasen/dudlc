@@ -137,6 +137,26 @@ static void cb_sleep( mservclient *c, int del )
 	(void)c;
 }
 
+/************************************************************
+ * tag
+ */
+
+static void cb_tagchange( mservclient *c, msc_tag *q )
+{
+	char buf[BUFLENTAG];
+
+	tty_msg( "changed tag: %s\n", mktag(buf, BUFLENTAG, q ));
+	(void)c;
+}
+
+static void cb_tagdel( mservclient *c, msc_tag *q )
+{
+	char buf[BUFLENTAG];
+
+	tty_msg( "deleted tag: %s\n", mktag(buf, BUFLENTAG, q ));
+	(void)c;
+}
+
 
 /************************************************************
  * init
@@ -170,6 +190,9 @@ void events_init( mservclient *c )
 	events.queueclear = cb_queueclear;
 
 	events.sleep = cb_sleep;
+
+	events.tagchange = cb_tagchange;
+	events.tagdel = cb_tagdel;
 }
 
 

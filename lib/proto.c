@@ -55,18 +55,77 @@ int _msc_send( mservclient *p, const char *fmt, ... )
 int _msc_cmd( mservclient *p, const char *fmt, ... )
 {
 	va_list ap;
-	int r;
 
 	va_start( ap, fmt );
-	r = _msc_vsend( p, fmt, ap );
+	if( _msc_vsend( p, fmt, ap )){
+		va_end(ap);
+		return -1;
+	}
 	va_end( ap );
-
-	if( r )
-		return r;
 
 	return _msc_rlast(p);
 }
 
+int _msc_cmd_succ( mservclient *c, const char *fmt, ... )
+{
+	va_list ap;
+
+	va_start(ap, fmt );
+	if( _msc_vsend(c, fmt, ap ) ){
+		va_end(ap);
+		return -1;
+	}
+	va_end(ap);
+
+	if( _msc_rlast(c) )
+		return -1;
+
+	if( *_msc_rcode(c) == '2' )
+		return 0;
+
+	return 1;
+}
+
+int _msc_cmd_int( mservclient *c, const char *fmt, ... )
+{
+	va_list ap;
+
+	va_start(ap, fmt );
+	if( _msc_vsend(c, fmt, ap ) ){
+		va_end(ap);
+		return -1;
+	}
+	va_end(ap);
+
+	if( _msc_rlast(c) )
+		return -1;
+
+	if( *_msc_rcode(c) == '2' )
+		return atoi(_msc_rline(c));
+
+	return  -1;
+}
+
+void *_msc_cmd_conv( mservclient *c, _msc_converter conv, 
+		const char *fmt, ... )
+{
+	va_list ap;
+
+	va_start(ap, fmt );
+	if( _msc_vsend(c, fmt, ap ) ){
+		va_end(ap);
+		return NULL;
+	}
+	va_end(ap);
+
+	if( _msc_rlast(c) )
+		return NULL;
+
+	if( *_msc_rcode(c) == '2' )
+		return (*conv)(_msc_rline(c), NULL);
+
+	return  NULL;
+}
 
 
 static void _msc_bcast( mservclient *p, const char *line )
@@ -86,6 +145,10 @@ static void _msc_bcast( mservclient *p, const char *line )
 			
 		case '6':
 			_msc_bcast_queue( p, line );
+			break;
+			
+		case '7':
+			_msc_bcast_tag( p, line );
 			break;
 			
 		default:

@@ -2,8 +2,7 @@
 #define _MSERVCLIENT_ITERATE_H
 
 #include <mservclient/client.h>
-
-typedef void *(*_msc_converter)( const char *line, char **end );
+#include <mservclient/proto.h>
 
 typedef struct {
 	mservclient *con;

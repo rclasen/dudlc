@@ -14,6 +14,7 @@
 #include <mservclient/sleep.h>
 #include <mservclient/history.h>
 #include <mservclient/help.h>
+#include <mservclient/tag.h>
 
 
 #endif

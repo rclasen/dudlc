@@ -5,6 +5,7 @@
 #include <mservclient/user.h>
 #include <mservclient/track.h>
 #include <mservclient/queue.h>
+#include <mservclient/tag.h>
 
 typedef void (*msc_ev_argnone)( mservclient *c );
 typedef void (*msc_ev_argstring)( mservclient *c, const char *s );
@@ -12,6 +13,7 @@ typedef void (*msc_ev_argint)( mservclient *c, int i );
 typedef void (*msc_ev_argclient)( mservclient *c, msc_client *t );
 typedef void (*msc_ev_argtrack)( mservclient *c, msc_track *t );
 typedef void (*msc_ev_argqueue)( mservclient *c, msc_queue *t );
+typedef void (*msc_ev_argtag)( mservclient *c, msc_tag *t );
 
 typedef struct {
 	/* my connection status */
@@ -41,6 +43,10 @@ typedef struct {
 	msc_ev_argqueue queueadd;
 	msc_ev_argqueue queuedel;
 	msc_ev_argnone queueclear;
+
+	/* tags */
+	msc_ev_argtag tagchange;
+	msc_ev_argtag tagdel;
 
 	// temporary:
 	msc_ev_argstring bcast;

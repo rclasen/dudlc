@@ -125,6 +125,8 @@ static char *cgen_cmd_raw( const char *text, int state )
 		int total = 0;
 		int used = 0;
 
+		len = strlen(text);
+
 		it = msc_cmd_help(con);
 		for( s = msc_it_help_cur(it); s; 
 				s = msc_it_help_next(it) ){
@@ -768,6 +770,230 @@ CMD(cmd_historytrack)
 }
 
 /************************************************************
+ * commands: tag
+ */
+
+CMD(cmd_taglist)
+{
+	msc_it_tag *it;
+
+	ARG_NONE;
+	it = msc_cmd_taglist( con );
+	dump_tags( it );
+	msc_it_tag_done( it );
+}
+
+CMD(cmd_tagget)
+{
+	int id;
+	char *e;
+	msc_tag *t;
+	char buf[BUFLENTAG];
+
+	ARG_NEED("tagID");
+	id = strtol( line, &e, 10 );
+	if( *e ){
+		MSG_BADARG("tagID");
+		return;
+	}
+
+	if( NULL == (t= msc_cmd_tagget(con, id))){
+		MSG_FAIL;
+		return;
+	}
+
+	tty_msg( "%s\n\n", mktaghead(buf,BUFLENTAG));
+	tty_msg( "%s\n", mktag(buf,BUFLENTAG, t));
+
+	msc_tag_free(t);
+}
+
+CMD(cmd_tagname)
+{
+	msc_tag *t;
+	char buf[BUFLENTAG];
+
+	ARG_NEED("tagName");
+	if( NULL == (t= msc_cmd_tagname(con, line))){
+		MSG_FAIL;
+		return;
+	}
+
+	tty_msg( "%s\n\n", mktaghead(buf,BUFLENTAG));
+	tty_msg( "%s\n", mktag(buf,BUFLENTAG, t));
+
+	msc_tag_free(t);
+}
+
+CMD(cmd_tagadd)
+{
+	int id;
+
+	ARG_NEED( "tagName" );
+	if( 0 > (id = msc_cmd_tagadd( con, line ))){
+		MSG_FAIL;
+		return;
+	}
+
+	tty_msg( "added with id %d\n", id );
+}
+
+CMD(cmd_tagsetname)
+{
+	char *e;
+	int id;
+
+
+	ARG_NEED("tagID");
+	id = strtol( line, &e, 10 );
+	if( line == e ){
+		MSG_BADARG("tagID");
+		return;
+	}
+
+	e += strspn(e, "\t ");
+	if( msc_cmd_tagsetname(con, id, e)){
+		MSG_FAIL;
+	}
+}
+
+CMD(cmd_tagsetdesc)
+{
+	char *e;
+	int id;
+
+
+	ARG_NEED("tagID");
+	id = strtol( line, &e, 10 );
+	if( line == e ){
+		MSG_BADARG("tagID");
+		return;
+	}
+
+	e += strspn(e, "\t ");
+	if( msc_cmd_tagsetdesc(con, id, e)){
+		MSG_FAIL;
+	}
+}
+
+CMD(cmd_tagdel)
+{
+	int id;
+	char *e;
+
+	ARG_NEED("tagID");
+	id = strtol( line, &e, 10 );
+	if( *e ){
+		MSG_BADARG("tagID");
+		return;
+	}
+
+	if( msc_cmd_tagdel(con, id)){
+		MSG_FAIL;
+	}
+}
+
+CMD(cmd_tracktags)
+{
+	int id;
+	char *e;
+	msc_it_tag *it;
+
+	ARG_NEED("trackID");
+	id = strtol( line, &e, 10 );
+	if( *e ){
+		MSG_BADARG("trackID");
+		return;
+	}
+
+	it = msc_cmd_tracktags( con, id );
+	dump_tags( it );
+	msc_it_tag_done( it );
+}
+
+CMD(cmd_tracktagged)
+{
+	int tagid, trid;
+	char *s, *e;
+	int r;
+
+	ARG_NEED("trackID");
+	trid = trackid( line, &e );
+	if( e == line ){
+		MSG_BADARG("trackID");
+		return;
+	}
+
+	s = e += strspn( e, "\t " );
+	tagid = strtol(s, &e, 10 );
+	if( *e ){
+		MSG_BADARG("trackID");
+		return;
+	}
+
+	if( 0 > (r = msc_cmd_tracktagged( con, trid, tagid ))){
+		MSG_FAIL;
+		return;
+	}
+
+	tty_msg( "tag is%s set for this track\n", r ? "": " not" );
+}
+
+CMD(cmd_tracktagset)
+{
+	int tagid, trid;
+	char *s, *e;
+
+	ARG_NEED("trackID");
+	trid = trackid( line, &e );
+	if( e == line ){
+		MSG_BADARG("trackID");
+		return;
+	}
+
+	s = e += strspn( e, "\t " );
+	tagid = strtol(s, &e, 10 );
+	if( *e ){
+		MSG_BADARG("trackID");
+		return;
+	}
+
+	if( msc_cmd_tracktagset( con, trid, tagid )){
+		MSG_FAIL;
+		return;
+	}
+	tty_msg( "set tag\n");
+}
+
+CMD(cmd_tracktagdel)
+{
+	int tagid, trid;
+	char *s, *e;
+
+	ARG_NEED("trackID");
+	trid = trackid( line, &e );
+	if( e == line ){
+		MSG_BADARG("trackID");
+		return;
+	}
+
+	s = e += strspn( e, "\t " );
+	tagid = strtol(s, &e, 10 );
+	if( *e ){
+		MSG_BADARG("trackID");
+		return;
+	}
+
+	if( msc_cmd_tracktagdel( con, trid, tagid )){
+		MSG_FAIL;
+		return;
+	}
+
+	tty_msg( "tag deleted\n");
+}
+
+
+/************************************************************
  * command list
  */
 
@@ -819,6 +1045,17 @@ static t_command commands[] = {
 	{ "sleepset", NULL, cmd_sleepset },
 	{ "history", NULL, cmd_history },
 	{ "historytrack", NULL, cmd_historytrack },
+	{ "taglist", NULL, cmd_taglist },
+	{ "tagget", NULL, cmd_tagget },
+	{ "tagname", NULL, cmd_tagname },
+	{ "tagadd", NULL, cmd_tagadd },
+	{ "tagsetname", NULL, cmd_tagsetname },
+	{ "tagsetdesc", NULL, cmd_tagsetdesc },
+	{ "tagdel", NULL, cmd_tagdel },
+	{ "tracktags", NULL, cmd_tracktags },
+	{ "tracktagged", NULL, cmd_tracktagged },
+	{ "tracktagset", NULL, cmd_tracktagset },
+	{ "tracktagdel", NULL, cmd_tracktagdel },
 
 	{ NULL, NULL, NULL }
 };

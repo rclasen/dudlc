@@ -200,3 +200,42 @@ void dump_history( msc_it_history *it )
 	}
 }
 
+
+/************************************************************
+ * tag
+ */
+
+const char *mktaghead( char *buf, unsigned int len )
+{
+	unsigned int l;
+
+	l = snprintf( buf, len, "%4.4s %-20s %-20s", "id", "name", "desc" );
+	if( l > len )
+		return NULL;
+
+	return buf;
+}
+
+const char *mktag( char *buf, unsigned int len, msc_tag *q )
+{
+	unsigned int l;
+
+	l = snprintf( buf, len, "%4d %-20s %-20s", q->id, q->name, q->desc );
+	if( l > len )
+		return NULL;
+
+	return buf;
+}
+
+void dump_tags( msc_it_tag *it )
+{
+	msc_tag *t;
+	char buf[BUFLENTAG];
+
+	tty_msg( "%s\n\n", mktaghead(buf, BUFLENTAG));
+	for( t = msc_it_tag_cur(it); t; t = msc_it_tag_next(it)){
+		tty_msg( "%s\n", mktag(buf,BUFLENTAG,t));
+		msc_tag_free(t);
+	}
+}
+

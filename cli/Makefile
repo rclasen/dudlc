@@ -27,7 +27,7 @@ OBJ	:=
 
 SRC_lib		:= sock.c client.c proto.c event.c iterate.c \
 		user.c track.c player.c random.c queue.c sleep.c \
-		history.c help.c 
+		history.c help.c tag.c
 SRC_lib		:= $(patsubst %,mservclient/%,$(SRC_lib))
 OBJ_lib		:= $(patsubst %.c,%.o,$(SRC_lib))
 LLNK += libmservclient.a
