@@ -62,12 +62,16 @@ static void cb_kicked( mservclient *c )
  * player
  */
 
-static void cb_nexttrack( mservclient *c, msc_track *t )
+static void cb_nexttrack( mservclient *c, msc_track *t, 
+		msc_artist *ar, msc_album *al )
 {
 	char buf[BUFLENTRACK];
 
-	tty_msg( "playing: \n\x1B[1m%s\x1B[0m\n", mktrack(buf, BUFLENTRACK, t));
+	tty_msg( "playing: \n\x1B[1m%s\x1B[0m\n", 
+			mkrtrack(buf, BUFLENTRACK, t, ar, al ));
 	(void)c;
+	(void)ar;
+	(void)al;
 }
 
 static void cb_stopped( mservclient *c )
