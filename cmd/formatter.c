@@ -51,14 +51,13 @@ static size_t isodate( char *s, size_t max, time_t time )
 
 const char *dfmt_clienthead( char *buf, unsigned int len )
 {
-	snprintf( buf, len, "%4.4s %4.4s %-15s", "id", "uid", "address" );
+	snprintf( buf, len, "%4.4s %-10s %-15s", "id", "user", "address" );
 	return buf;
 }
 
-// TODO: lookup user name
 const char *dfmt_client( char *buf, unsigned int len, duc_client *c )
 {
-	snprintf( buf, len, "%4d %4d %-15s", c->id, c->uid, c->addr );
+	snprintf( buf, len, "%4d %-10s %-15s", c->id, c->user->name, c->addr );
 	return buf;
 }
 
@@ -83,8 +82,7 @@ const char *dfmt_trackhead( char *buf, unsigned int len )
 
 #define BF	"\x1B[1m"
 #define NF	"\x1B[0m"
-const char *dfmt_rtrack( char *buf, unsigned int len, 
-		duc_track *t, duc_artist *ar, duc_album *al )
+const char *dfmt_track( char *buf, unsigned int len, duc_track *t )
 {
 	char tim[10];
 
@@ -95,26 +93,12 @@ const char *dfmt_rtrack( char *buf, unsigned int len,
 			"%-5.5s "
 			BF "%-16.16s " NF
 			"%-29.29s",
-			dfmt_trackid(t->albumid, t->albumnr), 
-			al->album, tim, ar->artist, t->title );
+			dfmt_trackid(t->album->id, t->albumnr), 
+			t->album->album, tim, t->artist->artist, t->title );
 
 	return buf;
 }
 
-// TODO: lookup artist and album name
-// TODO: include duration
-const char *dfmt_track( char *buf, unsigned int len, duc_track *t )
-{
-	char tim[10];
-
-	minutes(tim, 10, t->duration);
-	snprintf( buf, len, "%7s %-18s %5s %-16d %-29.29s",
-			dfmt_trackid(t->albumid, t->albumnr), "",
-			tim,
-			t->artistid, t->title );
-
-	return buf;
-}
 
 /************************************************************
  * queue
@@ -124,7 +108,7 @@ const char *dfmt_queuehead( char *buf, unsigned int len )
 {
 	unsigned int l;
 
-	l = snprintf( buf, len, "%4.4s %4.4s %-8.8s ", "id", "uid", "queued" );
+	l = snprintf( buf, len, "%4.4s %-10s %-8.8s ", "id", "user", "queued" );
 	if( l > len )
 		return NULL;
 
@@ -136,7 +120,7 @@ const char *dfmt_queue( char *buf, unsigned int len, duc_queue *q )
 {
 	unsigned int l;
 
-	l = snprintf( buf, len, "%4d %4d ", q->id, q->uid );
+	l = snprintf( buf, len, "%4d %-10s ", q->id, q->user->name );
 	if( l > len )
 		return NULL;
 
@@ -147,7 +131,7 @@ const char *dfmt_queue( char *buf, unsigned int len, duc_queue *q )
 	buf[l++] = ' ';
 	buf[l] = 0;
 
-	dfmt_track( buf+l, len-l, q->_track );
+	dfmt_track( buf+l, len-l, q->track );
 	return buf;
 }
 
@@ -159,7 +143,7 @@ const char *dfmt_historyhead( char *buf, unsigned int len )
 {
 	unsigned int l;
 
-	l = snprintf( buf, len, "%4.4s %-19.19s ", "uid", "played" );
+	l = snprintf( buf, len, "%-19.19s %-10s ", "played", "user" );
 	if( l > len )
 		return NULL;
 
@@ -171,18 +155,15 @@ const char *dfmt_history( char *buf, unsigned int len, duc_history *q )
 {
 	unsigned int l;
 
-	l = snprintf( buf, len, "%4d ", q->uid );
-	if( l > len )
-		return NULL;
-
-	l += isotimestamp( buf+l, len -l, q->played );
+	l = isotimestamp( buf, len, q->played );
 	if( l +2 > len )
 		return NULL;
 
-	buf[l++] = ' ';
-	buf[l] = 0;
+	l += snprintf( buf+l, len-l, " %-10s ", q->user->name );
+	if( l > len )
+		return NULL;
 
-	dfmt_track( buf+l, len-l, q->_track );
+	dfmt_track( buf+l, len-l, q->track );
 	return buf;
 }
 
@@ -192,23 +173,13 @@ const char *dfmt_history( char *buf, unsigned int len, duc_history *q )
 
 const char *dfmt_taghead( char *buf, unsigned int len )
 {
-	unsigned int l;
-
-	l = snprintf( buf, len, "%4.4s %-20s %-20s", "id", "name", "desc" );
-	if( l > len )
-		return NULL;
-
+	snprintf( buf, len, "%4.4s %-20s %-20s", "id", "name", "desc" );
 	return buf;
 }
 
 const char *dfmt_tag( char *buf, unsigned int len, duc_tag *q )
 {
-	unsigned int l;
-
-	l = snprintf( buf, len, "%4d %-20s %-20s", q->id, q->name, q->desc );
-	if( l > len )
-		return NULL;
-
+	snprintf( buf, len, "%4d %-20s %-20s", q->id, q->name, q->desc );
 	return buf;
 }
 
@@ -218,23 +189,13 @@ const char *dfmt_tag( char *buf, unsigned int len, duc_tag *q )
 
 const char *dfmt_userhead( char *buf, unsigned int len )
 {
-	unsigned int l;
-
-	l = snprintf( buf, len, "%4.4s %-20s %s", "id", "name", "right" );
-	if( l > len )
-		return NULL;
-
+	snprintf( buf, len, "%4.4s %-20s %s", "id", "name", "right" );
 	return buf;
 }
 
 const char *dfmt_user( char *buf, unsigned int len, duc_user *q )
 {
-	unsigned int l;
-
-	l = snprintf( buf, len, "%4d %-20s %2d", q->id, q->name, q->right );
-	if( l > len )
-		return NULL;
-
+	snprintf( buf, len, "%4d %-20s %2d", q->id, q->name, q->right );
 	return buf;
 }
 
@@ -245,24 +206,13 @@ const char *dfmt_user( char *buf, unsigned int len, duc_user *q )
 
 const char *dfmt_albumhead( char *buf, unsigned int len )
 {
-	unsigned int l;
-
-	l = snprintf( buf, len, "%4.4s %-25s %-20s", "id", "album", "artist" );
-	if( l > len )
-		return NULL;
-
+	snprintf( buf, len, "%4.4s %-25s %-20s", "id", "album", "artist" );
 	return buf;
 }
 
-// TODO: lookup artist
 const char *dfmt_album( char *buf, unsigned int len, duc_album *q )
 {
-	unsigned int l;
-
-	l = snprintf( buf, len, "%4d %-25s %-20d", q->id, q->album, q->artistid);
-	if( l > len )
-		return NULL;
-
+	snprintf( buf, len, "%4d %-25s %-20s", q->id, q->album, q->artist->artist);
 	return buf;
 }
 
@@ -273,23 +223,13 @@ const char *dfmt_album( char *buf, unsigned int len, duc_album *q )
 
 const char *dfmt_artisthead( char *buf, unsigned int len )
 {
-	unsigned int l;
-
-	l = snprintf( buf, len, "%4.4s %-20s", "id", "artist" );
-	if( l > len )
-		return NULL;
-
+	snprintf( buf, len, "%4.4s %-20s", "id", "artist" );
 	return buf;
 }
 
 const char *dfmt_artist( char *buf, unsigned int len, duc_artist *q )
 {
-	unsigned int l;
-
-	l = snprintf( buf, len, "%4d %-20s", q->id, q->artist);
-	if( l > len )
-		return NULL;
-
+	snprintf( buf, len, "%4d %-20s", q->id, q->artist);
 	return buf;
 }
 

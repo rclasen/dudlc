@@ -24,11 +24,6 @@ duc_track *_duc_track_parse( const char *line, char **end )
 		goto clean2;
 
 	s = e+1;
-	t->albumid = strtol( s, &e, 10 );
-	if( s == e )
-		goto clean2;
-
-	s = e+1;
 	t->albumnr = strtol( s, &e, 10 );
 	if( s == e )
 		goto clean2;
@@ -38,19 +33,24 @@ duc_track *_duc_track_parse( const char *line, char **end )
 		goto clean2;
 
 	s = e+1;
-	t->artistid = strtol( s, &e, 10 );
+	t->duration = strtol( s, &e, 10 );
 	if( s == e )
 		goto clean3;
 
 	s = e+1;
-	t->duration = strtol( s, &e, 10 );
-	if( s == e )
+	if( NULL == (t->artist = _duc_artist_parse( s, &e )))
 		goto clean3;
+
+	s = e+1;
+	if( NULL == (t->album = _duc_album_parse( s, &e )))
+		goto clean4;
 
 
 	if( end ) *end = e;
 	return t;
 
+clean4:
+	duc_artist_free(t->artist);
 clean3:
 	free(t->title);
 clean2:
@@ -66,6 +66,8 @@ void duc_track_free( duc_track *t )
 	if( ! t )
 		return;
 
+	duc_album_free(t->album);
+	duc_artist_free(t->artist);
 	free(t->title);
 	free(t);
 }

@@ -4,7 +4,7 @@
 #include "dudlc/event.h"
 #include "dudlc/user.h"
 
-static duc_user *_duc_user_parse( const char *line, char **end )
+duc_user *_duc_user_parse( const char *line, char **end )
 {
 	duc_user *c;
 

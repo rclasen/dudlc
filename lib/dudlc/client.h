@@ -3,12 +3,13 @@
 
 #include "session.h"
 #include "iterate.h"
+#include "user.h"
 
 
 // TODO: make addr a number
 typedef struct {
 	int id;
-	int uid;
+	duc_user *user;
 	char *addr;
 } duc_client;
 

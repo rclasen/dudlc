@@ -66,25 +66,13 @@ int duc_cmd_randomset( dudlc *c, int r )
 static void _duc_bcast_newtrack( dudlc *c, const char *line )
 {
 	duc_track *t;
-	duc_artist *art;
-	duc_album *alb;
 	char *end;
 
 	if( NULL == (t= _duc_track_parse(line+4,&end)))
 		return;
 
-	if( NULL == (art= _duc_artist_parse(end+1,&end)))
-		goto clean2;
+	_MSC_EVENT(c, nexttrack, c, t);
 
-	if( NULL == (alb= _duc_album_parse(end+1,NULL)))
-		goto clean3;
-
-	_MSC_EVENT(c, nexttrack, c, t, art, alb);
-
-	duc_album_free(alb);
-clean3:
-	duc_artist_free(art);
-clean2:
 	duc_track_free(t);
 }
 

@@ -24,23 +24,24 @@ static duc_queue *_duc_queue_parse( const char *line, char **end )
 		goto clean2;
 
 	s = e+1;
-	n->uid = strtol( s, &e, 10 );
-	if( s == e )
-		goto clean2;
-
-	s = e+1;
 	n->queued = strtol( s, &e, 10 );
 	if( s == e )
 		goto clean2;
 
 	s = e+1;
-	if( NULL == ( n->_track = _duc_track_parse( s, &e )))
+	if( NULL == ( n->user = _duc_user_parse( s, &e )))
 		goto clean2;
+
+	s = e+1;
+	if( NULL == ( n->track = _duc_track_parse( s, &e )))
+		goto clean3;
 
 
 	if( end ) *end = e;
 	return n;
 
+clean3:
+	duc_user_free(n->user);
 clean2:
 	free(n);
 clean1:
@@ -52,7 +53,8 @@ void duc_queue_free( duc_queue *q )
 {
 	if( ! q )
 		return;
-	duc_track_free(q->_track);
+	duc_user_free(q->user);
+	duc_track_free(q->track);
 	free(q);
 }
 

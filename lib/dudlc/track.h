@@ -3,13 +3,15 @@
 
 #include "session.h"
 #include "iterate.h"
+#include "artist.h"
+#include "album.h"
 
 typedef struct {
 	int id;
-	int albumid;
+	duc_album *album;
 	int albumnr;
 	char *title;
-	int artistid;
+	duc_artist *artist;
 	int duration;
 } duc_track;
 

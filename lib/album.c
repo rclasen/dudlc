@@ -28,8 +28,7 @@ duc_album *_duc_album_parse( const char *line, char **end )
 		goto clean2;
 
 	s = e+1;
-	n->artistid = strtol( s, &e, 10 );
-	if( s == e )
+	if( NULL == (n->artist = _duc_artist_parse(s, &e )))
 		goto clean3;
 
 	if( end ) *end = e;
@@ -46,6 +45,7 @@ clean1:
 
 void duc_album_free( duc_album *a )
 {
+	duc_artist_free(a->artist);
 	free(a->album);
 	free(a);
 }

@@ -16,8 +16,8 @@ typedef void (*duc_ev_argint)( dudlc *c, int i );
 typedef void (*duc_ev_argclient)( dudlc *c, duc_client *t );
 typedef void (*duc_ev_argqueue)( dudlc *c, duc_queue *t );
 typedef void (*duc_ev_argtag)( dudlc *c, duc_tag *t );
-typedef void (*duc_ev_argntrack)( dudlc *c, 
-		duc_track *t, duc_artist *ar, duc_album *al );
+typedef void (*duc_ev_argtrack)( dudlc *c, 
+		duc_track *t);
 
 typedef struct {
 	/* my connection status */
@@ -30,7 +30,7 @@ typedef struct {
 	duc_ev_argnone kicked;
 
 	/* player */
-	duc_ev_argntrack nexttrack;
+	duc_ev_argtrack nexttrack;
 	duc_ev_argnone stopped;
 	duc_ev_argnone paused;
 	duc_ev_argnone resumed;

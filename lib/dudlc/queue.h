@@ -2,13 +2,14 @@
 #define _DUDLC_QUEUE_H
 
 #include "session.h"
+#include "user.h"
 #include "track.h"
 
 typedef struct {
 	int id;
-	int uid;
 	int queued;
-	duc_track *_track;
+	duc_user *user;
+	duc_track *track;
 } duc_queue;
 
 void duc_queue_free( duc_queue *q );

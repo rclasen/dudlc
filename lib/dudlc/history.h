@@ -2,12 +2,13 @@
 #define _DUDLC_HISTORY_H
 
 #include "session.h"
+#include "user.h"
 #include "track.h"
 
 typedef struct {
-	int uid;
 	int played;
-	duc_track *_track;
+	duc_track *track;
+	duc_user *user;
 } duc_history;
 
 void duc_history_free( duc_history *h );

@@ -61,15 +61,12 @@ static void cb_kicked( dudlc *c )
  * player
  */
 
-static void cb_nexttrack( dudlc *c, duc_track *t, 
-		duc_artist *ar, duc_album *al )
+static void cb_nexttrack( dudlc *c, duc_track *t )
 {
 	char buf[BUFLENTRACK];
 
-	tty_msg( "%s\n", dfmt_rtrack(buf, BUFLENTRACK, t, ar, al ));
+	tty_msg( "%s\n", dfmt_track(buf, BUFLENTRACK, t ));
 	(void)c;
-	(void)ar;
-	(void)al;
 }
 
 static void cb_stopped( dudlc *c )

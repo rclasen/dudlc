@@ -21,16 +21,18 @@ static duc_client *_duc_client_parse( const char *line, char **end )
 		goto clean2;
 
 	s = e+1;
-	c->uid = strtol(s, &e, 10 );
-	if( s == e )
-		goto clean2;
-
-	s = e+1;
 	if( NULL == (c->addr = _duc_fielddup( s, &e )))
 		goto clean2;
 	
+	s = e+1;
+	if( NULL == (c->user = _duc_user_parse(s, &e )))
+		goto clean3;
+
 	if( end ) *end = e;
 	return c;
+
+clean3:
+	free(c->addr);
 clean2:
 	free(c);
 clean1:
@@ -43,7 +45,8 @@ void duc_client_free( duc_client *c )
 	if( ! c )
 		return;
 
-	free( c->addr);
+	duc_user_free( c->user );
+	free( c->addr );
 	free(c);
 }
 

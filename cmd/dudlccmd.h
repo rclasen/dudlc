@@ -10,8 +10,6 @@ const char *dfmt_trackid( int albumid, int nr );
 
 const char *dfmt_trackhead( char *buf, unsigned int len );
 const char *dfmt_track( char *buf, unsigned int len, duc_track *t );
-const char *dfmt_rtrack( char *buf, unsigned int len, 
-		duc_track *t, duc_artist *ar, duc_album *al );
 
 const char *dfmt_queuehead( char *buf, unsigned int len );
 const char *dfmt_queue( char *buf, unsigned int len, duc_queue *q );
