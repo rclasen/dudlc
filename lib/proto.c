@@ -5,6 +5,8 @@
 #include <stdarg.h>
 #include <ctype.h>
 
+#include <mservclient/command.h>
+#include <mservclient/event.h>
 #include <mservclient/proto.h>
 
 #define BUFLENLINE	2048
@@ -69,11 +71,20 @@ int _msc_cmd( mservclient *p, const char *fmt, ... )
 
 static void _msc_bcast( mservclient *p, const char *line )
 {
-	MSC_EVENT(p,bcast,p,line);
+	switch(line[1]){
+#ifdef todo_user
+		case '3':
+			_msc_bcast_user( p, line );
+			break;
+#endif
 
-	// TODO: bcast
-	(void) p;
-	(void)line;
+		case '4':
+			_msc_bcast_player( p, line );
+			break;
+			
+		default:
+			_MSC_EVENT(p,bcast,p,line);
+	}
 }
 
 int _msc_rnext( mservclient *p )

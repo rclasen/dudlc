@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include <mservclient/client.h>
+#include <mservclient/event.h>
 #include <mservclient/proto.h>
 
 mservclient *msc_new( const char *hostname, int port, 
@@ -51,20 +52,6 @@ int msc_fd( mservclient *p )
 	return msc_sock_fd( p->con );
 }
 
-msc_events *msc_getevents( mservclient *c )
-{
-	return c->ev;
-}
-
-msc_events *msc_setevents( mservclient *c, msc_events *e )
-{
-	msc_events *old;
-
-	old = c->ev;
-	c->ev = e;
-	return old;
-}
-
 int msc_open( mservclient *p )
 {
 	const char *c;
@@ -99,7 +86,7 @@ int msc_open( mservclient *p )
 	if( !c || *c != '2' )
 		goto clean1;
 
-	MSC_EVENT(p,connect,p);
+	_MSC_EVENT(p,connect,p);
 	return 0;
 
 clean1:
@@ -114,7 +101,7 @@ void msc_close( mservclient *p )
 	*p->code = 0;
 
 	msc_sock_disconnect( p->con );
-	MSC_EVENT(p,disconnect,p);
+	_MSC_EVENT(p,disconnect,p);
 }
 
 const char *msc_rmsg( mservclient *p )

@@ -1,6 +1,7 @@
 #include <stdlib.h>
 
 #include <mservclient/proto.h>
+#include <mservclient/event.h>
 #include <mservclient/player.h>
 
 msc_playstatus msc_cmd_status( mservclient *c )
@@ -105,8 +106,48 @@ int msc_cmd_randomset( mservclient *c, int r )
 }
 
 
+static void _msc_bcast_newtrack( mservclient *c, const char *line )
+{
+	msc_track *t;
+	
+	if( NULL == (t= _msc_track_parse(line+4,NULL)))
+		return;
+
+	_MSC_EVENT(c,nexttrack,c,t);
+	msc_track_free(t);
+}
+
 void _msc_bcast_player( mservclient *c, const char *line )
 {
+	int r;
+
+	switch(line[2]){
+		case '0': /* newtrack */
+			_msc_bcast_newtrack(c,line);
+			break;
+
+		case '1': /* stopped */
+			_MSC_EVENT(c,stopped,c);
+			break;
+
+		case '2': /* paused */
+			_MSC_EVENT(c,paused,c);
+			break;
+
+		case '3': /* resumed */
+			_MSC_EVENT(c,resumed,c);
+			break;
+
+		case '6': /* random */
+			r = atoi(line+4);
+			_MSC_EVENT(c,random,c,r);
+			break;
+
+
+		default:
+			_MSC_EVENT(c,bcast,c,line);
+	}
+
 	(void)c;
 	(void)line;
 }

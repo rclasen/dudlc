@@ -9,11 +9,6 @@
  * internal protocol parsing functions
  ************************************************************/
 
-#define MSC_EVENT(c,name,arg...)	\
-	if( (c)->ev && ((msc_events*)(c)->ev)->name ){ \
-		(*((msc_events*)(c)->ev)->name)(arg); \
-	}
-
 int _msc_vsend( mservclient *p, const char *fmt, va_list ap );
 int _msc_send( mservclient *p, const char *fmt, ... );
 

@@ -2,6 +2,7 @@
 #define _MSERVCLIENT_COMMAND_H
 
 #include <mservclient/client.h>
+#include <mservclient/event.h>
 
 /* include all commands */
 
