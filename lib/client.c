@@ -73,7 +73,7 @@ int msc_open( mservclient *p )
 		return 0;
 
 	if( msc_sock_connect(p->con) )
-		return 1;
+		return -1;
 
 	/* we are waiting for the hello message, but we are only
 	 * interested in the reply code */
@@ -99,11 +99,12 @@ int msc_open( mservclient *p )
 	if( !c || *c != '2' )
 		goto clean1;
 
+	MSC_EVENT(p,connect,p);
 	return 0;
 
 clean1:
 	msc_sock_disconnect(p->con);
-	return 1;
+	return -1;
 }
 
 void msc_close( mservclient *p )
@@ -119,6 +120,16 @@ void msc_close( mservclient *p )
 const char *msc_rmsg( mservclient *p )
 {
 	return _msc_rline( p );
+}
+
+
+int msc_cmd_disconnect( mservclient *c, int id )
+{
+	if( _msc_cmd(c, "disconnect %u", id ))
+		return -1;
+	if( *_msc_rcode(c) != '2' )
+		return -1;
+	return 0;
 }
 
 

@@ -46,5 +46,7 @@ msc_events *msc_setevents( mservclient *p, msc_events *e );
 
 const char *msc_rmsg( mservclient *p );
 
+int msc_cmd_disconnect( mservclient *p, int id );
+
 #endif
 
