@@ -1,3 +1,4 @@
+AUTOMAKE_OPTIONS=foreign
 
 CFLAGS:= -g -Wall -Werror -I../libdudlc
 

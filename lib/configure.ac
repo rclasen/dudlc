@@ -21,5 +21,7 @@ AC_C_INLINE
 AC_FUNC_MALLOC
 AC_CHECK_FUNCS([gethostbyname memmove socket strcspn strdup strspn strtol])
 
+AM_MAINTAINER_MODE
+
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT

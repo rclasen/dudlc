@@ -1,3 +1,4 @@
+AUTOMAKE_OPTIONS=foreign
 
 # TODO: ln -s . mservclient
 

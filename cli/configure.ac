@@ -25,5 +25,7 @@ AC_FUNC_STRFTIME
 AC_FUNC_VPRINTF
 AC_CHECK_FUNCS([memset select strcasecmp strcspn strdup strncasecmp strspn strtol])
 
+AM_MAINTAINER_MODE
+
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
