@@ -29,6 +29,7 @@ static msc_client *_msc_client_parse( const char *line, char **end )
 	if( NULL == (c->addr = _msc_fielddup( s, &e )))
 		goto clean2;
 	
+	if( end ) *end = e;
 	return c;
 clean2:
 	free(c);
