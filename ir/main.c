@@ -48,7 +48,21 @@ static void beep( void )
 	fclose( con );
 }
 
+/*
+ * retry a command to allow reconnect
+ */
+static int dudl_cmd( dudlc *con, char *cmd )
+{
+	int rv;
 
+	rv = duc_cmd(con, cmd );
+
+	if( rv != -EIO )
+		return rv;
+	
+	DPRINT("retrying command" );
+	return duc_cmd(con, cmd );
+}
 
 /* 
  * execute lirc cmds as long as lircd is alive
@@ -69,12 +83,7 @@ static void loop_lirccmd( struct lirc_config *config )
 
 			beep();
 
-			if( duc_open( dudl ) ) {
-				syslog( LOG_ERR, "reconnect to dudld failed" );
-				continue;
-			}
-
-			if( duc_cmd( dudl, c ) ){
+			if( dudl_cmd( dudl, c ) ){
 				syslog( LOG_ERR, "duc_cmd failed for %s", c);
 				continue;
 			}
