@@ -23,6 +23,6 @@ int server_fd( t_server *t );
 
 int server_recv( t_server *s );
 int server_send( t_server *s, const char *cmd );
-char *server_getline( t_server *s );
+const char *server_getline( t_server *s );
 
 

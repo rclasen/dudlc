@@ -53,6 +53,7 @@ int server_connect( t_server *s )
 	if( ! s )
 		return 1;
 
+	/* already open? */
 	if( s->fd != -1 )
 		return 0;
 
@@ -109,6 +110,9 @@ int server_send( t_server *s, const char *cmd )
 {
 	int len;
 
+	if( s->fd == -1 )
+		return 1;
+
 	len = strlen(cmd);
 	if( 0 > send(s->fd, cmd, len, MSG_DONTWAIT )){
 		return 1;
@@ -122,17 +126,21 @@ static inline void freeline( t_server *s )
 	if( ! s->llen )
 		return;
 
-	memmove(s->buf, s->buf + s->llen, s->llen );
+	memmove(s->buf, s->buf + s->llen, s->ilen - s->llen );
 	s->ilen -= s->llen;
 	s->llen = 0;
+	s->buf[s->ilen] = 0; 
 }
 
 int server_recv( t_server *s )
 {
 	int len;
 
+	if( s->fd == -1 )
+		return 1;
+
 	if( 0 > (len = recv( s->fd, s->buf + s->ilen, 
-					BUFLENRCV - s->ilen, 0 ))){
+					BUFLENRCV - s->ilen-1, 0 ))){
 		return 1;
 	}
 
@@ -142,7 +150,7 @@ int server_recv( t_server *s )
 	return 0;
 }
 	
-char *server_getline( t_server *s )
+const char *server_getline( t_server *s )
 {
 	freeline( s );
 
@@ -153,10 +161,11 @@ char *server_getline( t_server *s )
 	if( s->llen == s->ilen ){
 		/* no linebreak found */
 
-		if( s->llen < BUFLENRCV )
+		if( s->llen < BUFLENRCV -1 )
 			return NULL;
 
-		fprintf( stderr, "line too long for BUFLENRCV, " "truncating" );
+		fprintf( stderr, "line too long for BUFLENRCV, " 
+				"truncating\n" );
 	}
 
 	/* split buffer in found line and remainig stuff */
