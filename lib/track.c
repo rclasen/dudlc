@@ -54,7 +54,7 @@ clean3:
 clean2:
 	free(t);
 clean1:
-	if( end ) *end = e;
+	if( end ) (const char *)*end = line;
 	return NULL;
 }
 
