@@ -11,8 +11,11 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
+#include "proto.h"
 #include "cmd.h"
-#include "input.h"     
+#include "tty.h"     
+
+extern t_proto *con;
 
 /* types */
 
@@ -57,6 +60,19 @@ static void cmd_quit( const char *text )
 	terminate++;
 }
 
+static void cmd_misc( const char *text )
+{
+	proto_fsend( con, text );
+	if( proto_nextline(con) ){
+		tty_msg( "connection error\n" );
+		return;
+	}
+
+	tty_msg( "code: %s\n", proto_rcode(con));
+	do {
+		tty_msg( " %s\n", proto_rline(con));
+	} while( ! proto_nextline(con));
+}
 
 /************************************************************
  * command list
@@ -169,6 +185,8 @@ static void command_handler( char *input )
 	c = command_len(input);
 	if( NULL != (cmd = command_nfind( input, c )) && cmd->action )
 		cmd->action( input+c );
+	else 
+		cmd_misc( input );
 
 	free(input);
 }
