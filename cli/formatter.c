@@ -1,8 +1,39 @@
 #include <stdio.h>
+#include <time.h>
 
 #include "tty.h"
 #include "formatter.h"
 
+static size_t isotime( char *s, size_t max, time_t time )
+{
+	struct tm *t;
+
+	t = localtime( &time );
+	return strftime( s, max, "%H:%M:%S", t );
+	/*                        HH:MM:SS */
+	/*                        8 */
+}
+
+
+#if 0
+static size_t isotimestamp( char *s, size_t max, time_t time )
+{
+	struct tm *t;
+
+	t = localtime( &time );
+	return strftime( s, max, "%Y-%m-%d %H:%M:%S%z", t );
+	/*                      YYYY-mm-dd HH:MM:SS+zzzz */
+	/*                      10         13 */
+}
+
+static size_t isodate( char *s, size_t max, time_t time )
+{
+	struct tm *t;
+
+	t = localtime( &time );
+	return strftime( buf, max, "%Y-%m-%d", t );
+}
+#endif
 
 /************************************************************
  * client
@@ -37,18 +68,27 @@ void dump_clients( msc_it_client *it )
  * track
  */
 
+const char *mktrackid( int albumid, int nr )
+{
+	static char buf[40];
+
+	snprintf( buf, 40, "%d/%d", albumid, nr );
+	return buf;
+}
+
 const char *mktrackhead( char *buf, unsigned int len )
 {
-	snprintf( buf, len, "%5.5s %-20.20s %2.2s %-20.20s %s",
-			"id", "album", "nr", "artist", "title" );
+	snprintf( buf, len, "%7.7s %-20.20s %s",
+			"alb/nr", "artist", "title" );
 	return buf;
 }
 
 // TODO: lookup artist and album name
 const char *mktrack( char *buf, unsigned int len, msc_track *t )
 {
-	snprintf( buf, len, "%5d %-20d %2d %-20d %s",
-			t->id, t->albumid, t->albumnr, t->artistid, t->title );
+	snprintf( buf, len, "%7s %-20d %s",
+			mktrackid(t->albumid, t->albumnr), 
+			t->artistid, t->title );
 
 	return buf;
 }
@@ -65,4 +105,50 @@ void dump_tracks( msc_it_track *it )
 	}
 }
 
+/************************************************************
+ * track
+ */
+
+const char *mkqueuehead( char *buf, unsigned int len )
+{
+	unsigned int l;
+
+	l = snprintf( buf, len, "%4.4s %4.4s %-8.8s ", "id", "uid", "queued" );
+	if( l > len )
+		return NULL;
+
+	mktrackhead( buf+l, len-l );
+	return buf;
+}
+
+const char *mkqueue( char *buf, unsigned int len, msc_queue *q )
+{
+	unsigned int l;
+
+	l = snprintf( buf, len, "%4d %4d ", q->id, q->uid );
+	if( l > len )
+		return NULL;
+
+	l += isotime( buf+l, len -l, q->queued );
+	if( l +2 > len )
+		return NULL;
+
+	buf[l++] = ' ';
+	buf[l] = 0;
+
+	mktrack( buf+l, len-l, q->_track );
+	return buf;
+}
+
+void dump_queue( msc_it_queue *it )
+{
+	msc_queue *t;
+	char buf[BUFLENQUEUE];
+
+	tty_msg( "%s\n\n", mkqueuehead(buf, BUFLENQUEUE));
+	for( t = msc_it_queue_cur(it); t; t = msc_it_queue_next(it)){
+		tty_msg( "%s\n", mkqueue(buf,BUFLENQUEUE,t));
+		msc_queue_free(t);
+	}
+}
 

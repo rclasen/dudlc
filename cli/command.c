@@ -47,6 +47,32 @@ static int atobool( const char *in )
 	return -1;
 }
 
+static int trackid( const char *in, char **end )
+{
+	int a;
+	int b;
+	char *s, *e;
+
+	if( end ) (const char*) *end = in;
+
+	a = strtol( in, &e, 10 );
+	if( e == in )
+		return -1;
+
+	if( *e != '/' ){
+		if( end ) *end = e;
+		return a;
+	}
+
+	s = e + 1;
+	b = strtol( s, &e, 10 );
+	if( e == s )
+		return -1;
+
+	if( end ) *end = e;
+	return msc_cmd_trackid(con, a, b );
+}
+
 /************************************************************
  * sample command completer
  */
@@ -66,16 +92,14 @@ static char *cgen_cmd_foo( const char *line, int state )
 
 #define CMD(n)		static void n(const char *line )
 
-#define MSG_BADARG(a,v)	tty_msg( "bad argument for %s: %s\n", a, v )
+#define MSG_BADARG(a)	tty_msg( "bad argument for argument %s\n", a)
 #define MSG_ARGMIS(a)	tty_msg( "missing argument: %s\n",a )
 #define MSG_ARGMANY	tty_msg( "too many arguments\n" )
 #define MSG_FAIL	\
 	if( 0 > msc_fd(con) ){\
 		tty_msg( "failed: connection error\n"); \
-		return; \
 	} else {\
 		tty_msg( "failed: %s\n", msc_rmsg(con)); \
-		return; \
 	}
 
 
@@ -157,6 +181,7 @@ CMD(cmd_who)
 
 	if( NULL == (it = msc_cmd_who(con))){
 		MSG_FAIL;
+		return;
 	}
 	dump_clients(it);
 	msc_it_client_done(it);
@@ -230,6 +255,7 @@ CMD(cmd_status)
 	ARG_NONE;
 	if( 0 > ( stat = msc_cmd_status(con))){
 		MSG_FAIL;
+		return;
 	}
 	switch(stat){
 		case 0:
@@ -255,6 +281,7 @@ CMD(cmd_curtrack)
 	ARG_NONE;
 	if( NULL == (t = msc_cmd_curtrack(con))){
 		MSG_FAIL;
+		return;
 	}
 
 	tty_msg( "%s\n\n", mktrackhead(buf, BUFLENTRACK));
@@ -269,6 +296,7 @@ CMD(cmd_gap)
 	ARG_NONE;
 	if( 0 > (gap = msc_cmd_gap(con))){
 		MSG_FAIL;
+		return;
 	}
 
 	tty_msg( "delay (gap) before starting next track: %d sec\n", gap );
@@ -283,12 +311,13 @@ CMD(cmd_gapset)
 
 	gap = strtol(line, &end, 10 );
 	if( *end ){
-		MSG_BADARG("seconds",line);
+		MSG_BADARG("seconds");
 		return;
 	}
 
 	if( msc_cmd_gapset(con, gap )){
 		MSG_FAIL;
+		return;
 	}
 
 	tty_msg( "delay (gap) set to %d sec\n", gap );
@@ -301,6 +330,7 @@ CMD(cmd_random)
 	ARG_NONE;
 	if( 0 > (random = msc_cmd_random(con))){
 		MSG_FAIL;
+		return;
 	}
 
 	tty_msg( "random play (when queue is empty) is %s\n", 
@@ -314,7 +344,7 @@ CMD(cmd_randomset)
 	ARG_NEED("random_status");
 
 	if( -1 == ( random = atobool( line ))){
-		MSG_BADARG("random_status", line );
+		MSG_BADARG("random_status");
 		return;
 	}
 
@@ -335,10 +365,42 @@ CMD(cmd_tracks)
 
 	if( 0 > ( num = msc_cmd_tracks(con))){
 		MSG_FAIL;
+		return;
 	}
 
 	tty_msg( "available tracks: %d\n", num );
 }
+
+CMD(cmd_trackid)
+{
+	char *s;
+	char *e;
+	int albumid;
+	int num;
+	int id;
+
+	(const char *)s = line;
+	albumid = strtol(s, &e, 10 );
+	if( s == e ){
+		MSG_BADARG( "albumID" );
+		return;
+	}
+
+	s = e + strspn(e, "\t ");
+	num = strtol(s, &e, 10 );
+	if( s==e || *e ){
+		MSG_BADARG( "trackNr" );
+		return;
+	}
+
+	if( 0 > (id = msc_cmd_trackid( con, albumid, num))){
+		tty_msg( "track not found" );
+		return;
+	}
+
+	tty_msg( "track %s has ID: %d\n", mktrackid(albumid, num), id );
+}
+
 
 CMD(cmd_trackget)
 {
@@ -348,9 +410,12 @@ CMD(cmd_trackget)
 
 	ARG_NEED("trackID");
 
-	num = atoi(line);
+	if( 0 > (num = trackid( line, NULL ))){
+		MSG_BADARG( "trackID" );
+	}
 	if( NULL == ( t = msc_cmd_trackget(con, num ))){
 		MSG_FAIL;
+		return;
 	}
 
 	tty_msg( "%s\n\n", mktrackhead(buf, BUFLENTRACK));
@@ -366,6 +431,7 @@ CMD(cmd_tracksearch)
 
 	if( NULL == (it = msc_cmd_tracksearch( con, line ))){
 		MSG_FAIL;
+		return;
 	}
 
 	dump_tracks(it);
@@ -384,6 +450,7 @@ CMD(cmd_tracksalbum)
 	id = atoi(line);
 	if( NULL == (it = msc_cmd_tracksalbum( con, id ))){
 		MSG_FAIL;
+		return;
 	}
 
 	dump_tracks(it);
@@ -402,6 +469,7 @@ CMD(cmd_tracksartist)
 	id = atoi(line);
 	if( NULL == (it = msc_cmd_tracksartist( con, id ))){
 		MSG_FAIL;
+		return;
 	}
 
 	dump_tracks(it);
@@ -423,6 +491,7 @@ CMD(cmd_filter)
 
 	if( NULL == (f = msc_cmd_filter( con ))){
 		MSG_FAIL;
+		return;
 	}
 
 	tty_msg( "current filter: %s\n", f );
@@ -443,9 +512,82 @@ CMD(cmd_filterstat)
 	ARG_NONE;
 	if( 0 > ( n = msc_cmd_filterstat(con))){
 		MSG_FAIL;
+		return;
 	}
 
 	tty_msg( "tracks matching filter: %d\n", n );
+}
+
+/************************************************************
+ * commands: queue 
+ */
+
+CMD(cmd_queue)
+{
+	msc_it_queue *it;
+
+	ARG_NONE;
+
+	if( NULL == (it = msc_cmd_queue( con ))){
+		MSG_FAIL;
+		return;
+	}
+	dump_queue(it);
+	msc_it_queue_done(it);
+}
+
+CMD(cmd_queueget)
+{
+	char buf[BUFLENTRACK];
+	int id;
+	msc_queue *q;
+
+	ARG_NEED("queueID");
+	id = atoi(line);
+	if( NULL == (q = msc_cmd_queueget(con, id))){
+		MSG_FAIL;
+		return;
+	}
+
+	tty_msg("%s\n\n", mkqueuehead(buf, BUFLENTRACK));
+	tty_msg("%s\n", mkqueue(buf, BUFLENTRACK,q));
+	msc_queue_free(q);
+}
+
+CMD(cmd_queueadd)
+{
+	int id;
+
+	ARG_NEED("trackID");
+
+	if( 0 > (id = trackid(line, NULL))){
+		MSG_BADARG("trackID");
+		return;
+	}
+
+	if( 0 > msc_cmd_queueadd(con, id)){
+		MSG_FAIL;
+	}
+}
+
+CMD(cmd_queuedel)
+{
+	int id;
+
+	ARG_NEED("queueID");
+	id = atoi(line);
+	if( msc_cmd_queuedel(con, id )){
+		MSG_FAIL;
+	}
+}
+
+CMD(cmd_queueclear)
+{
+	ARG_NONE;
+
+	if( msc_cmd_queueclear( con )){
+		MSG_FAIL;
+	}
 }
 
 /************************************************************
@@ -481,6 +623,7 @@ static t_command commands[] = {
 	{ "random", NULL, cmd_random },
 	{ "randomset", NULL, cmd_randomset },
 	{ "tracks", NULL, cmd_tracks },
+	{ "trackid", NULL, cmd_trackid },
 	{ "trackget", NULL, cmd_trackget },
 	{ "tracksearch", NULL, cmd_tracksearch },
 	{ "tracksalbum", NULL, cmd_tracksalbum },
@@ -488,6 +631,11 @@ static t_command commands[] = {
 	{ "filter", NULL, cmd_filter },
 	{ "filterset", NULL, cmd_filterset },
 	{ "filterstat", NULL, cmd_filterstat },
+	{ "queue", NULL, cmd_queue },
+	{ "queueget", NULL, cmd_queueget },
+	{ "queueadd", NULL, cmd_queueadd },
+	{ "queuedel", NULL, cmd_queuedel },
+	{ "queueclear", NULL, cmd_queueclear },
 
 	{ NULL, NULL, NULL }
 };

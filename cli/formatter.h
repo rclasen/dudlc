@@ -3,6 +3,7 @@
 
 #define BUFLENCLIENT 512
 #define BUFLENTRACK 1024
+#define BUFLENQUEUE 1024
 
 #include <mservclient/command.h>
 
@@ -10,8 +11,14 @@ const char *mkclienthead( char *buf, unsigned int len );
 const char *mkclient( char *buf, unsigned int len, msc_client *c );
 void dump_clients( msc_it_client *it );
 
+const char *mktrackid( int albumid, int nr );
+
 const char *mktrackhead( char *buf, unsigned int len );
 const char *mktrack( char *buf, unsigned int len, msc_track *t );
 void dump_tracks( msc_it_track *it );
+
+const char *mkqueuehead( char *buf, unsigned int len );
+const char *mkqueue( char *buf, unsigned int len, msc_queue *q );
+void dump_queue( msc_it_queue *it );
 
 #endif

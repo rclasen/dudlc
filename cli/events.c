@@ -1,4 +1,4 @@
-
+#include <stdlib.h>
 
 #include "tty.h"
 #include "formatter.h"
@@ -86,7 +86,8 @@ static void cb_resumed( mservclient *c )
 	(void)c;
 }
 
-static void cb_random( mservclient *c, int r ){
+static void cb_random( mservclient *c, int r )
+{
 	tty_msg( "random mode turned %s\n", r ? "on": "off" );
 	(void)c;
 }
@@ -95,8 +96,34 @@ static void cb_random( mservclient *c, int r ){
  * random/filter
  */
 
-static void cb_filter( mservclient *c, const char *f ){
+static void cb_filter( mservclient *c, const char *f )
+{
 	tty_msg( "new filter: %s\n", f );
+	(void)c;
+}
+
+/************************************************************
+ * queue
+ */
+
+static void cb_queueadd( mservclient *c, msc_queue *q )
+{
+	char buf[BUFLENQUEUE];
+	tty_msg( "queued: %s\n", mkqueue(buf, BUFLENQUEUE,q ));
+	(void)c;
+}
+
+static void cb_queuedel( mservclient *c, msc_queue *q )
+{
+	char buf[BUFLENQUEUE];
+
+	tty_msg( "unqueued: %s\n", mkqueue(buf, BUFLENQUEUE, q ));
+	(void)c;
+}
+
+static void cb_queueclear( mservclient *c )
+{
+	tty_msg( "queue was cleared\n" );
 	(void)c;
 }
 
@@ -125,6 +152,12 @@ void events_init( mservclient *c )
 	events.random = cb_random;
 
 	events.filter = cb_filter;
+
+	events.queuefetch = NULL;
+	events.queueadd = cb_queueadd;
+	events.queuedel = cb_queuedel;
+	events.queueclear = cb_queueclear;
+
 }
 
 
