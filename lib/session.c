@@ -63,6 +63,9 @@ int duc_open( dudlc *p )
 	if( ! c || *c != '2' )
 		goto clean1;
 
+	if( strcmp("dudld", _duc_rline(p)) )
+		goto clean1;
+
 	if( p->user && duc_cmd_auth( p ))
 		goto clean1;
 
@@ -71,6 +74,7 @@ int duc_open( dudlc *p )
 	return 0;
 
 clean1:
+	duc_sock_disconnect(p->con);
 	return -1;
 }
 
