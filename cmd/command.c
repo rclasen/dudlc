@@ -1270,6 +1270,22 @@ CMD(cmd_albumsearch)
 	CMD_OK;
 }
 
+CMD(cmd_albumsartist)
+{
+	duc_it_album *it;
+	int id;
+
+	ARG_NEED("artistID");
+
+	id = atoi(line);
+	if( NULL == (it = duc_cmd_albumsartist( con, id )))
+		CMD_FAIL;
+
+	dmsg_dump_albums(it);
+	duc_it_album_done(it);
+	CMD_OK;
+}
+
 // TODO: CMD(cmd_albumsetartist)
 // TODO: CMD(cmd_albumsetname)
 
@@ -1412,6 +1428,7 @@ static t_command commands[] = {
 	{ "albumget", NULL, cmd_albumget },
 	{ "albumlist", NULL, cmd_albumlist },
 	{ "albumsearch", NULL, cmd_albumsearch },
+	{ "albumsartist", NULL, cmd_albumsartist },
 	//{ "albumsetartist", NULL, cmd_albumsetartist },
 	//{ "albumsetname", NULL, cmd_albumsetname },
 

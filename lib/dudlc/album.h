@@ -23,6 +23,7 @@ duc_album *duc_cmd_albumget( dudlc *c, int id );
 
 duc_it_album *duc_cmd_albumlist( dudlc *c );
 duc_it_album *duc_cmd_albumsearch( dudlc *c, const char *substr );
+duc_it_album *duc_cmd_albumsartist( dudlc *c, int artistid );
 
 int duc_cmd_albumsetname( dudlc *c, int id, const char *name );
 int duc_cmd_albumsetartist( dudlc *c, int id, int artistid );

@@ -1,3 +1,9 @@
+dudlc (0.1.2) unstable; urgency=low
+
+  * support new albumsartist command
+
+ -- Rainer Clasen <bj@zuto.de>  Sun, 29 Aug 2004 17:09:30 +0200
+
 dudlc (0.1.1) unstable; urgency=low
 
   * protocol change to get more data

@@ -68,6 +68,12 @@ duc_it_album *duc_cmd_albumsearch( dudlc *c, const char *str )
 			"albumsearch %s", str );
 }
 
+duc_it_album *duc_cmd_albumsartist( dudlc *c, int artistid )
+{
+	return _duc_iterate( c, (_duc_converter)_duc_album_parse, 
+			"albumsartist %d", artistid );
+}
+
 // TODO: duc_cmd_albumsearchf
 
 int duc_cmd_albumsetname( dudlc *c, int id, const char *name )

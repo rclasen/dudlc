@@ -206,13 +206,13 @@ const char *dfmt_user( char *buf, unsigned int len, duc_user *q )
 
 const char *dfmt_albumhead( char *buf, unsigned int len )
 {
-	snprintf( buf, len, "%4.4s %-25s %-20s", "id", "album", "artist" );
+	snprintf( buf, len, "%4.4s %-25s %-20s", "id", "artist", "album" );
 	return buf;
 }
 
 const char *dfmt_album( char *buf, unsigned int len, duc_album *q )
 {
-	snprintf( buf, len, "%4d %-25s %-20s", q->id, q->album, q->artist->artist);
+	snprintf( buf, len, "%4d %-25s %-20s", q->id, q->artist->artist, q->album);
 	return buf;
 }
 
