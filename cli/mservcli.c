@@ -11,10 +11,10 @@
 #include <mservclient/command.h>
 
 #include "tty.h"
+#include "events.h"
+#include "mservcli.h"
 
 mservclient *con = NULL;
-
-msc_events cb;
 
 int terminate = 0;
 
@@ -73,25 +73,6 @@ static void loop( void )
 	} while( ! terminate );
 }
 
-static void cb_disc( mservclient *c )
-{
-	tty_msg( "disconnected, trying to reconnect\n");
-	msc_open(c);
-}
-
-static void cb_conn( mservclient *c )
-{
-	tty_msg( "connected\n");
-	(void)c;
-}
-
-
-static void bcast( mservclient *c, const char *line )
-{
-	tty_msg( "%s\n", line );
-	(void)c;
-}
-
 int main( int argc, char **argv )
 {
 
@@ -102,12 +83,7 @@ int main( int argc, char **argv )
 
 	con = msc_new( "localhost", 4445, "ddd", "sss" );
 
-	memset(&cb, 0, sizeof(cb));
-	cb.connect = cb_conn;
-	cb.disconnect = cb_disc;
-	cb.bcast = bcast;
-	msc_setevents( con, &cb );
-
+	events_init(con);
 	
 	signal( SIGTERM, sig_term );
 	signal( SIGINT, sig_term );
