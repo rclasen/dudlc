@@ -81,13 +81,20 @@ const char *dfmt_trackhead( char *buf, unsigned int len )
 	return buf;
 }
 
+#define BF	"\x1B[1m"
+#define NF	"\x1B[0m"
 const char *dfmt_rtrack( char *buf, unsigned int len, 
 		duc_track *t, duc_artist *ar, duc_album *al )
 {
 	char tim[10];
 
 	minutes(tim, 10, t->duration);
-	snprintf( buf, len, "%7s %-18.18s %-5.5s %-16.16s %-29.29s",
+	snprintf( buf, len, 
+			"%7s "
+			BF "%-18.18s " NF
+			"%-5.5s "
+			BF "%-16.16s " NF
+			"%-29.29s",
 			dfmt_trackid(t->albumid, t->albumnr), 
 			al->album, tim, ar->artist, t->title );
 
