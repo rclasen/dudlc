@@ -47,6 +47,8 @@ msc_track *_msc_track_parse( const char *line, char **end )
 	if( s == e )
 		goto clean3;
 
+
+	if( end ) *end = e;
 	return t;
 
 clean3:
@@ -64,9 +66,6 @@ void msc_track_free( msc_track *t )
 	if( ! t )
 		return;
 
-	if( --t->_refs )
-		return;
-
 	free(t->title);
 	free(t);
 }
@@ -74,6 +73,17 @@ void msc_track_free( msc_track *t )
 int msc_cmd_tracks( mservclient *c )
 {
 	if( _msc_cmd( c, "tracks" ))
+		return -1;
+
+	if( *_msc_rcode(c) != '2' )
+		return -1;
+
+	return atoi(_msc_rline(c));
+}
+
+int msc_cmd_trackid( mservclient *c, int albumid, int nr )
+{
+	if( _msc_cmd( c, "trackid %d %d", albumid, nr ))
 		return -1;
 
 	if( *_msc_rcode(c) != '2' )
