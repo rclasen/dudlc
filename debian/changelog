@@ -1,3 +1,9 @@
+dudlc (0.1.3) unstable; urgency=low
+
+  * added support for list arguments
+
+ -- Rainer Clasen <bj@zuto.de>  Sun, 25 Sep 2005 19:06:24 +0200
+
 dudlc (0.1.2) unstable; urgency=low
 
   * support new albumsartist command
