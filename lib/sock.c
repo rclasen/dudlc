@@ -155,7 +155,7 @@ int duc_sock_recv( t_duc_sock *s )
 	return 0;
 }
 	
-const char *duc_sock_getline( t_duc_sock *s )
+char *duc_sock_getline( t_duc_sock *s )
 {
 	freeline( s );
 

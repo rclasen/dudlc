@@ -10,7 +10,7 @@ typedef struct {
 	int right;
 } duc_user;
 
-duc_user *_duc_user_parse( const char *line, char **end );
+duc_user *_duc_user_parse( char *line, char **end );
 void duc_user_free( duc_user *u );
 
 #define duc_it_user	_duc_iter

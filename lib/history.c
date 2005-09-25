@@ -5,15 +5,13 @@
 #include "dudlc/event.h"
 #include "dudlc/history.h"
 
-static duc_history *_duc_history_parse( const char *line, char **end )
+static duc_history *_duc_history_parse( char *line, char **end )
 {
 	duc_history *n;
-	const char *s;
+	char *s;
 	char *e;
 
-	/* why isn't strtol's endptr defined as (const char*) ?
-	 * now we have to cast the const hackishly away */
-	(const char*)e = s = line;
+	e = s = line;
 
 	if( NULL == (n = malloc(sizeof(duc_history)))){
 		goto clean1;
@@ -40,7 +38,7 @@ clean3:
 clean2:
 	free(n);
 clean1:
-	if( end ) (const char *)*end = line;
+	if( end ) *end = line;
 	return NULL;
 }
 

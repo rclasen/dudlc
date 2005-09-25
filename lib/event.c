@@ -16,7 +16,7 @@ duc_events *duc_setevents( dudlc *c, duc_events *e )
 	return old;
 }
 
-void _duc_bcast( dudlc *p, const char *line )
+void _duc_bcast( dudlc *p, char *line )
 {
 	switch(line[1]){
 		case '3':

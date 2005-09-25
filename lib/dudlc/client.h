@@ -26,7 +26,7 @@ int duc_cmd_clientcloseuser( dudlc *p, int uid );
 
 int duc_cmd_clientclose( dudlc *p, int id );
 
-void _duc_bcast_client( dudlc *c, const char *line );
+void _duc_bcast_client( dudlc *c, char *line );
 
 #endif
 

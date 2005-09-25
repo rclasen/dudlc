@@ -10,3 +10,4 @@ config.log
 .libs
 config.status
 libtool
+commands.txt

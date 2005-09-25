@@ -27,7 +27,7 @@ int duc_sock_fd( t_duc_sock *t );
 
 int duc_sock_recv( t_duc_sock *s );
 int duc_sock_send( t_duc_sock *s, const char *cmd );
-const char *duc_sock_getline( t_duc_sock *s );
+char *duc_sock_getline( t_duc_sock *s );
 
 
 #endif

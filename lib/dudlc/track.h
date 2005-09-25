@@ -20,7 +20,7 @@ typedef struct {
 #define duc_it_track_next(x)	(duc_track*)_duc_it_next((_duc_iter*)x)
 #define duc_it_track_done(x)	_duc_it_done((_duc_iter*)x)
 
-duc_track *_duc_track_parse( const char *line, char **end );
+duc_track *_duc_track_parse( char *line, char **end );
 void duc_track_free( duc_track *t );
 
 int duc_cmd_tracks( dudlc *c );

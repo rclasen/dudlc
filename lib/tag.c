@@ -5,15 +5,13 @@
 #include "dudlc/event.h"
 #include "dudlc/tag.h"
 
-static duc_tag *_duc_tag_parse( const char *line, char **end )
+static duc_tag *_duc_tag_parse( char *line, char **end )
 {
 	duc_tag *n;
-	const char *s;
+	char *s;
 	char *e;
 
-	/* why isn't strtol's endptr defined as (const char*) ?
-	 * now we have to cast the const hackishly away */
-	(const char*)e = s = line;
+	e = s = line;
 
 	if( NULL == (n = malloc(sizeof(duc_track)))){
 		goto clean1;
@@ -40,7 +38,7 @@ clean3:
 clean2:
 	free(n);
 clean1:
-	if( end ) (const char *)*end = line;
+	if( end ) *end = line;
 	return NULL;
 }
 
@@ -112,7 +110,7 @@ int duc_cmd_tracktagdel( dudlc *c, int tid, int id )
 	return _duc_cmd_succ( c, "tracktagdel %d %d", tid, id );
 }
 
-void _duc_bcast_tag( dudlc *c, const char *line )
+void _duc_bcast_tag( dudlc *c, char *line )
 {
 	duc_tag *t;
 

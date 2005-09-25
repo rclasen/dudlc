@@ -149,7 +149,7 @@ void *_duc_cmd_conv( dudlc *c, _duc_converter conv,
 
 int _duc_rnext( dudlc *p )
 {
-	const char *l = NULL;
+	char *l = NULL;
 
 	if( ! p->inreply )
 		return -2;
@@ -232,7 +232,7 @@ const char *_duc_rline( dudlc *p )
 
 void duc_poll( dudlc *p )
 {
-	const char *l;
+	char *l;
 
 	if( duc_open(p) )
 		return;
@@ -263,7 +263,7 @@ const char *_duc_skipspace( const char *s )
 	return s;
 }
 
-char *_duc_fielddup( const char *s, char **end )
+char *_duc_fielddup( char *s, char **end )
 {
 	char *dup;
 	char *p;
@@ -299,7 +299,7 @@ char *_duc_fielddup( const char *s, char **end )
 	}
 	*p++= 0;
 
-	if( end ) (const char *)*end = s;
+	if( end ) *end = s;
 
 	return dup;
 }

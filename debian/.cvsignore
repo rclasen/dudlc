@@ -1,3 +1,8 @@
 *.debhelper
 files
 *.substvars
+tmp
+dudl-client
+dudl-lirc
+libdudlc0
+libdudlc-dev

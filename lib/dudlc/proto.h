@@ -31,7 +31,7 @@ void *_duc_cmd_conv( dudlc *c, _duc_converter conv,
 		const char *fmt, ... );
 
 
-char *_duc_fielddup( const char *s, char **end );
+char *_duc_fielddup( char *s, char **end );
 const char *_duc_skipspace( const char *s );
 
 #endif

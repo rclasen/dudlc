@@ -4,14 +4,14 @@
 #include "dudlc/event.h"
 #include "dudlc/user.h"
 
-duc_user *_duc_user_parse( const char *line, char **end )
+duc_user *_duc_user_parse( char *line, char **end )
 {
 	duc_user *c;
 
-	const char *s;
+	char *s;
 	char *e;
 
-	(const char*)e = s = line;
+	e = s = line;
 
 	if( NULL == (c = malloc(sizeof(duc_user))))
 		goto clean1;
@@ -37,7 +37,7 @@ clean3:
 clean2:
 	free(c);
 clean1:
-	if( end ) (const char *)*end = line;
+	if( end ) *end = line;
 	return NULL;
 }
 

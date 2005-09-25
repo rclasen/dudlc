@@ -63,7 +63,7 @@ int duc_cmd_randomset( dudlc *c, int r )
 }
 
 
-static void _duc_bcast_newtrack( dudlc *c, const char *line )
+static void _duc_bcast_newtrack( dudlc *c, char *line )
 {
 	duc_track *t;
 	char *end;
@@ -76,7 +76,7 @@ static void _duc_bcast_newtrack( dudlc *c, const char *line )
 	duc_track_free(t);
 }
 
-void _duc_bcast_player( dudlc *c, const char *line )
+void _duc_bcast_player( dudlc *c, char *line )
 {
 	int r;
 

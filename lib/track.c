@@ -5,15 +5,13 @@
 #include "dudlc/proto.h"
 #include "dudlc/track.h"
 
-duc_track *_duc_track_parse( const char *line, char **end )
+duc_track *_duc_track_parse( char *line, char **end )
 {
 	duc_track *t;
-	const char *s;
+	char *s;
 	char *e;
 
-	/* why isn't strtol's endptr defined as (const char*) ?
-	 * now we have to cast the const hackishly away */
-	(const char*)e = s = line;
+	e = s = line;
 
 	if( NULL == (t = malloc(sizeof(duc_track)))){
 		goto clean1;
@@ -56,7 +54,7 @@ clean3:
 clean2:
 	free(t);
 clean1:
-	if( end ) (const char *)*end = line;
+	if( end ) *end = line;
 	return NULL;
 }
 

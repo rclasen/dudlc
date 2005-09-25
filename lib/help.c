@@ -4,9 +4,9 @@
 #include "dudlc/proto.h"
 #include "dudlc/help.h"
 
-static char *_duc_help_parse( const char *line, char **end )
+static char *_duc_help_parse( char *line, char **end )
 {
-	if( end ) (const char*) *end = line + strlen(line);
+	if( end ) *end = line + strlen(line);
 	return strdup(line);
 }
 

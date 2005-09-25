@@ -5,15 +5,13 @@
 #include "dudlc/event.h"
 #include "dudlc/artist.h"
 
-duc_artist *_duc_artist_parse( const char *line, char **end )
+duc_artist *_duc_artist_parse( char *line, char **end )
 {
 	duc_artist *n;
-	const char *s;
+	char *s;
 	char *e;
 
-	/* why isn't strtol's endptr defined as (const char*) ?
-	 * now we have to cast the const hackishly away */
-	(const char*)e = s = line;
+	e = s = line;
 
 	if( NULL == (n = malloc(sizeof(duc_artist)))){
 		goto clean1;
@@ -33,7 +31,7 @@ duc_artist *_duc_artist_parse( const char *line, char **end )
 clean2:
 	free(n);
 clean1:
-	if( end ) (const char *)*end = line;
+	if( end ) *end = line;
 	return NULL;
 }
 

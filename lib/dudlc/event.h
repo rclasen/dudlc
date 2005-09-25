@@ -68,5 +68,5 @@ duc_events *duc_setevents( dudlc *p, duc_events *e );
 
 #endif
 
-void _duc_bcast( dudlc *p, const char *line );
+void _duc_bcast( dudlc *p, char *line );
 

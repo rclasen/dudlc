@@ -4,14 +4,14 @@
 #include "dudlc/event.h"
 #include "dudlc/client.h"
 
-static duc_client *_duc_client_parse( const char *line, char **end )
+static duc_client *_duc_client_parse( char *line, char **end )
 {
 	duc_client *c;
 
-	const char *s;
+	char *s;
 	char *e;
 
-	(const char*)e = s = line;
+	e = s = line;
 
 	if( NULL == (c = malloc(sizeof(duc_client))))
 		goto clean1;
@@ -36,7 +36,7 @@ clean3:
 clean2:
 	free(c);
 clean1:
-	if( end ) (const char *)*end = line;
+	if( end ) *end = line;
 	return NULL;
 }
 
@@ -66,7 +66,7 @@ int duc_cmd_clientcloseuser( dudlc *c, int uid )
 	return _duc_cmd_succ(c, "clientcloseuser %d", uid );
 }
 
-void _duc_bcast_client( dudlc *c, const char *line )
+void _duc_bcast_client( dudlc *c, char *line )
 {
 	duc_client *u;
 

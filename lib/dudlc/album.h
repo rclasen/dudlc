@@ -16,7 +16,7 @@ typedef struct {
 #define duc_it_album_next(x)	(duc_album*)_duc_it_next((_duc_iter*)x)
 #define duc_it_album_done(x)	_duc_it_done((_duc_iter*)x)
 
-duc_album *_duc_album_parse( const char *line, char **end );
+duc_album *_duc_album_parse( char *line, char **end );
 void duc_album_free( duc_album *a );
 
 duc_album *duc_cmd_albumget( dudlc *c, int id );

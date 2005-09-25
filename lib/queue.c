@@ -5,15 +5,13 @@
 #include "dudlc/event.h"
 #include "dudlc/queue.h"
 
-static duc_queue *_duc_queue_parse( const char *line, char **end )
+static duc_queue *_duc_queue_parse( char *line, char **end )
 {
 	duc_queue *n;
-	const char *s;
+	char *s;
 	char *e;
 
-	/* why isn't strtol's endptr defined as (const char*) ?
-	 * now we have to cast the const hackishly away */
-	(const char*)e = s = line;
+	e = s = line;
 
 	if( NULL == (n = malloc(sizeof(duc_queue)))){
 		goto clean1;
@@ -45,7 +43,7 @@ clean3:
 clean2:
 	free(n);
 clean1:
-	if( end ) (const char *)*end = line;
+	if( end ) *end = line;
 	return NULL;
 }
 
@@ -126,7 +124,7 @@ int duc_cmd_queueclear( dudlc *c )
 	return _duc_cmd_succ( c, "queueclear" );
 }
 
-void _duc_bcast_queue( dudlc *c, const char *line )
+void _duc_bcast_queue( dudlc *c, char *line )
 {
 	duc_queue *q;
 

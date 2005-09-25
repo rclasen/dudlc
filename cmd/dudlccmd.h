@@ -1,5 +1,5 @@
 #ifndef _DUDLCCMD_H
-#define DUDLCCMD_H
+#define _DUDLCCMD_H
 
 #include <dudlc.h>
 
@@ -55,7 +55,7 @@ void dmsg_dump_artists( duc_it_artist *it );
 
 
 
-int duc_cmd( dudlc *con, const char *line );
+int duc_cmd( dudlc *con, char *line );
 
 typedef char *(*duc_cgen)( dudlc *con, const char *text, int state );
 duc_cgen duc_cgen_find( dudlc *con, const char* line, unsigned int pos );

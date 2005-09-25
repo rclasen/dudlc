@@ -5,15 +5,13 @@
 #include "dudlc/event.h"
 #include "dudlc/album.h"
 
-duc_album *_duc_album_parse( const char *line, char **end )
+duc_album *_duc_album_parse( char *line, char **end )
 {
 	duc_album *n;
-	const char *s;
+	char *s;
 	char *e;
 
-	/* why isn't strtol's endptr defined as (const char*) ?
-	 * now we have to cast the const hackishly away */
-	(const char*)e = s = line;
+	e = s = line;
 
 	if( NULL == (n = malloc(sizeof(duc_album)))){
 		goto clean1;
@@ -39,7 +37,7 @@ clean3:
 clean2:
 	free(n);
 clean1:
-	if( end ) (const char *)*end = line;
+	if( end ) *end = line;
 	return NULL;
 }
 
