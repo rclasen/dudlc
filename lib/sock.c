@@ -10,6 +10,12 @@
 
 #include "dudlc/sock.h"
 
+#if 0
+#define DPRINTF(arg...) fprintf(stderr,arg)
+#else
+#define DPRINTF(arg...) while(0){}
+#endif
+
 t_duc_sock *duc_sock_open( const char *h, int p )
 {
 	t_duc_sock *s;
@@ -114,6 +120,7 @@ int duc_sock_send( t_duc_sock *s, const char *cmd )
 		return -1;
 
 	len = strlen(cmd);
+	DPRINTF("duc_sock_send: >%s<\n", cmd );
 	if( 0 > send(s->fd, cmd, len, MSG_DONTWAIT )){
 		return -1;
 	}
@@ -139,6 +146,7 @@ int duc_sock_recv( t_duc_sock *s )
 	if( s->fd == -1 )
 		return -1;
 
+	DPRINTF("duc_sock_recv\n");
 	if( 0 > (len = recv( s->fd, s->buf + s->ilen, 
 					BUFLENRCV - s->ilen-1, 0 ))){
 		return -1;
@@ -179,6 +187,7 @@ char *duc_sock_getline( t_duc_sock *s )
 	s->buf[s->llen++] = 0;
 	s->llen += strspn( s->buf + s->llen, "\n\r" );
 
+	DPRINTF("duc_sock_getline: >%s<\n", s->buf);
 	return s->buf;
 }
 
