@@ -18,23 +18,70 @@
 static int redisplay = 0;
 static int inprompt = 0;
 
-
+/* 
+ * pointer function that builds the list of completions for current
+ * context 
+ */
 duc_cgen cgen = NULL;
 
-static char *tty_cgen( const char *text, int state )
+static char *topcmds[] = {
+	"quit",
+	"exit",
+	"user",
+	NULL
+};
+
+/*
+ * called by readline to get one/next possible completion
+ * for top-level commands.
+ *
+ * this adds local completions to the ones returned from the lib.
+ */
+static char *tty_cgen_top( const char *text, int state )
 {
-	if( NULL == cgen )
-		return NULL;
-	return( (*cgen)( con, text, state ));
+	static char **next;
+	static unsigned int len;
+
+	if( state == 0 ){
+		next = topcmds;
+		len = strlen(text);
+	}
+
+	if( cgen ){
+		char *r;
+
+		if( NULL != (r = (*cgen)( con, text, state )))
+			return r;
+	}
+
+	while( *next ){
+		if( strncasecmp(text,*next,len) == 0 )
+			return strdup(*(next++));
+		next++;
+	}
+	return NULL;
 }
 
-/* handler invoked by readline to get a list of complettions */
+/*
+ * called by readline to get one/next possible completion
+ * for commands arguments.
+ */
+static char *tty_cgen( const char *text, int state )
+{
+	if( ! cgen )
+		return NULL;
+
+	return (*cgen)( con, text, state );
+}
+
+/* 
+ * handler invoked by readline to get a list of complettions 
+ */
 static char **tty_completer( const char *text, int start, int end )
 {
 	duc_cgen gen;
 
 	(void) end; /* shut up gcc */
-	(void) start;
 
 	rl_attempted_completion_over = 1;
 
@@ -42,12 +89,18 @@ static char **tty_completer( const char *text, int start, int end )
 		return NULL;
 
 	cgen = gen;
-	return rl_completion_matches( text, tty_cgen );
+
+	return rl_completion_matches( text, start ? tty_cgen : tty_cgen_top );
 }
 
 static void cmd_user( char *input )
 {
 	char *pass;
+
+	if( ! *input ){
+		tty_msg( "missing username\n");
+		return;
+	}
 
 	if( NULL == ( pass = getpass("Password:" ) )){
 		tty_msg( "failed: %s\n", strerror(errno));
