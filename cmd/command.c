@@ -8,328 +8,12 @@
 #include <dudlc/proto.h>
 
 #include "dudlccmd.h"
+#include "parseval.h"
 #include "idlist.h"
 
-typedef int (*t_action)( dudlc *dudl, char *line );
-typedef int (*t_convert)( dudlc *dudl, char *in, char **end );
 
 
-static int atobool( const char *in )
-{
-	if( 0 == strcasecmp( in, "on" ) ){
-		return 1;
-	} 
-	
-	if( 0 == strcasecmp( in, "off" )){
-		return 0;
-	} 
-	
-	if( 0 == strcasecmp( in, "true" )){
-		return 1;
-	} 
-	
-	if( 0 == strcasecmp( in, "false" )){
-		return 0;
-	} 
-	
-	if( 0 == strcasecmp( in , "yes" )){
-		return 1;
-	} 
-	
-	if( 0 == strcasecmp( in , "no" )){
-		return 0;
-	} 
-	
-	if( 0 == strcmp( in, "1" )){
-		return 1;
-	} 
-	
-	if( 0 == strcmp( in, "0" )){
-		return 0;
-	} 
 
-	return -1;
-}
-
-/* 
- * track := 'c'|<id>|<aid>/<pos>
- */
-static int track2id( dudlc *con, char *in, char **end )
-{
-	int a;
-	int b;
-	char *s, *e;
-	duc_track *t;
-
-	if( end ) *end = in;
-
-	if( *in == 'c' ){
-		if(NULL == (t = duc_cmd_curtrack(con))){
-			return -1;
-		}
-		a = t->id;
-		duc_track_free(t);
-
-		if( end ) (*end)++;
-		return a;
-	}
-
-	a = strtol( in, &e, 10 );
-	if( e == in )
-		return -1;
-
-	if( *e != '/' ){
-		if( end ) *end = e;
-		return a;
-	}
-
-	s = e + 1;
-	b = strtol( s, &e, 10 );
-	if( e == s )
-		return -1;
-
-	if( end ) *end = e;
-	return duc_cmd_track2id(con, a, b );
-}
-
-/*
- * tag := <tagname>|<id>
- */
-static int tag2id( dudlc *con, char *in, char **end )
-{
-	int id;
-	char *e;
-	char tag[10];
-	int len;
-
-	if( end ) *end = in;
-
-	id = strtol( in, &e, 10 );
-	if( in != e ){
-		if( end ) *end = e;
-		return id;
-	}
-
-	len = strcspn(in, "\t ");
-	if( len >= 10  )
-		return -1;
-
-	e = in +len;
-	strncpy( tag, in, len );
-	if( 0 > ( id = duc_cmd_tag2id( con, tag ))){
-		return -1;
-	}
-
-	if( end ) *end = e;
-	return id;
-}
-
-// TODO: ask server for user2id
-static int user2id( dudlc *con, char *in, char **end )
-{
-	(void) con;
-	return strtol( in, end, 10 );
-}
-
-// TODO: ask server for right2id
-static int right2id( dudlc *con, char *in, char **end )
-{
-	(void) con;
-	return strtol( in, end, 10 );
-}
-
-/*
- * sfilter := <sfiltername>|<id>
- */
-static int sfilter2id( dudlc *con, char *in, char **end )
-{
-	int id;
-	char *e;
-	char sfilter[10];
-	int len;
-
-	if( end ) *end = in;
-
-	id = strtol( in, &e, 10 );
-	if( in != e ){
-		if( end ) *end = e;
-		return id;
-	}
-
-	len = strcspn(in, "\t ");
-	if( len >= 10  )
-		return -1;
-
-	e = in +len;
-	strncpy( sfilter, in, len );
-	if( 0 > ( id = duc_cmd_sfilter2id( con, sfilter ))){
-		return -1;
-	}
-
-	if( end ) *end = e;
-	return id;
-}
-
-/*
- * list := <item>[,...]
- * item := <parsed by t_convert function>
- */
-static int idl_addclist( t_idlist *idl, char *in, char **end, dudlc *con, t_convert conv )
-{
-	int added = 0;
-	char *ntok = in;
-	char *e;
-
-	while(1){
-		int id;
-		
-		id = (*conv)( con, ntok, &e );
-		if( ntok == e ){
-			if( end )
-				*end = in;
-			return 0;
-		}
-		idl_add( idl, id );
-		added ++;
-
-		if( *e != ',' )
-			break;
-
-		++e;
-		ntok = e;
-	}
-
-	if( end )
-		*end = e;
-
-	return added;
-}
-
-static int idl_addalbum( t_idlist *idl, dudlc *con, int album, int first, int last )
-{
-	duc_it_track *it;
-	duc_track *t;
-	int added = 0;
-
-	if( album < 0 ){
-		duc_track *t;
-		if(NULL == (t = duc_cmd_curtrack(con)))
-			return 0;
-
-		album = t->album->id;
-		duc_track_free(t);
-	}
-
-        if( NULL == (it = duc_cmd_tracksalbum(con,album)))
-		return 0;
-
-	for( t = duc_it_track_cur(it); t; t = duc_it_track_next(it)){
-		if( first < 0 || last <= first || 
-				(first <= t->albumnr && last >= t->albumnr)){
-			idl_add(idl, t->id );
-		}
-		duc_track_free(t);
-	}
-	duc_it_track_done(it);
-
-	return added;
-}
-
-
-/*
- * list := <item>[,...]
- * item := c|<id>|c/<pos>
- * pos  := *|<num>[-<num2>]
- */
-
-static int idl_addtracklist( t_idlist *idl, dudlc *con, char *in, char **end)
-{
-	char *tok = in;
-	int added = 0;
-
-	if( end ) *end = in;
-
-	while(1){
-		char *e;
-		int id1;
-
-		id1 = strtoul(tok, &e, 10 );
-		if( e == tok ){
-			if( *e == 'c' ){
-				id1 = -1;
-				e++;
-			} else {
-				return 0;
-			}
-		}
-		tok = e;
-
-		/* is it <id1>/anything? */
-		if( *tok == '/' ){
-			int pos1;
-
-			tok++;
-			pos1 = strtoul(tok, &e, 10 );
-			if( e == tok ){
-				/* no <pos>, must be '*' */
-				if( e[0] == '*' && (e[1] == 0 || e[1] == ',')){
-					added += idl_addalbum(idl, con, id1, -1, -1 );
-					tok++;
-				} else {
-					return 0;
-				}
-
-			} else {
-				tok = e;
-
-				/* is it <id1>/<pos1>-anything? */
-				if( *tok == '-' ){
-					int pos2;
-
-					tok++;
-					pos2 = strtoul(tok, &e, 10 );
-					if( e == tok )
-						return 0;
-					tok = e;
-
-					added += idl_addalbum(idl, con, id1, pos1, pos2);
-				} else {
-					int tid;
-					tid = duc_cmd_track2id(con, id1, pos1 );
-					if( tid >= 0 )
-						if( -1 != idl_add( idl, tid ))
-							added++;
-				}
-
-
-			}
-
-		} else if( *tok == 0 || *tok == ',' ){
-			/* no / found */
-			if( id1 < 0 ){
-				duc_track *t;
-				if(NULL == (t = duc_cmd_curtrack(con)))
-					return 0;
-
-				id1 = t->id;
-				duc_track_free(t);
-			}
-			if( -1 != idl_add(idl,id1) )
-				added++;
-
-		} else {
-			return 0;
-		}
-
-		if( *tok != ',' )
-			break;
-		tok++;
-	}
-
-	if( end )
-		*end = tok;
-	return added;
-}
 
 #define CMD(n)	static int n(dudlc *con, char *line )
 #define CGEN(n)	static char *n( dudlc *con, const char *text, int state )
@@ -515,9 +199,9 @@ CMD(cmd_clientclose)
 	
 	ARG_NEED("conIDs");
 
-	if( NULL == (idl = idl_new(NULL)))
+	if( NULL == (idl = val_clientlist(con, line, &end )))
 		CMD_FAIL;
-	idl_addlist( idl, line, &end );
+
 	if( *end ){
 		idl_done(idl);
 		CMD_FAIL_BADARG("conIDs");
@@ -544,9 +228,8 @@ CMD(cmd_clientcloseuser)
 
 	ARG_NEED("userIDs");
 
-	if( NULL == (idl = idl_new(NULL)))
+	if( NULL == (idl = val_userlist(con, line, &end )))
 		CMD_FAIL;
-	idl_addclist( idl, line, &end, con, user2id );
 	if( *end ){
 		idl_done(idl);
 		CMD_FAIL_BADARG("userIDs");
@@ -586,7 +269,7 @@ CMD(cmd_userget)
 
 	ARG_NEED("uid");
 
-	uid = user2id( con, line, &end );
+	uid = val_user( con, line, &end );
 	if( *end )
 		CMD_FAIL_ARGMIS("uid");
 
@@ -622,7 +305,7 @@ CMD(cmd_usersetpass)
 
 	ARG_NEED("uid");
 
-	uid = user2id( con, line, &end );
+	uid = val_user( con, line, &end );
 	if( line == end )
 		CMD_FAIL_ARGMIS("uid");
 
@@ -642,12 +325,12 @@ CMD(cmd_usersetright)
 
 	ARG_NEED("uid");
 
-	uid = user2id( con, line, &end );
+	uid = val_user( con, line, &end );
 	if( line == end )
 		CMD_FAIL_ARGMIS("uid");
 
 	s = end + strspn( end, "\t ");
-	right = right2id( con, s, &end );
+	right = val_right( con, s, &end );
 	if( *end )
 		CMD_FAIL_ARGMIS("right");
 
@@ -677,7 +360,7 @@ CMD(cmd_userdel)
 
 	ARG_NEED("uid");
 
-	uid = user2id( con, line, &end );
+	uid = val_user( con, line, &end );
 	if( *end )
 		CMD_FAIL_ARGMIS("uid");
 
@@ -872,7 +555,7 @@ CMD(cmd_randomset)
 
 	ARG_NEED("random_status");
 
-	if( -1 == ( random = atobool( line )))
+	if( -1 == ( random = val_bool( con, line, NULL )))
 		CMD_FAIL_BADARG("random_status");
 
 	if( duc_cmd_randomset(con, random))
@@ -901,30 +584,16 @@ CMD(cmd_trackcount)
 // TODO: remove track2id cmd
 CMD(cmd_track2id)
 {
-	char *s;
-	char *e;
-	int albumid;
-	int num;
 	int id;
 
-	// TODO: deal with special "c" track
-
-	s = line;
-	albumid = strtol(s, &e, 10 );
-	if( s == e )
-		CMD_FAIL_BADARG( "albumID" );
-
-	s = e + strspn(e, "\t /");
-	num = strtol(s, &e, 10 );
-	if( s==e || *e )
-		CMD_FAIL_BADARG( "trackNr" );
-
-	if( 0 > (id = duc_cmd_track2id( con, albumid, num))){
+	// TODO: idlist
+	ARG_NEED("trackID");
+	if( 0 > (id = val_track( con, line, NULL))){
 		dmsg_msg( "track not found" );
 		return -ENOENT;
 	}
 
-	dmsg_msg( "track %s has ID: %d\n", dfmt_trackid(albumid, num), id );
+	dmsg_msg( "track has ID: %d\n", id );
 	CMD_OK;
 }
 
@@ -938,7 +607,7 @@ CMD(cmd_trackget)
 	// TODO: idlist
 	ARG_NEED("trackID");
 
-	if( 0 > (num = track2id( con, line, NULL )))
+	if( 0 > (num = val_track( con, line, NULL )))
 		CMD_FAIL_BADARG( "trackID" );
 
 	if( NULL == ( t = duc_cmd_trackget(con, num )))
@@ -1122,9 +791,8 @@ CMD(cmd_queueadd)
 
 	ARG_NEED("trackIDs");
 
-	if( NULL == (idl = idl_new(NULL)))
+	if( NULL == (idl = val_tracklist(con, line, &end )))
 		CMD_FAIL;
-	idl_addtracklist(idl, con, line, &end );
 	if( *end ){
 		idl_done(idl);
 		CMD_FAIL_BADARG("trackIDs");
@@ -1150,9 +818,8 @@ CMD(cmd_queuedel)
 
 	ARG_NEED("queueIDs");
 
-	if( NULL == (idl = idl_new(NULL)))
+	if( NULL == (idl = val_queuelist(con, line, &end)))
 		CMD_FAIL;
-	idl_addlist( idl, line, &end );
 	if( *end ){
 		idl_done(idl);
 		CMD_FAIL_BADARG("queueIDs");
@@ -1244,7 +911,7 @@ CMD(cmd_historytrack)
 	duc_it_history *it;
 	char *end;
 
-	if( 0 > (id = track2id(con, line, &end)))
+	if( 0 > (id = val_track(con, line, &end)))
 		CMD_FAIL_BADARG("trackID");
 
 	if( *end ){
@@ -1287,7 +954,7 @@ CMD(cmd_tagget)
 
 	ARG_NEED("tagID");
 
-	id = tag2id( con, line, &e );
+	id = val_tag( con, line, &e );
 	if( *e )
 		CMD_FAIL_BADARG("tagID");
 
@@ -1333,7 +1000,7 @@ CMD(cmd_tagsetname)
 
 
 	ARG_NEED("tagID");
-	id = tag2id( con, line, &e );
+	id = val_tag( con, line, &e );
 	if( line == e )
 		CMD_FAIL_BADARG("tagID");
 
@@ -1351,7 +1018,7 @@ CMD(cmd_tagsetdesc)
 
 
 	ARG_NEED("tagID");
-	id = tag2id( con, line, &e );
+	id = val_tag( con, line, &e );
 	if( line == e )
 		CMD_FAIL_BADARG("tagID");
 
@@ -1368,7 +1035,7 @@ CMD(cmd_tagdel)
 	char *e;
 
 	ARG_NEED("tagID");
-	id = tag2id( con, line, &e );
+	id = val_tag( con, line, &e );
 	if( *e )
 		CMD_FAIL_BADARG("tagID");
 
@@ -1386,7 +1053,7 @@ CMD(cmd_tracktaglist)
 
 	// TODO: idlist
 	ARG_NEED("trackID");
-	id = track2id( con, line, &e );
+	id = val_track( con, line, &e );
 	if( *e )
 		CMD_FAIL_BADARG("trackID");
 
@@ -1405,12 +1072,12 @@ CMD(cmd_tracktagged)
 	int r;
 
 	ARG_NEED("trackID");
-	trid = track2id( con, line, &e );
+	trid = val_track( con, line, &e );
 	if( e == line )
 		CMD_FAIL_BADARG("trackID");
 
 	s = e += strspn( e, "\t " );
-	tid = tag2id(con, s, &e );
+	tid = val_tag(con, s, &e );
 	if( *e )
 		CMD_FAIL_BADARG("tagID");
 
@@ -1428,13 +1095,13 @@ CMD(cmd_tracktagset)
 
 	// TODO: idlist1
 	ARG_NEED("trackID");
-	trid = track2id( con, line, &e );
+	trid = val_track( con, line, &e );
 	if( e == line )
 		CMD_FAIL_BADARG("trackID");
 
 	// TODO: idlist
 	s = e += strspn( e, "\t " );
-	tid = tag2id(con, s, &e );
+	tid = val_tag(con, s, &e );
 	if( *e )
 		CMD_FAIL_BADARG("tagID");
 
@@ -1452,13 +1119,13 @@ CMD(cmd_tracktagdel)
 
 	// TODO: idlist1
 	ARG_NEED("trackID");
-	trid = track2id( con, line, &e );
+	trid = val_track( con, line, &e );
 	if( e == line )
 		CMD_FAIL_BADARG("trackID");
 
 	// TODO: idlist
 	s = e += strspn( e, "\t " );
-	tid = tag2id(con, s, &e );
+	tid = val_tag(con, s, &e );
 	if( *e )
 		CMD_FAIL_BADARG("tagID");
 
@@ -1620,7 +1287,7 @@ CMD(cmd_sfilterget)
 
 	ARG_NEED("sfilterID");
 
-	id = sfilter2id( con, line, &e );
+	id = val_sfilter( con, line, &e );
 	if( *e )
 		CMD_FAIL_BADARG("sfilterID");
 
@@ -1666,7 +1333,7 @@ CMD(cmd_sfiltersetname)
 
 
 	ARG_NEED("sfilterID");
-	id = sfilter2id( con, line, &e );
+	id = val_sfilter( con, line, &e );
 	if( line == e )
 		CMD_FAIL_BADARG("sfilterID");
 
@@ -1684,7 +1351,7 @@ CMD(cmd_sfiltersetfilter)
 
 
 	ARG_NEED("sfilterID");
-	id = sfilter2id( con, line, &e );
+	id = val_sfilter( con, line, &e );
 	if( line == e )
 		CMD_FAIL_BADARG("sfilterID");
 
@@ -1701,7 +1368,7 @@ CMD(cmd_sfilterdel)
 	char *e;
 
 	ARG_NEED("sfilterID");
-	id = sfilter2id( con, line, &e );
+	id = val_sfilter( con, line, &e );
 	if( *e )
 		CMD_FAIL_BADARG("sfilterID");
 
@@ -1718,7 +1385,7 @@ CMD(cmd_sfilterload)
 	duc_sfilter *t;
 
 	ARG_NEED("sfilterID");
-	id = sfilter2id( con, line, &e );
+	id = val_sfilter( con, line, &e );
 	if( *e )
 		CMD_FAIL_BADARG("sfilterID");
 
@@ -1741,7 +1408,7 @@ CMD(cmd_sfiltersave)
 	char *f;
 
 	ARG_NEED("sfilterID");
-	id = sfilter2id( con, line, &e );
+	id = val_sfilter( con, line, &e );
 	if( *e )
 		CMD_FAIL_BADARG("sfilterID");
 
@@ -1761,6 +1428,7 @@ CMD(cmd_sfiltersave)
  * command list
  */
 
+typedef int (*t_action)( dudlc *dudl, char *line );
 
 typedef struct _t_command {
 	char *name;
@@ -1927,6 +1595,7 @@ CGEN(cgen_top)
 	return NULL;
 }
 
+/* find proper completer function for current context */
 duc_cgen duc_cgen_find( dudlc *con, const char *line, unsigned int pos )
 {
 	int len;
