@@ -13,7 +13,7 @@ static duc_tag *_duc_tag_parse( char *line, char **end )
 
 	e = s = line;
 
-	if( NULL == (n = malloc(sizeof(duc_track)))){
+	if( NULL == (n = malloc(sizeof(duc_tag)))){
 		goto clean1;
 	}
 
