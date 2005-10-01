@@ -24,7 +24,8 @@ libdudlc_la_SOURCES= album.c \
 	sock.c \
 	tag.c \
 	track.c \
-	user.c 
+	user.c \
+	sfilter.c 
 
 commands.txt:
 	grep duc_cmd_ dudlc/*.h  | \

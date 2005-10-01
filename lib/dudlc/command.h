@@ -16,6 +16,7 @@
 #include "history.h"
 #include "help.h"
 #include "tag.h"
+#include "sfilter.h"
 
 
 #endif

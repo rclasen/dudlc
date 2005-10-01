@@ -116,5 +116,17 @@ void dmsg_dump_artists( duc_it_artist *it )
 	}
 }
 
+void dmsg_dump_sfilters( duc_it_sfilter *it )
+{
+	duc_sfilter *t;
+	char buf[BUFLENTAG];
+
+	dmsg_msg( "%s\n\n", dfmt_sfilterhead(buf, BUFLENTAG));
+	for( t = duc_it_sfilter_cur(it); t; t = duc_it_sfilter_next(it)){
+		dmsg_msg( "%s\n", dfmt_sfilter(buf,BUFLENTAG,t));
+		duc_sfilter_free(t);
+	}
+}
+
 
 

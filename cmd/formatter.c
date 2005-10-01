@@ -233,4 +233,20 @@ const char *dfmt_artist( char *buf, unsigned int len, duc_artist *q )
 	return buf;
 }
 
+/************************************************************
+ * sfilter
+ */
+
+const char *dfmt_sfilterhead( char *buf, unsigned int len )
+{
+	snprintf( buf, len, "%4.4s %-20s %s", "id", "name", "sfilter" );
+	return buf;
+}
+
+const char *dfmt_sfilter( char *buf, unsigned int len, duc_sfilter *q )
+{
+	snprintf( buf, len, "%4d %-20s %s", q->id, q->name, q->filter );
+	return buf;
+}
+
 

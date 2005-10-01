@@ -139,6 +139,38 @@ static int right2id( dudlc *con, char *in, char **end )
 }
 
 /*
+ * sfilter := <sfiltername>|<id>
+ */
+static int sfilter2id( dudlc *con, char *in, char **end )
+{
+	int id;
+	char *e;
+	char sfilter[10];
+	int len;
+
+	if( end ) *end = in;
+
+	id = strtol( in, &e, 10 );
+	if( in != e ){
+		if( end ) *end = e;
+		return id;
+	}
+
+	len = strcspn(in, "\t ");
+	if( len >= 10  )
+		return -1;
+
+	e = in +len;
+	strncpy( sfilter, in, len );
+	if( 0 > ( id = duc_cmd_sfilter2id( con, sfilter ))){
+		return -1;
+	}
+
+	if( end ) *end = e;
+	return id;
+}
+
+/*
  * list := <item>[,...]
  * item := <parsed by t_convert function>
  */
@@ -1108,7 +1140,7 @@ CMD(cmd_queueadd)
 }
 
 
-// TODO: unqueue by user, client, album, track
+// TODO: unqueue by user, client, album, track, filter
 CMD(cmd_queuedel)
 {
 	int rv = 0;
@@ -1563,6 +1595,169 @@ CMD(cmd_artistsearch)
 // TODO: CMD(cmd_artistsetname)
 
 /************************************************************
+ * commands: sfilter
+ */
+
+// TODO: remove sfilter2id cmd
+CMD(cmd_sfilter2id)
+{
+	int id;
+
+	ARG_NEED("sfilterName");
+	if( 0 > (id = duc_cmd_sfilter2id(con, line)))
+		CMD_FAIL;
+
+	dmsg_msg( "sfilter has ID %d\n", id );
+	CMD_OK;
+}
+
+CMD(cmd_sfilterget)
+{
+	int id;
+	char *e;
+	duc_sfilter *t;
+	char buf[BUFLENTAG];
+
+	ARG_NEED("sfilterID");
+
+	id = sfilter2id( con, line, &e );
+	if( *e )
+		CMD_FAIL_BADARG("sfilterID");
+
+	if( NULL == (t= duc_cmd_sfilterget(con, id)))
+		CMD_FAIL;
+
+	dmsg_msg( "%s\n\n", dfmt_sfilterhead(buf,BUFLENTAG));
+	dmsg_msg( "%s\n", dfmt_sfilter(buf,BUFLENTAG, t));
+	duc_sfilter_free(t);
+	CMD_OK;
+}
+
+CMD(cmd_sfilterlist)
+{
+	duc_it_sfilter *it;
+
+	ARG_NONE;
+
+	if( NULL == (it = duc_cmd_sfilterlist( con )))
+		CMD_FAIL;
+
+	dmsg_dump_sfilters( it );
+	duc_it_sfilter_done( it );
+	CMD_OK;
+}
+
+CMD(cmd_sfilteradd)
+{
+	int id;
+
+	ARG_NEED( "sfilterName" );
+	if( 0 > (id = duc_cmd_sfilteradd( con, line )))
+		CMD_FAIL;
+
+	dmsg_msg( "added with id %d\n", id );
+	CMD_OK;
+}
+
+CMD(cmd_sfiltersetname)
+{
+	char *e;
+	int id;
+
+
+	ARG_NEED("sfilterID");
+	id = sfilter2id( con, line, &e );
+	if( line == e )
+		CMD_FAIL_BADARG("sfilterID");
+
+	e += strspn(e, "\t ");
+	if( duc_cmd_sfiltersetname(con, id, e))
+		CMD_FAIL;
+
+	CMD_OK;
+}
+
+CMD(cmd_sfiltersetfilter)
+{
+	char *e;
+	int id;
+
+
+	ARG_NEED("sfilterID");
+	id = sfilter2id( con, line, &e );
+	if( line == e )
+		CMD_FAIL_BADARG("sfilterID");
+
+	e += strspn(e, "\t ");
+	if( duc_cmd_sfiltersetfilter(con, id, e))
+		CMD_FAIL;
+
+	CMD_OK;
+}
+
+CMD(cmd_sfilterdel)
+{
+	int id;
+	char *e;
+
+	ARG_NEED("sfilterID");
+	id = sfilter2id( con, line, &e );
+	if( *e )
+		CMD_FAIL_BADARG("sfilterID");
+
+	if( duc_cmd_sfilterdel(con, id))
+		CMD_FAIL;
+
+	CMD_OK;
+}
+
+CMD(cmd_sfilterload)
+{
+	int id;
+	char *e;
+	duc_sfilter *t;
+
+	ARG_NEED("sfilterID");
+	id = sfilter2id( con, line, &e );
+	if( *e )
+		CMD_FAIL_BADARG("sfilterID");
+
+	if( NULL == (t= duc_cmd_sfilterget(con, id)))
+		CMD_FAIL;
+
+	if( duc_cmd_filterset(con, t->filter)){
+		duc_sfilter_free(t);
+		CMD_FAIL;
+	}
+	duc_sfilter_free(t);
+	
+	CMD_OK;
+}
+
+CMD(cmd_sfiltersave)
+{
+	int id;
+	char *e;
+	char *f;
+
+	ARG_NEED("sfilterID");
+	id = sfilter2id( con, line, &e );
+	if( *e )
+		CMD_FAIL_BADARG("sfilterID");
+
+	if( NULL == (f = duc_cmd_filter( con )))
+		CMD_FAIL;
+
+	if( duc_cmd_sfiltersetfilter(con, id, f)){
+		free(f);
+		CMD_FAIL;
+	}
+	free(f);
+
+	CMD_OK;
+}
+
+/************************************************************
  * command list
  */
 
@@ -1654,6 +1849,17 @@ static t_command commands[] = {
 	{ "artistlist", NULL, cmd_artistlist },
 	{ "artistsearch", NULL, cmd_artistsearch },
 	//{ "artistsetname", NULL, cmd_artistsetname },
+
+	{ "sfilter2id", NULL, cmd_sfilter2id },
+	{ "sfilterget", NULL, cmd_sfilterget },
+	{ "sfilterlist", NULL, cmd_sfilterlist },
+	{ "sfilteradd", NULL, cmd_sfilteradd },
+	{ "sfiltersetname", NULL, cmd_sfiltersetname },
+	{ "sfiltersetfilter", NULL, cmd_sfiltersetfilter },
+	{ "sfilterdel", NULL, cmd_sfilterdel },
+
+	{ "sfiltersave", NULL, cmd_sfiltersave },
+	{ "sfilterload", NULL, cmd_sfilterload },
 
 	{ NULL, NULL, NULL }
 };
