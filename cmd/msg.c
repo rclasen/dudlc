@@ -18,6 +18,90 @@ int dmsg_msg( const char *fmt, ... )
 	return (*dmsg_msg_cb)(fmt, ap );
 }
 
+
+
+
+void dmsg_dump_client( duc_client *c )
+{
+	char buf[BUFLENCLIENT];
+
+	dmsg_msg( "%s\n\n", dfmt_clienthead(buf, BUFLENCLIENT));
+	dmsg_msg( "%s\n", dfmt_client(buf, BUFLENCLIENT, c ));
+}
+
+void dmsg_dump_track( duc_track *t )
+{
+	char buf[BUFLENTRACK];
+
+	dmsg_msg( "%s\n\n", dfmt_trackhead(buf, BUFLENTRACK));
+	dmsg_msg( "%s\n", dfmt_track(buf,BUFLENTRACK,t));
+}
+
+void dmsg_dump_queue( duc_queue *t )
+{
+	char buf[BUFLENQUEUE];
+
+	dmsg_msg( "%s\n\n", dfmt_queuehead(buf, BUFLENQUEUE));
+	dmsg_msg( "%s\n", dfmt_queue(buf,BUFLENQUEUE,t));
+}
+
+
+void dmsg_dump_history( duc_history *t )
+{
+	char buf[BUFLENQUEUE];
+
+	dmsg_msg( "%s\n\n", dfmt_historyhead(buf, BUFLENQUEUE));
+	dmsg_msg( "%s\n", dfmt_history(buf,BUFLENQUEUE,t));
+}
+
+
+void dmsg_dump_tag( duc_tag *t )
+{
+	char buf[BUFLENTAG];
+
+	dmsg_msg( "%s\n\n", dfmt_taghead(buf, BUFLENTAG));
+	dmsg_msg( "%s\n", dfmt_tag(buf,BUFLENTAG,t));
+}
+
+void dmsg_dump_user( duc_user *t )
+{
+	char buf[BUFLENUSER];
+
+	dmsg_msg( "%s\n\n", dfmt_userhead(buf, BUFLENUSER));
+	dmsg_msg( "%s\n", dfmt_user(buf,BUFLENUSER,t));
+}
+
+void dmsg_dump_album( duc_album *t )
+{
+	char buf[BUFLENALBUM];
+
+	dmsg_msg( "%s\n\n", dfmt_albumhead(buf, BUFLENALBUM));
+	dmsg_msg( "%s\n", dfmt_album(buf,BUFLENALBUM,t));
+}
+
+void dmsg_dump_artist( duc_artist *t )
+{
+	char buf[BUFLENARTIST];
+
+	dmsg_msg( "%s\n\n", dfmt_artisthead(buf, BUFLENARTIST));
+	dmsg_msg( "%s\n", dfmt_artist(buf,BUFLENARTIST,t));
+}
+
+void dmsg_dump_sfilter( duc_sfilter *t )
+{
+	char buf[BUFLENTAG];
+
+	dmsg_msg( "%s\n\n", dfmt_sfilterhead(buf, BUFLENTAG));
+	dmsg_msg( "%s\n", dfmt_sfilter(buf,BUFLENTAG,t));
+}
+
+
+
+
+
+
+
+
 void dmsg_dump_clients( duc_it_client *it )
 {
 	char buf[BUFLENCLIENT];
@@ -42,7 +126,7 @@ void dmsg_dump_tracks( duc_it_track *it )
 	}
 }
 
-void dmsg_dump_queue( duc_it_queue *it )
+void dmsg_dump_queues( duc_it_queue *it )
 {
 	duc_queue *t;
 	char buf[BUFLENQUEUE];
@@ -55,7 +139,7 @@ void dmsg_dump_queue( duc_it_queue *it )
 }
 
 
-void dmsg_dump_history( duc_it_history *it )
+void dmsg_dump_historys( duc_it_history *it )
 {
 	duc_history *t;
 	char buf[BUFLENQUEUE];

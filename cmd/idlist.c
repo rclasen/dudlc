@@ -104,7 +104,7 @@ int idl_cur( t_idlist *idl )
 {
 	if( idl->cur < idl->num )
 		return idl->ids[idl->cur];
-	return 0;
+	return -1;
 }
 
 int idl_begin( t_idlist *idl )

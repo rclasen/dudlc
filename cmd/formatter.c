@@ -49,13 +49,13 @@ static size_t isodate( char *s, size_t max, time_t time )
  * client
  */
 
-const char *dfmt_clienthead( char *buf, unsigned int len )
+char *dfmt_clienthead( char *buf, unsigned int len )
 {
 	snprintf( buf, len, "%4.4s %-10s %-15s", "id", "user", "address" );
 	return buf;
 }
 
-const char *dfmt_client( char *buf, unsigned int len, duc_client *c )
+char *dfmt_client( char *buf, unsigned int len, duc_client *c )
 {
 	snprintf( buf, len, "%4d %-10s %-15s", c->id, c->user->name, c->addr );
 	return buf;
@@ -65,7 +65,7 @@ const char *dfmt_client( char *buf, unsigned int len, duc_client *c )
  * track
  */
 
-const char *dfmt_trackid( int albumid, int nr )
+char *dfmt_trackid( int albumid, int nr )
 {
 	static char buf[40];
 
@@ -73,7 +73,7 @@ const char *dfmt_trackid( int albumid, int nr )
 	return buf;
 }
 
-const char *dfmt_trackhead( char *buf, unsigned int len )
+char *dfmt_trackhead( char *buf, unsigned int len )
 {
 	snprintf( buf, len, "%7.7s %-18.18s %-5.5s %-16.16s %-29.29s",
 			"alb/nr", "album", "dur", "artist", "title" );
@@ -82,7 +82,7 @@ const char *dfmt_trackhead( char *buf, unsigned int len )
 
 #define BF	"\x1B[1m"
 #define NF	"\x1B[0m"
-const char *dfmt_track( char *buf, unsigned int len, duc_track *t )
+char *dfmt_track( char *buf, unsigned int len, duc_track *t )
 {
 	char tim[10];
 
@@ -104,7 +104,7 @@ const char *dfmt_track( char *buf, unsigned int len, duc_track *t )
  * queue
  */
 
-const char *dfmt_queuehead( char *buf, unsigned int len )
+char *dfmt_queuehead( char *buf, unsigned int len )
 {
 	unsigned int l;
 
@@ -116,7 +116,7 @@ const char *dfmt_queuehead( char *buf, unsigned int len )
 	return buf;
 }
 
-const char *dfmt_queue( char *buf, unsigned int len, duc_queue *q )
+char *dfmt_queue( char *buf, unsigned int len, duc_queue *q )
 {
 	unsigned int l;
 
@@ -139,7 +139,7 @@ const char *dfmt_queue( char *buf, unsigned int len, duc_queue *q )
  * history
  */
 
-const char *dfmt_historyhead( char *buf, unsigned int len )
+char *dfmt_historyhead( char *buf, unsigned int len )
 {
 	unsigned int l;
 
@@ -151,7 +151,7 @@ const char *dfmt_historyhead( char *buf, unsigned int len )
 	return buf;
 }
 
-const char *dfmt_history( char *buf, unsigned int len, duc_history *q )
+char *dfmt_history( char *buf, unsigned int len, duc_history *q )
 {
 	unsigned int l;
 
@@ -171,13 +171,13 @@ const char *dfmt_history( char *buf, unsigned int len, duc_history *q )
  * tag
  */
 
-const char *dfmt_taghead( char *buf, unsigned int len )
+char *dfmt_taghead( char *buf, unsigned int len )
 {
 	snprintf( buf, len, "%4.4s %-20s %-20s", "id", "name", "desc" );
 	return buf;
 }
 
-const char *dfmt_tag( char *buf, unsigned int len, duc_tag *q )
+char *dfmt_tag( char *buf, unsigned int len, duc_tag *q )
 {
 	snprintf( buf, len, "%4d %-20s %-20s", q->id, q->name, q->desc );
 	return buf;
@@ -187,13 +187,13 @@ const char *dfmt_tag( char *buf, unsigned int len, duc_tag *q )
  * user
  */
 
-const char *dfmt_userhead( char *buf, unsigned int len )
+char *dfmt_userhead( char *buf, unsigned int len )
 {
 	snprintf( buf, len, "%4.4s %-20s %s", "id", "name", "right" );
 	return buf;
 }
 
-const char *dfmt_user( char *buf, unsigned int len, duc_user *q )
+char *dfmt_user( char *buf, unsigned int len, duc_user *q )
 {
 	snprintf( buf, len, "%4d %-20s %2d", q->id, q->name, q->right );
 	return buf;
@@ -204,13 +204,13 @@ const char *dfmt_user( char *buf, unsigned int len, duc_user *q )
  * album
  */
 
-const char *dfmt_albumhead( char *buf, unsigned int len )
+char *dfmt_albumhead( char *buf, unsigned int len )
 {
 	snprintf( buf, len, "%4.4s %-25s %-20s", "id", "artist", "album" );
 	return buf;
 }
 
-const char *dfmt_album( char *buf, unsigned int len, duc_album *q )
+char *dfmt_album( char *buf, unsigned int len, duc_album *q )
 {
 	snprintf( buf, len, "%4d %-25s %-20s", q->id, q->artist->artist, q->album);
 	return buf;
@@ -221,13 +221,13 @@ const char *dfmt_album( char *buf, unsigned int len, duc_album *q )
  * artist
  */
 
-const char *dfmt_artisthead( char *buf, unsigned int len )
+char *dfmt_artisthead( char *buf, unsigned int len )
 {
 	snprintf( buf, len, "%4.4s %-20s", "id", "artist" );
 	return buf;
 }
 
-const char *dfmt_artist( char *buf, unsigned int len, duc_artist *q )
+char *dfmt_artist( char *buf, unsigned int len, duc_artist *q )
 {
 	snprintf( buf, len, "%4d %-20s", q->id, q->artist);
 	return buf;
@@ -237,13 +237,13 @@ const char *dfmt_artist( char *buf, unsigned int len, duc_artist *q )
  * sfilter
  */
 
-const char *dfmt_sfilterhead( char *buf, unsigned int len )
+char *dfmt_sfilterhead( char *buf, unsigned int len )
 {
 	snprintf( buf, len, "%4.4s %-20s %s", "id", "name", "sfilter" );
 	return buf;
 }
 
-const char *dfmt_sfilter( char *buf, unsigned int len, duc_sfilter *q )
+char *dfmt_sfilter( char *buf, unsigned int len, duc_sfilter *q )
 {
 	snprintf( buf, len, "%4d %-20s %s", q->id, q->name, q->filter );
 	return buf;
