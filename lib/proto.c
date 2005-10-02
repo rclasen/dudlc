@@ -82,7 +82,7 @@ int _duc_cmd_succ( dudlc *c, const char *fmt, ... )
 	if( *_duc_rcode(c) == '2' || *_duc_rcode(c) == '3' )
 		return 0;
 
-	return 1;
+	return -1;
 }
 
 char *_duc_cmd_string( dudlc *c, const char *fmt, ... )

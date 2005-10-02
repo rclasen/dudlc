@@ -72,8 +72,6 @@ duc_it_album *duc_cmd_albumsartist( dudlc *c, int artistid )
 			"albumsartist %d", artistid );
 }
 
-// TODO: duc_cmd_albumsearchf
-
 int duc_cmd_albumsetname( dudlc *c, int id, const char *name )
 {
 	return _duc_cmd_succ(c, "albumsetname %d %s", id, name );
