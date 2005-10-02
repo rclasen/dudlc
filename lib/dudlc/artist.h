@@ -23,6 +23,7 @@ duc_it_artist *duc_cmd_artistlist( dudlc *c );
 duc_it_artist *duc_cmd_artistsearch( dudlc *c, const char *substr );
 
 int duc_cmd_artistsetname( dudlc *c, int id, const char *name );
+int duc_cmd_artistmerge( dudlc *c, int from, int to);
 int duc_cmd_artistadd( dudlc *c, const char *name );
 int duc_cmd_artistdel( dudlc *c, int id );
 
