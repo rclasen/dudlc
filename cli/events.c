@@ -8,11 +8,13 @@
 duc_events events;
 
 
+#if 0
 static void cb_bcast( dudlc *c, const char *line )
 {
-	tty_msg( "%s\n", line );
+	tty_msg( "unhandled bcast: %s\n", line );
 	(void)c;
 }
+#endif
 
 /************************************************************
  * dis-/connect
@@ -36,6 +38,7 @@ static void cb_conn( dudlc *c )
  * user/clients
  */
 
+#if 0
 static void cb_login( dudlc *c, duc_client *u )
 {
 	char buf[BUFLENCLIENT];
@@ -51,6 +54,7 @@ static void cb_logout( dudlc *c, duc_client *u )
 	tty_msg( "logout: %s\n", dfmt_client(buf,BUFLENTRACK, u));
 	(void)c;
 }
+#endif
 
 static void cb_kicked( dudlc *c )
 {
@@ -98,16 +102,19 @@ static void cb_random( dudlc *c, int r )
  * random/filter
  */
 
+#if 0
 static void cb_filter( dudlc *c, const char *f )
 {
 	tty_msg( "new filter: %s\n", f );
 	(void)c;
 }
+#endif
 
 /************************************************************
  * queue
  */
 
+#if 0
 static void cb_queueadd( dudlc *c, duc_queue *q )
 {
 	char buf[BUFLENQUEUE];
@@ -122,6 +129,7 @@ static void cb_queuedel( dudlc *c, duc_queue *q )
 	tty_msg( "unqueued: %s\n", dfmt_queue(buf, BUFLENQUEUE, q ));
 	(void)c;
 }
+#endif
 
 static void cb_queueclear( dudlc *c )
 {
@@ -143,6 +151,7 @@ static void cb_sleep( dudlc *c, int del )
  * tag
  */
 
+#if 0
 static void cb_tagchange( dudlc *c, duc_tag *q )
 {
 	char buf[BUFLENTAG];
@@ -158,7 +167,7 @@ static void cb_tagdel( dudlc *c, duc_tag *q )
 	tty_msg( "deleted tag: %s\n", dfmt_tag(buf, BUFLENTAG, q ));
 	(void)c;
 }
-
+#endif
 
 /************************************************************
  * init
@@ -169,13 +178,13 @@ void events_init( dudlc *c )
 	memset(&events, 0, sizeof(events));
 	duc_setevents( c, &events );
 
-	events.bcast = cb_bcast;
+	//events.bcast = cb_bcast;
 
 	events.connect = cb_conn;
 	events.disconnect = cb_disc;
 
-	events.login = cb_login;
-	events.logout = cb_logout;
+	//events.login = cb_login;
+	//events.logout = cb_logout;
 	events.kicked = cb_kicked;
 
 	events.nexttrack = cb_nexttrack;
@@ -184,17 +193,17 @@ void events_init( dudlc *c )
 	events.resumed = cb_resumed;
 	events.random = cb_random;
 
-	events.filter = cb_filter;
+	//events.filter = cb_filter;
 
 	events.queuefetch = NULL;
-	events.queueadd = cb_queueadd;
-	events.queuedel = cb_queuedel;
+	//events.queueadd = cb_queueadd;
+	//events.queuedel = cb_queuedel;
 	events.queueclear = cb_queueclear;
 
 	events.sleep = cb_sleep;
 
-	events.tagchange = cb_tagchange;
-	events.tagdel = cb_tagdel;
+	//events.tagchange = cb_tagchange;
+	//events.tagdel = cb_tagdel;
 }
 
 
