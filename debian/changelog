@@ -1,3 +1,14 @@
+dudlc (0.1.5) unstable; urgency=low
+
+  * disabled some broadcasts for cli client - became too noisy
+  * added proper cmd parser for bool and rights
+  * report errors if idlist commands failed
+  * minor bugfixes
+  * renamed tracktagset -> tracktagadd
+  * renamed randomtop -> filtertop
+
+ -- Rainer Clasen <bj@zuto.de>  Mon, 10 Oct 2005 18:49:49 +0200
+
 dudlc (0.1.4) unstable; urgency=low
 
   * rewrote command parsing to offer more help and simplify lists
