@@ -4,6 +4,14 @@
 #include <dudlc.h>
 #include "idlist.h"
 
+typedef struct _t_enum {
+	char *text;
+	int val;
+} t_enum;
+
+extern t_enum bools[];
+extern t_enum rights[];
+
 int val_bool( dudlc *con, char *in, char **end );
 int val_uint( dudlc *con, char *in, char **end );
 char *val_string( dudlc *con, char *in, char **end );

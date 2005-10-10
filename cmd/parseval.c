@@ -74,44 +74,59 @@ static int idl_addalbum( t_idlist *idl, dudlc *con, int album, int first, int la
 	return added;
 }
 
-int val_bool( dudlc *con, char *in, char **end ) // TODO**
-{
-	(void)con;
-	(void)end;
+t_enum bools[] = {
+	{ "on", 	1 },
+	{ "off",	0 },
+	{ "true",	1 },
+	{ "false",	0 },
+	{ "yes",	1 },
+	{ "no",		0 },
+	{ "1",		1 },
+	{ "0",		0 },
+	{ NULL, 0 },
+};
 
-	if( 0 == strcasecmp( in, "on" ) ){
-		return 1;
-	} 
-	
-	if( 0 == strcasecmp( in, "off" )){
-		return 0;
-	} 
-	
-	if( 0 == strcasecmp( in, "true" )){
-		return 1;
-	} 
-	
-	if( 0 == strcasecmp( in, "false" )){
-		return 0;
-	} 
-	
-	if( 0 == strcasecmp( in , "yes" )){
-		return 1;
-	} 
-	
-	if( 0 == strcasecmp( in , "no" )){
-		return 0;
-	} 
-	
-	if( 0 == strcmp( in, "1" )){
-		return 1;
-	} 
-	
-	if( 0 == strcmp( in, "0" )){
-		return 0;
-	} 
+t_enum rights[] = {
+	{ "any",	0 },
+	{ "quest",	1 },
+	{ "user",	2 },
+	{ "admin",	3 },
+	{ "master",	4 },
+	{ NULL, 0 },
+};
+
+static int val_enum( t_enum *lst, char *in, char **end )
+{
+	t_enum *it;
+
+	if( end ) *end = in;
+
+	/* TODO: accept numeric values, too */
+	for( it = lst; it && it->text; it++ ){
+		int len;
+
+		len = strlen(it->text);
+		if( 0 == strncasecmp(it->text, in, len)){
+			if( end ) *end = in+len;
+			return it->val;
+		}
+	}
 
 	return -1;
+}
+
+int val_bool( dudlc *con, char *in, char **end )
+{
+	(void)con;
+
+	return val_enum( bools, in, end );
+}
+
+int val_right( dudlc *con, char *in, char **end )
+{
+	(void)con;
+
+	return val_enum( rights, in, end );
 }
 
 int val_uint( dudlc *con, char *in, char **end )
@@ -177,11 +192,6 @@ t_idlist *val_userlist( dudlc *con, char *in, char **end )
 	idl_addclist( idl, in, end, con, val_user );
 
 	return idl;
-}
-
-int val_right( dudlc *con, char *in, char **end ) // TODO
-{
-	return val_uint( con, in, end );
 }
 
 /* 
@@ -298,7 +308,7 @@ t_idlist *val_tracklist( dudlc *con, char *in, char **end)
 
 			}
 
-		} else if( *tok == 0 || *tok == ',' ){
+		} else {
 			/* no / found */
 			if( id1 < 0 ){
 				duc_track *t;
@@ -311,10 +321,6 @@ t_idlist *val_tracklist( dudlc *con, char *in, char **end)
 				duc_track_free(t);
 			}
 			idl_add(idl,id1);
-
-		} else {
-			idl_done(idl);
-			return 0;
 		}
 
 		if( *tok != ',' )
