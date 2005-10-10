@@ -100,9 +100,9 @@ int duc_cmd_tracktagged( dudlc *c, int tid, int id )
 	return _duc_cmd_int(c, "tracktagged %d %d", tid, id );
 }
 
-int duc_cmd_tracktagset( dudlc *c, int tid, int id )
+int duc_cmd_tracktagadd( dudlc *c, int tid, int id )
 {
-	return _duc_cmd_succ( c, "tracktagset %d %d", tid, id );
+	return _duc_cmd_succ( c, "tracktagadd %d %d", tid, id );
 }
 
 int duc_cmd_tracktagdel( dudlc *c, int tid, int id )

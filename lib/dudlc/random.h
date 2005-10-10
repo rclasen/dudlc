@@ -8,7 +8,7 @@ char *duc_cmd_filter( dudlc *c );
 int duc_cmd_filterset( dudlc *c, const char *filter );
 int duc_cmd_filterstat( dudlc *c );
 
-duc_it_track *duc_cmd_randomtop( dudlc *c, int num );
+duc_it_track *duc_cmd_filtertop( dudlc *c, int num );
 
 void _duc_bcast_random( dudlc *c, const char *line );
 

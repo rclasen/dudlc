@@ -6,11 +6,7 @@ cli: readline handling is clumsy
 
 cmd: uses hardcoded terminal control codes for bold output
 
-cli: put nexttrack bcast in current line, opening a new one
-
-lib: make all functions accept lists of track/artist/whatever IDs
-
-cli: parse lists and ranges of tracks/artist/whatever
+cli: put bcast in current line, opening a new one
 
 implement all lib commands
 
@@ -18,6 +14,8 @@ implement all cli commands
 
 cache layer for artists, albums, tags, user
 
-make completion list generation more modular:
- - only return what shall be completed
- - provide a way to get a list of completions for this
+GTK client
+
+ncurses client (extra window for current track/status)
+
+method to find command mismatches server, lib, cmd

@@ -29,7 +29,7 @@ int duc_cmd_tagdel( dudlc *c, int id );
 duc_it_tag *duc_cmd_tracktaglist( dudlc *c, int tid );
 int duc_cmd_tracktagged( dudlc *c, int tid, int id );
 
-int duc_cmd_tracktagset( dudlc *c, int tid, int id );
+int duc_cmd_tracktagadd( dudlc *c, int tid, int id );
 int duc_cmd_tracktagdel( dudlc *c, int tid, int id );
 
 void _duc_bcast_tag( dudlc *c, char *line );

@@ -25,6 +25,7 @@ static int idl_iterate( t_idlist *idl, t_idl_itfunc func, dudlc *dudl, void *dat
 			if( 0 > duc_fd(dudl) ){
 				return -1;
 			}
+			dmsg_msg("id=%d failed: %s\n", id, duc_rmsg(dudl));
 		}
 	}
 
@@ -475,7 +476,7 @@ CMD(c_filterstat)
 	if( 0 > (cnt = duc_cmd_filterstat(dudl)))
 		return -1;
 
-	dmsg_msg( "tracks matching filter: %s\n", cnt );
+	dmsg_msg( "tracks matching filter: %d\n", cnt );
 	return 0;
 }
 
@@ -484,7 +485,7 @@ CMD(c_filtertop)
 	int num = (int)argv[0];
 	duc_it_track *it;
 
-	if( NULL == (it = duc_cmd_randomtop( dudl, num )))
+	if( NULL == (it = duc_cmd_filtertop( dudl, num )))
 		return -1;
 
 	dmsg_dump_tracks(it);
@@ -738,22 +739,22 @@ CMD(c_tracktaglist)
 	return idl_iterate((t_idlist *)argv[0], i_tracktaglist, dudl, NULL );
 }
 
-static int i_tracktagsettrack( dudlc *dudl, int id, void *data )
+static int i_tracktagaddtrack( dudlc *dudl, int id, void *data )
 {
 	int trackid = (int)data;
-	return duc_cmd_tracktagset(dudl, trackid, id);
+	return duc_cmd_tracktagadd(dudl, trackid, id);
 }
 
-static int i_tracktagset( dudlc *dudl, int id, void *data )
+static int i_tracktagadd( dudlc *dudl, int id, void *data )
 {
-	return idl_iterate((t_idlist *)data, i_tracktagsettrack, dudl, (void*)id );
+	return idl_iterate((t_idlist *)data, i_tracktagaddtrack, dudl, (void*)id );
 }
 
-CMD(c_tracktagset)
+CMD(c_tracktagadd)
 {
 	t_idlist *tracks = (t_idlist*)argv[0];
 	t_idlist *tags = (t_idlist*)argv[1];
-	return idl_iterate(tracks, i_tracktagset, dudl, tags );
+	return idl_iterate(tracks, i_tracktagadd, dudl, tags );
 }
 
 static int i_tracktagdeltrack( dudlc *dudl, int id, void *data )
@@ -980,6 +981,13 @@ CMD(c_sfiltersetfilter)
 	return duc_cmd_sfiltersetfilter(dudl, id, flt );
 }
 
+CMD(c_sfilterdel)
+{
+	int id = (int)argv[0];
+
+	return duc_cmd_sfilterdel(dudl, id);
+}
+
 CMD(c_sfilterload)
 {
 	int id = (int)argv[0];
@@ -1083,10 +1091,12 @@ t_cmd_arg args_tracknum[]	= { arg_track, arg_onum, arg_end };
 t_cmd_arg args_tagname[]	= { arg_tag, arg_name, arg_end };
 t_cmd_arg args_tagdesc[]	= { arg_tag, arg_string, arg_end };
 t_cmd_arg args_tracktaglist[]	= { arg_tracklist, arg_taglist, arg_end };
-t_cmd_arg args_artistname[]	= { arg_artist, arg_name, arg_end };
+t_cmd_arg args_artistname[]	= { arg_artist, arg_string, arg_end };
 t_cmd_arg args_artistmerge[]	= { arg_artist, arg_artist, arg_end };
 t_cmd_arg args_sfiltername[]	= { arg_sfilter, arg_name, arg_end };
 t_cmd_arg args_sfilterfilter[]	= { arg_sfilter, arg_string, arg_end };
+
+// TODO: shortcuts
 
 t_cmd cmds_top[] = {
 	{ "open",		c_open,			args_none,
@@ -1140,6 +1150,9 @@ t_cmd cmds_top[] = {
 		"is random playback on? (when the queue ist empty)" },
 	{ "randomset",		c_randomset,		args_bool,
 		"set random playback status" },
+	// TODO: c_seek
+	// TODO: c_jump
+	// TODO: c_elapsed
 
 	{ "trackcount",		c_trackcount,		args_none,
 		"show number of available tracks" },
@@ -1147,7 +1160,7 @@ t_cmd cmds_top[] = {
 		"show track details" },
 	{ "tracksearchf",	c_tracksearchf,		args_string,
 		"search for titles matching filter" },
-	// TODO: trackalter
+	// TODO: modify track
 
 	{ "filter",		c_filter,		args_none,
 		"show filter for random that's in use" },
@@ -1204,7 +1217,7 @@ t_cmd cmds_top[] = {
 
 	{ "tracktaglist",	c_tracktaglist,		args_tracklist,
 		"show tags set for titles" },
-	{ "tracktagset",	c_tracktagset,		args_tracktaglist,
+	{ "tracktagadd",	c_tracktagadd,		args_tracktaglist,
 		"add tags to titles" },
 	{ "tracktagdel",	c_tracktagdel,		args_tracktaglist,
 		"remove tags from titles" },
@@ -1217,7 +1230,7 @@ t_cmd cmds_top[] = {
 		"search albums matching substring" },
 	{ "albumsartist",	c_albumsartist,		args_artist,
 		"search albums by artist" },
-	// TODO: albumalter/-add
+	// TODO: modify/add album
 
 	{ "artistlist",		c_artistlist,		args_none,
 		"show all artists" },
@@ -1240,6 +1253,8 @@ t_cmd cmds_top[] = {
 		"rename saved filter" },
 	{ "sfiltersetfilter",	c_sfiltersetfilter,	args_sfilterfilter,
 		"save filter to slot" },
+	{ "sfilterdel",		c_sfilterdel,		args_sfilter,
+		"delete filter slot" },
 	{ "sfilterload",	c_sfilterload,		args_sfilter,
 		"load and set ilter from slot" },
 	{ "sfiltersave",	c_sfiltersave,		args_sfilter,
@@ -1336,6 +1351,7 @@ CMD(c_helpcmd)
 	if( NULL == (usage = cmd_usage(cmd)))
 		return 0;
 
+	// TODO: offer help on argument syntax
 	dmsg_msg( "%s\n\t%s\n", usage, cmd->help );
 	free(usage);
 
@@ -1374,7 +1390,6 @@ static int cmd_parse( dudlc *dudl, t_cmd *cmd, char *line )
 		void **tmp;
 
 		SKIPSPACE(next);
-
 		if( *next == 0 ){
 			missing++;
 			continue;
@@ -1382,7 +1397,7 @@ static int cmd_parse( dudlc *dudl, t_cmd *cmd, char *line )
 
 		data = (*arg->parse)( dudl, next, &end );
 		// TODO respect ->optional
-		if( end == next ){
+		if( end == next || ( *end && !isspace(*end) )){
 			dmsg_msg( "invalid data for argument %s\n", arg->name );
 			goto clean1;
 		}
@@ -1457,7 +1472,7 @@ static duc_cgen cmd_find_genc( dudlc *dudl, t_cmd *cmd, char *line, unsigned int
 
 		data = (*arg->parse)( dudl, next, &end );
 		// TODO respect ->optional
-		if( end == next )
+		if( end == next || ( *end && !isspace(*end) ))
 			goto clean1;
 		next = end;
 
