@@ -63,6 +63,17 @@ int duc_cmd_randomset( dudlc *c, int r )
 }
 
 
+int duc_cmd_elapsed( dudlc *c )
+{
+	return _duc_cmd_int(c, "elapsed");
+}
+
+int duc_cmd_jump( dudlc *c, int r )
+{
+	return _duc_cmd_succ(c, "jump %d", r );
+}
+
+
 static void _duc_bcast_newtrack( dudlc *c, char *line )
 {
 	duc_track *t;
@@ -100,6 +111,11 @@ void _duc_bcast_player( dudlc *c, char *line )
 		case '6': /* random */
 			r = atoi(line+4);
 			_MSC_EVENT(c,random,c,r);
+			break;
+
+		case '7': /* elapsed */
+			r = atoi(line+4);
+			_MSC_EVENT(c,elapsed,c,r);
 			break;
 
 

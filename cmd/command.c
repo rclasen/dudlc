@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <ctype.h>
+#include <time.h>
 
 #include <dudlc.h>
 #include <dudlc/proto.h>
@@ -70,6 +71,7 @@ typedef int(*t_cmd_run)(dudlc *dudl, void **argv );
 
 typedef struct _t_cmd {
 	char *name;
+	char *alias;
 	t_cmd_run run;
 	t_cmd_arg *args;
 	char *help;
@@ -361,7 +363,7 @@ CMD(c_gap)
 	if( 0 > (gap = duc_cmd_gap(dudl)))
 		return -1;
 
-	dmsg_msg( "gap between tracks: %s sec\n", gap );
+	dmsg_msg( "gap between tracks: %d sec\n", gap );
 	return 0;
 }
 
@@ -389,6 +391,31 @@ CMD(c_randomset)
 {
 	int rnd = (int)argv[0];
 	return duc_cmd_randomset(dudl, rnd);
+}
+
+CMD(c_elapsed)
+{
+	time_t pos;
+	struct tm *t;
+	char buf[10];
+
+
+
+	(void)argv;
+	if( 0 > (pos = duc_cmd_elapsed(dudl)))
+		return -1;
+
+	t = gmtime(&pos);
+	strftime( buf,10 , "%H:%M:%S", t );
+
+	dmsg_msg( "elapsed: %s\n", buf );
+	return 0;
+}
+
+CMD(c_jump)
+{
+	int pos = (int)argv[0];
+	return duc_cmd_randomset(dudl, pos);
 }
 
 /************************************************************
@@ -712,19 +739,21 @@ static int i_tracktaglist( dudlc *dudl, int id, void *data )
 	duc_it_tag *it;
 	duc_tag *ta;
 	char buf[4096] = "";
+	int arg = 0;
 
 	(void)data;
 	if( NULL == (tr = duc_cmd_trackget(dudl, id )))
 		return -1;
 	strcat( buf, dfmt_trackid( tr->album->id, tr->albumnr));
-	strcat( buf, ":" );
+	strcat( buf, ": " );
 	duc_track_free(tr);
 
 	if( NULL == (it = duc_cmd_tracktaglist( dudl, id )))
 		return -1;
 
 	for( ta = duc_it_tag_cur(it); ta; ta = duc_it_tag_next(it)){
-		strcat( buf, " " ); // TODO: use , as seperator (cut'n'paste)
+		if( arg++ )
+			strcat( buf, "," );
 		strcat( buf, ta->name );
 	}
 	duc_it_tag_done(it);
@@ -1047,8 +1076,8 @@ CMD(c_sfiltersave)
 // TODO: lst_right
 #define arg_right	\
 	{ "right",	0, AP(val_right),	NULL,		NULL }
-#define arg_sec	\
-	{ "sec",	0, AP(val_uint),	NULL,		NULL }
+#define arg_time	\
+	{ "time",	0, AP(val_time),	NULL,		NULL }
 // TODO: lst_bool
 #define arg_bool	\
 	{ "bool",	0, AP(val_bool),	NULL,		NULL }
@@ -1071,11 +1100,11 @@ CMD(c_sfiltersave)
 	{ "sfilter",	0, AP(val_sfilter),	NULL,		NULL }
 
 t_cmd_arg args_none[]		= { arg_end };
+t_cmd_arg args_time[]		= { arg_time, arg_end };
 t_cmd_arg args_idlist[]		= { arg_idlist, arg_end };
 t_cmd_arg args_userlist[]	= { arg_userlist, arg_end };
 t_cmd_arg args_name[]		= { arg_name, arg_end };
 t_cmd_arg args_cmd[]		= { arg_cmd, arg_end };
-t_cmd_arg args_sec[]		= { arg_sec, arg_end };
 t_cmd_arg args_bool[]		= { arg_bool, arg_end };
 t_cmd_arg args_track[]		= { arg_track, arg_end };
 t_cmd_arg args_tracklist[]	= { arg_tracklist, arg_end };
@@ -1096,172 +1125,244 @@ t_cmd_arg args_artistmerge[]	= { arg_artist, arg_artist, arg_end };
 t_cmd_arg args_sfiltername[]	= { arg_sfilter, arg_name, arg_end };
 t_cmd_arg args_sfilterfilter[]	= { arg_sfilter, arg_string, arg_end };
 
-// TODO: shortcuts
-
 t_cmd cmds_top[] = {
-	{ "open",		c_open,			args_none,
+	{ "open",		NULL,
+		c_open,			args_none,
 		"open connection to server" },
-	{ "help",		c_help,			args_none,
+	{ "help",		NULL,
+		c_help,			args_none,
 		"show list of commands" },
-	{ "helpcmd",		c_helpcmd,		args_cmd,
+	{ "helpcmd",		NULL,
+		c_helpcmd,		args_cmd,
 		"show help for one command" },
-	{ "raw",		c_raw,			args_raw,
+	{ "raw",		NULL,
+		c_raw,			args_raw,
 		"send raw commando to server" },
 
-	{ "clientlist",		c_clientlist,		args_none,
+	{ "clientlist",		NULL,
+		c_clientlist,		args_none,
 		"list all connected clients" },
-	{ "clientclose",	c_clientclose,		args_idlist,
+	{ "clientclose",	NULL,
+		c_clientclose,		args_idlist,
 		"disconnect clients" },
-	{ "clientcloseuser",	c_clientcloseuser,	args_userlist,
+	{ "clientcloseuser",	NULL,
+		c_clientcloseuser,	args_userlist,
 		"disconnect clients owned by certain users" },
 
-	{ "userget",		c_userget,		args_userlist,
+	{ "userget",		NULL,
+		c_userget,		args_userlist,
 		"show user details" },
-	{ "userlist",		c_userlist,		args_none,
+	{ "userlist",		NULL,
+		c_userlist,		args_none,
 		"list all users" },
-	{ "usersetpass",	c_usersetpass,		args_uidpass,
+	{ "usersetpass",	NULL,
+		c_usersetpass,		args_uidpass,
 		"set user's password" },
-	{ "usersetright",	c_usersetright,		args_uidright,
+	{ "usersetright",	NULL,
+		c_usersetright,		args_uidright,
 		"set user's permissions" },
-	{ "useradd",		c_useradd,		args_name,
+	{ "useradd",		NULL,
+		c_useradd,		args_name,
 		"add user" },
-	{ "userdel",		c_userdel,		args_userlist,
+	{ "userdel",		NULL,
+		c_userdel,		args_userlist,
 		"delete user" },
 
-	{ "play",		c_play,			args_none,
-		"start playing" },
-	{ "stop",		c_stop,			args_none,
+	{ "play",		"r",
+		c_play,			args_none,
+		"start/resume playing" },
+	{ "stop",		"s",
+		c_stop,			args_none,
 		"stop playing" },
-	{ "next",		c_next,			args_none,
+	{ "next",		"n",
+		c_next,			args_none,
 		"play next track" },
-	{ "prev",		c_prev,			args_none,
+	{ "prev",		NULL,
+		c_prev,			args_none,
 		"pley previous track" },
-	{ "pause",		c_pause,		args_none,
+	{ "pause",		"p",
+		c_pause,		args_none,
 		"pause playing" },
-	{ "status",		c_status,		args_none,
+	{ "status",		NULL,
+		c_status,		args_none,
 		"show current play-status" },
-	{ "info",		c_info,			args_none,
+	{ "info",		NULL,
+		c_info,			args_none,
 		"show more detailed infoe abour currently playing track" },
-	{ "gap",		c_gap,		args_none,
+	{ "gap",		NULL,
+		c_gap,		args_none,
 		"show the delay between tracks (sec)" },
-	{ "gapset",		c_gapset,		args_sec,
+	{ "gapset",		NULL,
+		c_gapset,		args_time,
 		"set the delay between tracks (sec)" },
-	{ "random",		c_random,		args_none,
+	{ "random",		NULL,
+		c_random,		args_none,
 		"is random playback on? (when the queue ist empty)" },
-	{ "randomset",		c_randomset,		args_bool,
+	{ "randomset",		NULL,
+		c_randomset,		args_bool,
 		"set random playback status" },
+	{ "elapsed",		NULL,
+		c_elapsed,		args_none,
+		"show play progress for current track" },
+	{ "jump|j",		NULL,
+		c_jump,			args_time,
+		"jump to specified position in current track" },
 	// TODO: c_seek
-	// TODO: c_jump
-	// TODO: c_elapsed
 
-	{ "trackcount",		c_trackcount,		args_none,
+	{ "trackcount",		NULL,
+		c_trackcount,		args_none,
 		"show number of available tracks" },
-	{ "trackget",		c_trackget,		args_tracklist,
+	{ "trackget",		NULL,
+		c_trackget,		args_tracklist,
 		"show track details" },
-	{ "tracksearchf",	c_tracksearchf,		args_string,
+	{ "tracksearchf",	"f",
+		c_tracksearchf,		args_string,
 		"search for titles matching filter" },
 	// TODO: modify track
 
-	{ "filter",		c_filter,		args_none,
+	{ "filter",		NULL,
+		c_filter,		args_none,
 		"show filter for random that's in use" },
-	{ "filterset",		c_filterset,		args_string,
+	{ "filterset",		NULL,
+		c_filterset,		args_string,
 		"set filter for random filter" },
-	{ "filterstat",		c_filterstat,		args_none,
+	{ "filterstat",		NULL,
+		c_filterstat,		args_none,
 		"show filter statistics" },
-	{ "filtertop",		c_filtertop,		args_onum,
+	{ "filtertop",		NULL,
+		c_filtertop,		args_onum,
 		"show tracks with highest probability" },
 
-	{ "queuelist",		c_queuelist,		args_none,
+	{ "queuelist",		NULL,
+		c_queuelist,		args_none,
 		"show all queued titles" },
-	{ "queueget",		c_queueget,		args_idlist,
+	{ "queueget",		NULL,
+		c_queueget,		args_idlist,
 		"show queue details" },
-	{ "queueadd",		c_queueadd,		args_tracklist,
+	{ "queueadd",		"q",
+		c_queueadd,		args_tracklist,
 		"add titles to queue" },
-	{ "queuedel",		c_queuedel,		args_idlist,
+	{ "queuedel",		NULL,
+		c_queuedel,		args_idlist,
 		"remove titles from queue" },
 	/*
 	 * TODO: filter for queue ops
-	{ "queuesearchf",	c_queuesearchf,		args_string,
+	{ "queuesearchf",	NULL,
+		c_queuesearchf,		args_string,
 		"show queue details" },
-	{ "queueaddf",		c_queueaddf,		args_string,
+	{ "queueaddf",		NULL,
+		c_queueaddf,		args_string,
 		"add titles to queue" },
 	 * TODO: unqueue by user, client, album, track, filter
-	{ "queuedelf",		c_queuedelf,		args_string,
+	{ "queuedelf",		NULL,
+		c_queuedelf,		args_string,
 		"remove titles from queue" },
 	*/
-	{ "queueclear",		c_queueclear,		args_none,
+	{ "queueclear",		NULL,
+		c_queueclear,		args_none,
 		"remove all titles from queue" },
 
-	{ "sleep",		c_sleep,		args_none,
+	{ "sleep",		NULL,
+		c_sleep,		args_none,
 		"get remaining time until scheduled pause" },
-	{ "sleepset",		c_sleepset,		args_sec,
+	{ "sleepset",		NULL,
+		c_sleepset,		args_time,
 		"schedule pause after specified time" },
 
-	{ "history",		c_history,		args_onum,
+	{ "history",		NULL,
+		c_history,		args_onum,
 		"show last played titles" },
-	{ "historytrack",	c_historytrack,		args_tracknum,
+	{ "historytrack",	NULL,
+		c_historytrack,		args_tracknum,
 		"history for titles" },
 	
-	{ "taglist",		c_taglist,		args_none,
+	{ "taglist",		NULL,
+		c_taglist,		args_none,
 		"show all tags" },
-	{ "tagget",		c_tagget,		args_taglist,
+	{ "tagget",		NULL,
+		c_tagget,		args_taglist,
 		"show tag details" },
-	{ "tagadd",		c_tagadd,		args_name,
+	{ "tagadd",		NULL,
+		c_tagadd,		args_name,
 		"add tag" },
-	{ "tagsetname",		c_tagsetname,		args_tagname,
+	{ "tagsetname",		NULL,
+		c_tagsetname,		args_tagname,
 		"change tag name" },
-	{ "tagsetdesc",		c_tagsetdesc,		args_tagdesc,
+	{ "tagsetdesc",		NULL,
+		c_tagsetdesc,		args_tagdesc,
 		"change tag description" },
-	{ "tagdel",		c_tagdel,		args_taglist,
+	{ "tagdel",		NULL,
+		c_tagdel,		args_taglist,
 		"delete tag" },
 
-	{ "tracktaglist",	c_tracktaglist,		args_tracklist,
+	{ "tracktaglist",	"tl",
+		c_tracktaglist,		args_tracklist,
 		"show tags set for titles" },
-	{ "tracktagadd",	c_tracktagadd,		args_tracktaglist,
+	{ "tracktagadd",	"ta",
+		c_tracktagadd,		args_tracktaglist,
 		"add tags to titles" },
-	{ "tracktagdel",	c_tracktagdel,		args_tracktaglist,
+	{ "tracktagdel",	"td",
+		c_tracktagdel,		args_tracktaglist,
 		"remove tags from titles" },
 
-	{ "albumlist",		c_albumlist,		args_none,
+	{ "albumlist",		NULL,
+		c_albumlist,		args_none,
 		"show all albums" },
-	{ "albumget",		c_albumget,		args_idlist,
+	{ "albumget",		NULL,
+		c_albumget,		args_idlist,
 		"show album details" },
-	{ "albumsearch",	c_albumsearch,		args_string,
+	{ "albumsearch",	NULL,
+		c_albumsearch,		args_string,
 		"search albums matching substring" },
-	{ "albumsartist",	c_albumsartist,		args_artist,
+	{ "albumsartist",	NULL,
+		c_albumsartist,		args_artist,
 		"search albums by artist" },
 	// TODO: modify/add album
 
-	{ "artistlist",		c_artistlist,		args_none,
+	{ "artistlist",		NULL,
+		c_artistlist,		args_none,
 		"show all artists" },
-	{ "artistget",		c_artistget,		args_idlist,
+	{ "artistget",		NULL,
+		c_artistget,		args_idlist,
 		"show artist details" },
-	{ "artistsearch",	c_artistsearch,		args_string,
+	{ "artistsearch",	NULL,
+		c_artistsearch,		args_string,
 		"search artists matching substring" },
-	{ "artistsetname",	c_artistsetname,	args_artistname,
+	{ "artistsetname",	NULL,
+		c_artistsetname,	args_artistname,
 		"change artist name" },
-	{ "artistmerge",	c_artistmerge,		args_artistmerge,
+	{ "artistmerge",	NULL,
+		c_artistmerge,		args_artistmerge,
 		"merge two artists" },
 
-	{ "sfilterlist",	c_sfilterlist,		args_none,
+	{ "sfilterlist",	NULL,
+		c_sfilterlist,		args_none,
 		"show all saved filters" },
-	{ "sfilterget",		c_sfilterget,		args_idlist,
+	{ "sfilterget",		NULL,
+		c_sfilterget,		args_idlist,
 		"show saved filter details" },
-	{ "sfilteradd",		c_sfilteradd,		args_name,
+	{ "sfilteradd",		NULL,
+		c_sfilteradd,		args_name,
 		"add new slot for saving filters" },
-	{ "sfiltersetname",	c_sfiltersetname,	args_sfiltername,
+	{ "sfiltersetname",	NULL,
+		c_sfiltersetname,	args_sfiltername,
 		"rename saved filter" },
-	{ "sfiltersetfilter",	c_sfiltersetfilter,	args_sfilterfilter,
+	{ "sfiltersetfilter",	NULL,
+		c_sfiltersetfilter,	args_sfilterfilter,
 		"save filter to slot" },
-	{ "sfilterdel",		c_sfilterdel,		args_sfilter,
+	{ "sfilterdel",		NULL,
+		c_sfilterdel,		args_sfilter,
 		"delete filter slot" },
-	{ "sfilterload",	c_sfilterload,		args_sfilter,
+	{ "sfilterload",	"load",
+		c_sfilterload,		args_sfilter,
 		"load and set ilter from slot" },
-	{ "sfiltersave",	c_sfiltersave,		args_sfilter,
+	{ "sfiltersave",	"save",
+		c_sfiltersave,		args_sfilter,
 		"save current filter to slot" },
 
 
-	{ NULL,			NULL,			args_none,
+	{ NULL,			NULL,
+		NULL,			args_none,
 		NULL },
 };
 
@@ -1269,6 +1370,7 @@ GENC(lst_cmd)
 {
 	static t_cmd *next = NULL;
 	static int len;
+	static int nname;
 
 	// TODO: only offer commands, the user is permitted to use
 	(void)dudl;
@@ -1276,13 +1378,22 @@ GENC(lst_cmd)
 	if( state == 0 ){
 		next = cmds_top;
 		len = strlen(text);
+		nname = 1;
 	}
 
 
 	while( next && next->name ){
-		if( 0 == strncasecmp(next->name, text, len))
-			return strdup(next++->name);
-		next++;
+		if( nname ){
+			nname = 0;
+			if( 0 == strncasecmp(next->name, text, len))
+				return strdup(next->name);
+		} else {
+			nname++;
+			next++;
+			if( next->alias && 0 == strncasecmp(next->alias,
+						text, len))
+				return strdup(next->alias);
+		}
 	}
 
 	return NULL;
@@ -1295,6 +1406,8 @@ static t_cmd *cmd_find( char *name )
 	for( cmd = cmds_top; cmd && cmd->name; cmd++ ){
 		if( 0 == strcmp(cmd->name, name))
 			return cmd;
+		if( cmd->alias && 0 == strcmp(cmd->alias, name))
+			return cmd;
 	}
 
 	return NULL;
@@ -1306,6 +1419,10 @@ static char *cmd_usage( t_cmd *cmd )
 	char buf[2048] = "";
 
 	strcat( buf, cmd->name );
+	if( cmd->alias ){
+		strcat(buf, "|");
+		strcat(buf, cmd->alias);
+	}
 
 	for( arg = cmd->args; arg && arg->name; arg++ ){
 		strcat( buf, " <" );
@@ -1372,7 +1489,7 @@ static void cmd_arg_free( t_cmd *cmd, void **argv )
 	free(argv);
 }
 
-static int cmd_parse( dudlc *dudl, t_cmd *cmd, char *line )
+static int cmd_arg_parse( dudlc *dudl, t_cmd *cmd, char *line )
 {
 	char *next = line;
 	char *end;
@@ -1447,7 +1564,7 @@ clean1:
 
 }
 
-static duc_cgen cmd_find_genc( dudlc *dudl, t_cmd *cmd, char *line, unsigned int pos )
+static duc_cgen cmd_find_arg_genc( dudlc *dudl, t_cmd *cmd, char *line, unsigned int pos )
 {
 	char *next = line;
 	char *end;
@@ -1467,7 +1584,7 @@ static duc_cgen cmd_find_genc( dudlc *dudl, t_cmd *cmd, char *line, unsigned int
 		if( *next == 0 )
 			break;
 
-		if( (unsigned int) (next - line) >= pos )
+		if( next - line >= (int)pos )
 			break;
 
 		data = (*arg->parse)( dudl, next, &end );
@@ -1517,7 +1634,7 @@ int duc_cmd( dudlc *dudl, char *line )
 		return -1;
 	}
 
-	return cmd_parse( dudl, cmd, line );
+	return cmd_arg_parse( dudl, cmd, line );
 }
 
 duc_cgen duc_cgen_find( dudlc *dudl, char* line, unsigned int pos )
@@ -1527,19 +1644,22 @@ duc_cgen duc_cgen_find( dudlc *dudl, char* line, unsigned int pos )
 	char *scmd;
 	t_cmd *cmd;
 
+	SKIPSPACE(start);
+	pos -= start - line;
+
 	if( pos == 0 )
 		return lst_cmd;
 
-	SKIPSPACE(start);
 	scmd = val_name( dudl, start, &end );
 	if( start == end || ! scmd ){
 		return NULL;
 	}
-	pos -= end - line;
+
+	pos -= end - start;
 	start = end;
 
 	if( NULL == (cmd = cmd_find( scmd )))
 		return NULL;
 
-	return cmd_find_genc( dudl, cmd, start, pos );
+	return cmd_find_arg_genc( dudl, cmd, start, pos );
 }

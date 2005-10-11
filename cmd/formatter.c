@@ -18,7 +18,7 @@ static size_t minutes( char *s, size_t max, time_t time )
 {
 	struct tm *t;
 
-	t = localtime( &time );
+	t = gmtime( &time );
 	return strftime( s, max, "%M:%S", t );
 	/*                        MM:SS */
 	/*                        5 */

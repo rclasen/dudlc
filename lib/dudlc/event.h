@@ -35,6 +35,7 @@ typedef struct {
 	duc_ev_argnone paused;
 	duc_ev_argnone resumed;
 	duc_ev_argint random;
+	duc_ev_argint elapsed;
 
 	/* random/filter */
 	duc_ev_argstring filter;

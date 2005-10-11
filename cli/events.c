@@ -98,6 +98,14 @@ static void cb_random( dudlc *c, int r )
 	(void)c;
 }
 
+#if 0
+static void cb_elapsed( dudlc *c, int r )
+{
+	tty_msg( "elapsed: %d\n", r );
+	(void)c;
+}
+#endif
+
 /************************************************************
  * random/filter
  */
@@ -192,6 +200,7 @@ void events_init( dudlc *c )
 	events.paused = cb_paused;
 	events.resumed = cb_resumed;
 	events.random = cb_random;
+	//events.elapsed = cb_elapsed;
 
 	//events.filter = cb_filter;
 

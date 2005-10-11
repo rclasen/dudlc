@@ -1,3 +1,12 @@
+dudlc (0.1.6) unstable; urgency=low
+
+  * added elapsed callback
+  * added jump/elapsed commands
+  * added cmd shortcuts
+  * make tab-completion work if line starts with whitespace
+
+ -- Rainer Clasen <bj@zuto.de>  Tue, 11 Oct 2005 20:33:04 +0200
+
 dudlc (0.1.5) unstable; urgency=low
 
   * disabled some broadcasts for cli client - became too noisy

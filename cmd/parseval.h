@@ -13,6 +13,7 @@ extern t_enum bools[];
 extern t_enum rights[];
 
 int val_bool( dudlc *con, char *in, char **end );
+int val_time( dudlc *con, char *in, char **end );
 int val_uint( dudlc *con, char *in, char **end );
 char *val_string( dudlc *con, char *in, char **end );
 char *val_name( dudlc *con, char *in, char **end );

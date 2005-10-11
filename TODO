@@ -12,10 +12,20 @@ implement all lib commands
 
 implement all cli commands
 
-cache layer for artists, albums, tags, user
-
 GTK client
+ + visual progress indication
+ + jump on click
+ + pick search result for queue/tagging/...
+ + "visual" "drag/drop" queue manipulation
+ + single-key actions for play/pause/stop/next
+ - tagging
+ - filter manipulation (sfilter*/filterset)
 
 ncurses client (extra window for current track/status)
 
-method to find command mismatches server, lib, cmd
+method to find command mismatches: server, lib, cmd
+
+find way to feed search results to other commands
+ - tracksearch -> queueadd
+ - queuesearch -> queuedel
+ - ...

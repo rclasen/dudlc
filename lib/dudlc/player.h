@@ -27,6 +27,9 @@ int duc_cmd_gapset( dudlc *c, unsigned int gap );
 int duc_cmd_random( dudlc *c );
 int duc_cmd_randomset( dudlc *c, int r );
 
+int duc_cmd_elapsed( dudlc *c );
+int duc_cmd_jump( dudlc *c, int r );
+
 void _duc_bcast_player( dudlc *c, char *line );
 
 #endif

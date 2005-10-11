@@ -1,8 +1,10 @@
 #define _GNU_SOURCE
+#define _XOPEN_SOURCE
 
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <time.h>
 
 #include "parseval.h"
 
@@ -383,7 +385,7 @@ t_idlist *val_taglist( dudlc *con, char *in, char **end )
 /*
  * sfilter := <sfiltername>|<id>
  */
-int val_sfilter( dudlc *con, char *in, char **end ) // TODO
+int val_sfilter( dudlc *con, char *in, char **end )
 {
 	int id;
 	char *e;
@@ -414,3 +416,12 @@ int val_sfilter( dudlc *con, char *in, char **end ) // TODO
 	return id;
 }
 
+/*
+ * time := [<hours>:[<minutes>:]]<seconds>
+ */
+int val_time( dudlc *con, char *in, char **end ) // TODO
+{
+
+	(void)con;
+	return strtoul(in,end,10);
+}
