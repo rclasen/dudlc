@@ -13,6 +13,7 @@ pkginclude_HEADERS= album.h \
 	queue.h \
 	random.h \
 	session.h \
+	sfilter.h \
 	sleep.h \
 	sock.h \
 	tag.h \

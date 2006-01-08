@@ -27,6 +27,7 @@ int duc_cmd_queuealbum( dudlc *c, int id );
 int duc_cmd_queueadd( dudlc *c, int tid );
 int duc_cmd_queuedel( dudlc *c, int qid );
 int duc_cmd_queueclear( dudlc *c );
+int duc_cmd_queuesum( dudlc *c );
 
 void _duc_bcast_queue( dudlc *c, char *line );
 

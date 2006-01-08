@@ -156,7 +156,7 @@ int main( int argc, char **argv )
 
 	} else {
 		signal( SIGTERM, sig_term );
-		signal( SIGINT, sig_term );
+		signal( SIGINT, SIG_IGN ); // TODO kill line on ^C
 		signal( SIGPIPE, SIG_IGN );
 
 		tty_init( progname, "> " );

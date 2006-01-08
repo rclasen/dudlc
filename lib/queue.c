@@ -124,6 +124,11 @@ int duc_cmd_queueclear( dudlc *c )
 	return _duc_cmd_succ( c, "queueclear" );
 }
 
+int duc_cmd_queuesum( dudlc *c )
+{
+	return _duc_cmd_int( c, "queuesum" );
+}
+
 void _duc_bcast_queue( dudlc *c, char *line )
 {
 	duc_queue *q;

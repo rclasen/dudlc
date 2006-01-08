@@ -5,7 +5,7 @@ CFLAGS:= -g -Wall -W -Wunused -Wmissing-prototypes -Wcast-qual -Wcast-align \
 
 bin_PROGRAMS=dudlc
 
-dudlc_LDFLAGS=-L../lib -L../cmd -ldudlc -ldudlccmd -lreadline
+dudlc_LDFLAGS=-L../lib -L../cmd -ldudlc -ldudlccmd -lreadline -lcurses
 dudlc_SOURCES= events.c \
 	main.c \
 	tty.c \

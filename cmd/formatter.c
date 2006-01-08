@@ -3,6 +3,9 @@
 
 #include "dudlccmd.h"
 
+// TODO: give user chance to influence column width
+// TODO: adjust column width to window size
+
 static size_t isotime( char *s, size_t max, time_t time )
 {
 	struct tm *t;
@@ -75,7 +78,7 @@ char *dfmt_trackid( int albumid, int nr )
 
 char *dfmt_trackhead( char *buf, unsigned int len )
 {
-	snprintf( buf, len, "%7.7s %-18.18s %-5.5s %-16.16s %-29.29s",
+	snprintf( buf, len, "%7.7s %-18.18s %-5.5s %-16.16s %-29s",
 			"alb/nr", "album", "dur", "artist", "title" );
 	return buf;
 }
@@ -92,7 +95,7 @@ char *dfmt_track( char *buf, unsigned int len, duc_track *t )
 			BF "%-18.18s " NF
 			"%-5.5s "
 			BF "%-16.16s " NF
-			"%-29.29s",
+			"%-29s",
 			dfmt_trackid(t->album->id, t->albumnr), 
 			t->album->album, tim, t->artist->artist, t->title );
 

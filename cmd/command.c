@@ -415,7 +415,7 @@ CMD(c_elapsed)
 CMD(c_jump)
 {
 	int pos = (int)argv[0];
-	return duc_cmd_randomset(dudl, pos);
+	return duc_cmd_jump(dudl, pos);
 }
 
 /************************************************************
@@ -595,6 +595,24 @@ CMD(c_queueclear)
 	(void)argv;
 	return duc_cmd_queueclear( dudl );
 }
+
+CMD(c_queuesum)
+{
+	char buf[10];
+	struct tm *t;
+	time_t dur;
+
+	(void)argv;
+	if( 0 > (dur = duc_cmd_queuesum(dudl)))
+		return -1;
+
+	t = gmtime(&dur);
+	strftime( buf, 10, "%H:%M:%S", t );
+
+	dmsg_msg( "duration: %s\n", buf );
+	return 0;
+}
+
 
 /************************************************************
  *
@@ -1070,21 +1088,21 @@ CMD(c_sfiltersave)
 	{ "idlist",	0, AP(val_idlist),	NULL,		AF(idl_done) }
 // TODO: lst_user
 #define arg_user	\
-	{ "user",	0, AP(val_user),	NULL,		NULL }
+	{ "userid",	0, AP(val_user),	NULL,		NULL }
 #define arg_userlist	\
-	{ "userlist",	0, AP(val_userlist),	NULL,		AF(idl_done) }
+	{ "useridlist",	0, AP(val_userlist),	NULL,		AF(idl_done) }
 // TODO: lst_right
 #define arg_right	\
 	{ "right",	0, AP(val_right),	NULL,		NULL }
 #define arg_time	\
-	{ "time",	0, AP(val_time),	NULL,		NULL }
+	{ "seconds",	0, AP(val_time),	NULL,		NULL }
 // TODO: lst_bool
 #define arg_bool	\
 	{ "bool",	0, AP(val_bool),	NULL,		NULL }
 #define arg_track	\
-	{ "track",	0, AP(val_track),	NULL,		NULL }
+	{ "trackid",	0, AP(val_track),	NULL,		NULL }
 #define arg_tracklist	\
-	{ "tracklist",	0, AP(val_tracklist),	NULL,		AF(idl_done) }
+	{ "trackidlist", 0, AP(val_tracklist),	NULL,		AF(idl_done) }
 // TODO:* lst_taglist
 #define arg_taglist	\
 	{ "taglist",	0, AP(val_taglist),	NULL,		AF(idl_done) }
@@ -1095,7 +1113,7 @@ CMD(c_sfiltersave)
 	{ "num",	1, AP(val_uint),	NULL,		NULL }
 // TODO: lst_artist
 #define arg_artist	\
-	{ "artist",	0, AP(val_uint),	NULL,		NULL }
+	{ "artistid",	0, AP(val_uint),	NULL,		NULL }
 #define arg_sfilter	\
 	{ "sfilter",	0, AP(val_sfilter),	NULL,		NULL }
 
@@ -1204,7 +1222,8 @@ t_cmd cmds_top[] = {
 	{ "elapsed",		NULL,
 		c_elapsed,		args_none,
 		"show play progress for current track" },
-	{ "jump|j",		NULL,
+	// TODO: c_remain
+	{ "jump",		"j",
 		c_jump,			args_time,
 		"jump to specified position in current track" },
 	// TODO: c_seek
@@ -1233,16 +1252,16 @@ t_cmd cmds_top[] = {
 		c_filtertop,		args_onum,
 		"show tracks with highest probability" },
 
-	{ "queuelist",		NULL,
+	{ "queuelist",		"ql",
 		c_queuelist,		args_none,
 		"show all queued titles" },
 	{ "queueget",		NULL,
 		c_queueget,		args_idlist,
 		"show queue details" },
-	{ "queueadd",		"q",
+	{ "queueadd",		"qa",
 		c_queueadd,		args_tracklist,
 		"add titles to queue" },
-	{ "queuedel",		NULL,
+	{ "queuedel",		"qd",
 		c_queuedel,		args_idlist,
 		"remove titles from queue" },
 	/*
@@ -1258,9 +1277,12 @@ t_cmd cmds_top[] = {
 		c_queuedelf,		args_string,
 		"remove titles from queue" },
 	*/
-	{ "queueclear",		NULL,
+	{ "queueclear",		"qc",
 		c_queueclear,		args_none,
 		"remove all titles from queue" },
+	{ "queuesum",		NULL,
+		c_queuesum,		args_none,
+		"show total playtime of queued tracks" },
 
 	{ "sleep",		NULL,
 		c_sleep,		args_none,
@@ -1304,6 +1326,7 @@ t_cmd cmds_top[] = {
 	{ "tracktagdel",	"td",
 		c_tracktagdel,		args_tracktaglist,
 		"remove tags from titles" },
+	// TODO: make tracklist optional for tracktagadd/-del
 
 	{ "albumlist",		NULL,
 		c_albumlist,		args_none,

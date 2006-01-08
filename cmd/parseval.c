@@ -65,8 +65,8 @@ static int idl_addalbum( t_idlist *idl, dudlc *con, int album, int first, int la
 		return 0;
 
 	for( t = duc_it_track_cur(it); t; t = duc_it_track_next(it)){
-		if( first < 0 || last <= first || 
-				(first <= t->albumnr && last >= t->albumnr)){
+		if( (first < 0 || first <= t->albumnr) &&
+				(last < 0 || last >= t->albumnr)){
 			idl_add(idl, t->id );
 		}
 		duc_track_free(t);
@@ -179,11 +179,13 @@ t_idlist *val_idlist( dudlc *con, char *in, char **end )
 	return idl;
 }
 
+// also update arg_user help
 int val_user( dudlc *con, char *in, char **end ) // TODO*
 {
 	return val_uint( con, in, end );
 }
 
+// also update arg_userlist help
 t_idlist *val_userlist( dudlc *con, char *in, char **end )
 {
 	t_idlist *idl;
@@ -240,7 +242,7 @@ int val_track( dudlc *con, char *in, char **end )
 /*
  * list := <item>[,...]
  * item := c|<id>|c/<pos>
- * pos  := *|<num>[-<num2>]
+ * pos  := *|<num>[-<num2>|*]
  */
 t_idlist *val_tracklist( dudlc *con, char *in, char **end)
 {
@@ -276,7 +278,7 @@ t_idlist *val_tracklist( dudlc *con, char *in, char **end)
 			pos1 = strtoul(tok, &e, 10 );
 			if( e == tok ){
 				/* no <pos>, must be '*' */
-				if( e[0] == '*' && (e[1] == 0 || e[1] == ',')){
+				if( *e == '*' ){
 					idl_addalbum(idl, con, id1, -1, -1 );
 					tok++;
 				} else {
@@ -294,8 +296,13 @@ t_idlist *val_tracklist( dudlc *con, char *in, char **end)
 					tok++;
 					pos2 = strtoul(tok, &e, 10 );
 					if( e == tok ){
-						idl_done(idl);
-						return 0;
+						if( *e == '*' ){
+							pos2 = -1;
+							e++;
+						} else {
+							idl_done(idl);
+							return 0;
+						}
 					}
 					tok = e;
 
@@ -419,6 +426,7 @@ int val_sfilter( dudlc *con, char *in, char **end )
 /*
  * time := [<hours>:[<minutes>:]]<seconds>
  */
+// update arg_time help
 int val_time( dudlc *con, char *in, char **end ) // TODO
 {
 

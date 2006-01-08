@@ -4,7 +4,7 @@ CFLAGS:= -g -Wall  -W -Wunused -Wmissing-prototypes -Wcast-qual -Wcast-align -We
 
 lib_LTLIBRARIES=libdudlccmd.la
 
-include_HEADERS= dudlccmd.h
+include_HEADERS= dudlccmd.h idlist.h parseval.h
 
 libdudlccmd_la_SOURCES= formatter.c msg.c command.c idlist.c parseval.c
 
