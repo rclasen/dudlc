@@ -110,6 +110,13 @@ duc_it_track *duc_cmd_tracksartist( dudlc *c, int id )
 			"tracksartist %d", id );
 }
 
+int duc_cmd_tracksetname( dudlc *c, int id, const char *name )
+{
+	return _duc_cmd_succ(c, "tracksetname %d %s", id, name );
+}
 
-
+int duc_cmd_tracksetartist( dudlc *c, int id, int artistid )
+{
+	return _duc_cmd_succ(c, "tracksetartist %d %d", id, artistid );
+}
 

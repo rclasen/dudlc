@@ -1,0 +1,88 @@
+.TH DUDL_FILTER 1 "2002-08-01"
+
+.SH NAME
+dudl_filter \- filter language for the dudl jukebox
+
+.SH DESCRIPTION
+
+Die Filter werden an mehreren Stellen verwendet um Titel zu
+suchen/einzugrenzen. Dabei können alle Daten eines Titel herangezogen
+werden um zu entscheiden, ob ein Titel "erwünscht" ist - wenigstens sollte
+das so sein.
+
+Je nach Datenfeld eines Titels stehen mehrere Vergleiche zur Verfügung:
+ = genauer vergleich (incl. groß/klein)
+ ~ regular expression match
+ > größer
+ < kleiner
+ >= größer gleich
+ <= kleiner gleich
+
+Diese Vergleiche müssen immer mit einem fest anzugebenden Wert ausgeführt
+werden. Unterstützt wird:
+ "<string>"  Für den Vergleich gegen den Text eines Eintrages
+ <nummer>    Für Zahlen oder die ID eines eintrages
+
+Als Sonderfall existiert die genaue Prüfung gegen eine Liste von werten:
+ <feld> IN <wert1>[, ...]
+
+Im einzelnen werden die folgenden Felder mit den aufgeführten Vergleichen
+unterstützt:
+
+ Feld		Wert	=	~	<><=>=	IN
+
+ duration	nummer	*	-	*	-
+ lastplay	nummer	*	-	*	-
+ tag		nummer	*	-	-	*
+ 		string	*	*	-	*
+ artist		string	*	*	-	-
+ 		nummer	*	-	-	TODO
+ title		string	*	*	-	-
+ album		string	*	*	-	-
+ 		nummer	*	-	-	TODO
+ year		nummer	*	-	*	-
+
+Die Ausdrücke dürfen mit beliebig vielen Whitespaces ausgeschmückt werden
+(natürlich nicht innerhalb von strings).
+
+Beispiele:
+
+ title ~ "foo.*bar"
+ title~"foo.bar"
+ artist = 22
+ artist = "Aerosmith"
+ artist ~ "Aero"
+ duration < 30		# 30 sekunden
+ duration > 300		# 5 minuten
+ year > 1990
+ tag in "foo", "bar", 4
+ lastplay > 1135968969	# sekunden seit 1970-1-1 - klappt nicht?
+
+
+Einzelne Ausdrücke lassen sich auch mittels vorangestelltem ! verneinen.
+Zwei Ausdrücke könne per oder/und verknüpft werden:
+ a & b        - und
+ a | b        - oder
+
+Beispiele:
+
+ ! tag in ( "bad", "doppelt" )
+ title ~ "love" & artist ~ "metal"
+
+
+Mittels runder Klammern () können Ausdrücke gruppiert werden:
+ ( a & b ) | ( c & d )
+
+Gruppen müssen zB. immer dann gebildet werden, wenn mehr als 2 Ausdrücke
+kombiniert werden:
+ a & ( b & c )
+
+.SH SEE ALSO
+.BR dudlc (1),
+.BR dudld (8)
+.br
+.SH AUTHOR
+This manual page was written by Rainer Clasen.
+
+
+

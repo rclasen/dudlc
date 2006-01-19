@@ -1,9 +1,15 @@
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "dudlc/session.h"
 #include "dudlc/event.h"
 #include "dudlc/proto.h"
+
+#define DUC_PROTO_MAJOR	1
+#define DUC_PROTO_MINOR	0
+
+// TODO: better error-reporting than stderr!!!
 
 dudlc *duc_new( const char *hostname, int port )
 {
@@ -18,6 +24,8 @@ dudlc *duc_new( const char *hostname, int port )
 	p->ev = NULL;
 	p->user = NULL;
 	p->pass = NULL;
+	p->vminor = 0;
+	p->vminor = 0;
 
 	if( NULL == (p->con = duc_sock_open( hostname, port )))
 		goto clean1;
@@ -45,6 +53,7 @@ int duc_fd( dudlc *p )
 
 int duc_open( dudlc *p )
 {
+	char *s, *e;
 	const char *c;
 
 	if( -1 != duc_sock_fd(p->con))
@@ -63,12 +72,37 @@ int duc_open( dudlc *p )
 	if( ! c || *c != '2' )
 		goto clean1;
 
-	if( strcmp("dudld", _duc_rline(p)) )
+	s = _duc_rline(p);
+	if( 0 != strncmp("dudld", s, 5 )){
+		fprintf( stderr, "contacted server is no dudl server\n" );
 		goto clean1;
+	}
 
-	if( p->user && duc_cmd_auth( p ))
+	s+=5;
+	p->vmajor = strtol(s, &e, 10 );
+	if( s == e ){ 
+		p->vmajor = 0;
+		p->vminor = 0;
+	} else {
+		s=e;
+		p->vminor = strtol(s, &e, 10 );
+		if( s == e )
+			p->vminor = 0;
+	}
+
+	if( p->vmajor != DUC_PROTO_MAJOR ){
+		fprintf( stderr, "invalid major protocol version: got %d, want %d\n", 
+				p->vmajor, DUC_PROTO_MAJOR );
 		goto clean1;
+	}
 
+	if( p->vminor < DUC_PROTO_MINOR )
+		fprintf( stderr, "minor protocol version mismatch - some features won't work\n" );
+
+	if( p->user && duc_cmd_auth( p )){
+		fprintf( stderr, "login failed\n" );
+		goto clean1;
+	}
 
 	_MSC_EVENT(p,connect,p);
 	return 0;

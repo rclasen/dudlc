@@ -17,8 +17,8 @@ int _duc_send( dudlc *p, const char *fmt, ... );
 int _duc_rlast( dudlc *p );
 int _duc_rnext( dudlc *p );
 int _duc_rend( dudlc *p );
-const char *_duc_rcode( dudlc *p );
-const char *_duc_rline( dudlc *p );
+char *_duc_rcode( dudlc *p );
+char *_duc_rline( dudlc *p );
 
 #define duc_rmsg _duc_rline
 
@@ -32,7 +32,7 @@ void *_duc_cmd_conv( dudlc *c, _duc_converter conv,
 
 
 char *_duc_fielddup( char *s, char **end );
-const char *_duc_skipspace( const char *s );
+char *_duc_skipspace( char *s );
 
 #endif
 

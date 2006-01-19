@@ -214,7 +214,7 @@ int _duc_rend( dudlc *p )
 	return ! p->inreply;
 }
 
-const char *_duc_rcode( dudlc *p )
+char *_duc_rcode( dudlc *p )
 {
 	if( ! *p->code )
 		return NULL;
@@ -222,7 +222,7 @@ const char *_duc_rcode( dudlc *p )
 	return p->code;
 }
 
-const char *_duc_rline( dudlc *p )
+char *_duc_rline( dudlc *p )
 {
 	if( ! p->line )
 		return NULL;
@@ -255,7 +255,7 @@ void duc_poll( dudlc *p )
 	}
 }
 
-const char *_duc_skipspace( const char *s )
+char *_duc_skipspace( char *s )
 {
 	while( *s && isspace(*s))
 		s++;

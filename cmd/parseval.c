@@ -137,6 +137,12 @@ int val_uint( dudlc *con, char *in, char **end )
 	return strtoul(in, end, 10 );
 }
 
+int val_year( dudlc *con, char *in, char **end ) // TODO
+{
+	(void)con;
+	return strtoul(in, end, 10 );
+}
+
 char *val_string( dudlc *con, char *in, char **end )
 {
 	(void)con;

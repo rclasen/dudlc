@@ -209,13 +209,14 @@ char *dfmt_user( char *buf, unsigned int len, duc_user *q )
 
 char *dfmt_albumhead( char *buf, unsigned int len )
 {
-	snprintf( buf, len, "%4.4s %-25s %-20s", "id", "artist", "album" );
+	snprintf( buf, len, "%4.4s %4s %-25s %-20s", "id", "year", "artist", "album" );
 	return buf;
 }
 
 char *dfmt_album( char *buf, unsigned int len, duc_album *q )
 {
-	snprintf( buf, len, "%4d %-25s %-20s", q->id, q->artist->artist, q->album);
+	snprintf( buf, len, "%4d %4d %-25s %-20s", 
+			q->id, q->year, q->artist->artist, q->album);
 	return buf;
 }
 

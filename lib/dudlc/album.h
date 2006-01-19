@@ -9,6 +9,7 @@ typedef struct {
 	int id;
 	char *album;
 	duc_artist *artist;
+	int year;
 } duc_album;
 
 #define duc_it_album	_duc_iter
@@ -27,5 +28,6 @@ duc_it_album *duc_cmd_albumsartist( dudlc *c, int artistid );
 
 int duc_cmd_albumsetname( dudlc *c, int id, const char *name );
 int duc_cmd_albumsetartist( dudlc *c, int id, int artistid );
+int duc_cmd_albumsetyear( dudlc *c, int id, int year );
 
 #endif

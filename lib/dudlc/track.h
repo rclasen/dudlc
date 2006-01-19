@@ -32,7 +32,7 @@ duc_it_track *duc_cmd_tracksearchf( dudlc *c, const char *filter );
 duc_it_track *duc_cmd_tracksalbum( dudlc *c, int id );
 duc_it_track *duc_cmd_tracksartist( dudlc *c, int id );
 
-// TODO: alter 
-
+int duc_cmd_tracksetname( dudlc *c, int id, const char *name );
+int duc_cmd_tracksetartist( dudlc *c, int id, int artistid );
 
 #endif

@@ -472,6 +472,28 @@ CMD(c_tracksearchf)
 	return 0;
 }
 
+static int i_tracksetartist( dudlc *dudl, int id, void *data )
+{
+	return duc_cmd_tracksetartist( dudl, id, (int)data );
+}
+
+CMD(c_tracksetartist)
+{
+	t_idlist *tracks = (t_idlist*)argv[0];
+	int artistid = (int)argv[1];
+
+	return idl_iterate(tracks, i_tracksetartist, dudl, (void*)artistid);
+}
+
+CMD(c_tracksetname)
+{
+	int trackid = (int)argv[0];
+	char *name = (char*)argv[1];
+
+	return duc_cmd_tracksetname( dudl, trackid, name );
+}
+
+
 /************************************************************
  *
  */
@@ -892,6 +914,31 @@ CMD(c_albumsartist)
 	return 0;
 }
 
+CMD(c_albumsetartist)
+{
+	int albumid = (int)argv[0];
+	int artistid = (int)argv[1];
+
+	return duc_cmd_albumsetartist( dudl, albumid, artistid );
+}
+
+CMD(c_albumsetname)
+{
+	int albumid = (int)argv[0];
+	char *name = (char*)argv[1];
+
+	return duc_cmd_albumsetname( dudl, albumid, name );
+}
+
+CMD(c_albumsetyear)
+{
+	int albumid = (int)argv[0];
+	int year = (int)argv[1];
+
+	return duc_cmd_albumsetyear( dudl, albumid, year );
+}
+
+
 /************************************************************
  *
  */
@@ -960,6 +1007,21 @@ CMD(c_artistmerge)
 	int from = (int)argv[0];
 	int to = (int)argv[1];
 	return duc_cmd_artistmerge( dudl, from, to );
+}
+
+CMD(c_artistadd)
+{
+	char *name = (char*)argv[0];
+	if( -1 == duc_cmd_artistadd(dudl, name))
+		return -1;
+
+	return 0;
+}
+
+CMD(c_artistdel)
+{
+	int id = (int)argv[0];
+	return duc_cmd_artistdel( dudl, id );
 }
 
 /************************************************************
@@ -1114,8 +1176,13 @@ CMD(c_sfiltersave)
 // TODO: lst_artist
 #define arg_artist	\
 	{ "artistid",	0, AP(val_uint),	NULL,		NULL }
+// TODO: lst_album
+#define arg_album	\
+	{ "albumid",	0, AP(val_uint),	NULL,		NULL }
 #define arg_sfilter	\
 	{ "sfilter",	0, AP(val_sfilter),	NULL,		NULL }
+#define arg_year	\
+	{ "year",	0, AP(val_year),	NULL,		NULL }
 
 t_cmd_arg args_none[]		= { arg_end };
 t_cmd_arg args_time[]		= { arg_time, arg_end };
@@ -1126,6 +1193,8 @@ t_cmd_arg args_cmd[]		= { arg_cmd, arg_end };
 t_cmd_arg args_bool[]		= { arg_bool, arg_end };
 t_cmd_arg args_track[]		= { arg_track, arg_end };
 t_cmd_arg args_tracklist[]	= { arg_tracklist, arg_end };
+t_cmd_arg args_trackname[]	= { arg_track, arg_string, arg_end };
+t_cmd_arg args_trackartist[]	= { arg_tracklist, arg_artist, arg_end };
 t_cmd_arg args_string[]		= { arg_string, arg_end };
 t_cmd_arg args_onum[]		= { arg_onum, arg_end };
 t_cmd_arg args_taglist[]	= { arg_taglist, arg_end };
@@ -1138,6 +1207,9 @@ t_cmd_arg args_tracknum[]	= { arg_track, arg_onum, arg_end };
 t_cmd_arg args_tagname[]	= { arg_tag, arg_name, arg_end };
 t_cmd_arg args_tagdesc[]	= { arg_tag, arg_string, arg_end };
 t_cmd_arg args_tracktaglist[]	= { arg_tracklist, arg_taglist, arg_end };
+t_cmd_arg args_albumartist[]	= { arg_album, arg_artist, arg_end };
+t_cmd_arg args_albumname[]	= { arg_album, arg_string, arg_end };
+t_cmd_arg args_albumyear[]	= { arg_album, arg_year, arg_end };
 t_cmd_arg args_artistname[]	= { arg_artist, arg_string, arg_end };
 t_cmd_arg args_artistmerge[]	= { arg_artist, arg_artist, arg_end };
 t_cmd_arg args_sfiltername[]	= { arg_sfilter, arg_name, arg_end };
@@ -1237,7 +1309,13 @@ t_cmd cmds_top[] = {
 	{ "tracksearchf",	"f",
 		c_tracksearchf,		args_string,
 		"search for titles matching filter" },
-	// TODO: modify track
+	{ "tracksetartist",	NULL,
+		c_tracksetartist,	args_trackartist,
+		"change artist" },
+	{ "tracksetname",	NULL,
+		c_tracksetname,		args_trackname,
+		"change track name" },
+	// TODO: add/del/move track
 
 	{ "filter",		NULL,
 		c_filter,		args_none,
@@ -1340,7 +1418,16 @@ t_cmd cmds_top[] = {
 	{ "albumsartist",	NULL,
 		c_albumsartist,		args_artist,
 		"search albums by artist" },
-	// TODO: modify/add album
+	{ "albumsetartist",	NULL,
+		c_albumsetartist,	args_albumartist,
+		"change artist" },
+	{ "albumsetname",	NULL,
+		c_albumsetname,		args_albumname,
+		"change album name" },
+	{ "albumsetyear",	NULL,
+		c_albumsetyear,		args_albumyear,
+		"change album year" },
+	// TODO: add/del album
 
 	{ "artistlist",		NULL,
 		c_artistlist,		args_none,
@@ -1357,6 +1444,12 @@ t_cmd cmds_top[] = {
 	{ "artistmerge",	NULL,
 		c_artistmerge,		args_artistmerge,
 		"merge two artists" },
+	{ "artistadd",	NULL,
+		c_artistadd,		args_string,
+		"add artist" },
+	{ "artistdel",	NULL,
+		c_artistdel,		args_artist,
+		"delete artists" },
 
 	{ "sfilterlist",	NULL,
 		c_sfilterlist,		args_none,

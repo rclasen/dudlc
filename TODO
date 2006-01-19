@@ -8,6 +8,10 @@ cmd: uses hardcoded terminal control codes for bold output
 
 cli: put bcast in current line, opening a new one
 
+cmd: make queue-idlist aware of min/max queue IDs
+
+remove queuealbum
+
 implement all lib commands
 
 implement all cli commands
@@ -23,7 +27,7 @@ GTK client
 
 ncurses client (extra window for current track/status)
 
-method to find command mismatches: server, lib, cmd
+method to find command mismatches: db-backend, server, lib, cmd
 
 find way to feed search results to other commands
  - tracksearch -> queueadd

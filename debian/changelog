@@ -1,3 +1,16 @@
+dudlc (0.1.8) unstable; urgency=low
+
+  * added tracksetartist/-name
+  * added albumsetname/-artist/-year
+  * added artistadd/-del
+  * added album->year to protocol parser. THIS IS AN INCOMPATIBLE CHANGE and
+    requires a new server.
+  * added some man pages
+  * check and enforce protocol version on startup
+  * converted some functions to no-"const" THIS IS AN API CHANGE
+
+ -- Rainer Clasen <bj@zuto.de>  Mon, 16 Jan 2006 11:36:47 +0100
+
 dudlc (0.1.7) unstable; urgency=low
 
   * adjusted cmd usage info to reflect current implementation status.

@@ -11,10 +11,12 @@ typedef struct {
 	char *pass;
 
 	t_duc_sock *con;
+	int vmajor;
+	int vminor;
 
 	int inreply;
 	char code[4];
-	const char *line;
+	char *line;
 } dudlc;
 
 

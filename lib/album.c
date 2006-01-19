@@ -26,6 +26,11 @@ duc_album *_duc_album_parse( char *line, char **end )
 		goto clean2;
 
 	s = e+1;
+	n->year = strtol( s, &e, 10 );
+	if( s == e )
+		goto clean2;
+
+	s = e+1;
 	if( NULL == (n->artist = _duc_artist_parse(s, &e )))
 		goto clean3;
 
@@ -82,5 +87,9 @@ int duc_cmd_albumsetartist( dudlc *c, int id, int artistid )
 	return _duc_cmd_succ(c, "albumsetartist %d %d", id, artistid );
 }
 
+int duc_cmd_albumsetyear( dudlc *c, int id, int year )
+{
+	return _duc_cmd_succ(c, "albumsetyear %d %d", id, year );
+}
 
-
+// TODO: add/del album
