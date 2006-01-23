@@ -1,0 +1,27 @@
+.TH DUDL_CMD 1 "2006-06-22"
+
+.SH NAME
+dudl_cmd \- dudl jukebox client commands
+
+.SH DESCRIPTION
+
+TODO: command description.
+
+For now you have to rely on the online help that's available through the
+.BR help
+command.
+
+The filter syntax for the 
+.BR tracksearchf
+and 
+.BR filterset
+is explained in the 
+.BR dudl_filter (1) 
+manpage.
+
+.SH SEE ALSO
+.BR dudlc (1),
+.BR dudl_filter (1)
+.br
+.SH AUTHOR
+This manual page was written by Rainer Clasen.

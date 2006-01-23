@@ -8,6 +8,10 @@ include_HEADERS= dudlccmd.h idlist.h parseval.h
 
 libdudlccmd_la_SOURCES= formatter.c msg.c command.c idlist.c parseval.c
 
+man1_MANS=dudl_cmd.man
+
+EXTRA_DIST=$(MANS)
+
 checklib:
 	make -C ../lib commands.txt
 	while read cmd; do \

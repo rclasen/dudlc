@@ -4,6 +4,7 @@
 dudl_filter \- filter language for the dudl jukebox
 
 .SH DESCRIPTION
+.\" TODO: translate to english
 
 Die Filter werden an mehreren Stellen verwendet um Titel zu
 suchen/einzugrenzen. Dabei können alle Daten eines Titel herangezogen
