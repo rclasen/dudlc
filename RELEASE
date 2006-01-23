@@ -3,6 +3,6 @@ release:
 - debian/changelog: Version, changes
 - configure.ac: Version
 - autoremake
-- fakeroot debian/rules binary
+- fakeroot debian/rules binary; fakeroot debian/rules binary
 - make dist
 

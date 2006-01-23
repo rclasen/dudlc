@@ -2,7 +2,7 @@
 .\" First parameter, NAME, should be all caps
 .\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
 .\" other parameters are allowed: see man(7), man(1)
-.TH DUDLC 1 "2002-08-01"
+.TH IRDUDL 1 "2002-08-01"
 .\" Please adjust this date whenever revising the manpage.
 .\"
 .\" Some roff macros, for reference:
@@ -16,20 +16,26 @@
 .\" .sp <n>    insert n+1 empty lines
 .\" for manpage-specific macros, see man(7)
 .SH NAME
-dudlc \- command line client for dudld jukebox
+irdudl \- lirc line client for dudld jukebox
 .SH SYNOPSIS
-.B dudlc
+.B irdudl
 .RI [ options ]
+.B <lirc_config>
 .SH DESCRIPTION
 This manual page documents briefly the
-.B dudlc
+.B irdudl
 command.
 .PP
 .\" TeX users may be more comfortable with the \fB<whatever>\fP and
 .\" \fI<whatever>\fP escape sequences to invode bold face and italics, 
 .\" respectively.
-\fBdudlc\fP is a readline enabled textmode client to access a dudld
-jukebox.
+\fBirdudl\fP is a lirc client to access a dudld jukebox.
+
+The specified 
+.B <lirc_config>
+defines the commands issued on lirc key presses. It uses the same syntax
+as irexec. Please consult the lirc documentation for a description.
+
 .SH OPTIONS
 These programs follow the usual GNU command line syntax, with long
 options starting with two dashes (`-').
@@ -51,14 +57,22 @@ dudld user.
 .B \-p, \-\-pass <pass>
 dudld password.
 .TP
-.B \-c, \-\-command <cmd>
-run specified command and exit immediately.
-
-.\" TODO: describe available commands.
+.B \-b, \-\-beep
+send beep to local console after every command.
+.TP
+.B \-f, \-\-foreground
+do not detach from current terminal and stay in foreground.
+.TP
+.B \-f, \-\-debug
+enable debug logging.
+.TP
+.B \-l, \-\-pidfile <pidfile>
+file to store the pid in. For use in init scripts and to avoid duplicate
+instances.
 
 .SH SEE ALSO
 .BR dudl_filter (1),
-.BR irdudl (1),
+.BR dudlc (1),
 .BR dudld (8).
 .br
 .SH AUTHOR

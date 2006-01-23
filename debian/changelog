@@ -1,3 +1,11 @@
+dudlc (0.1.9) unstable; urgency=low
+
+  * made lintian clean
+  * added manpage for irdudl
+  * really install manpages
+
+ -- Rainer Clasen <bj@zuto.de>  Thu, 19 Jan 2006 17:12:42 +0100
+
 dudlc (0.1.8) unstable; urgency=low
 
   * added tracksetartist/-name
