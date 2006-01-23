@@ -1,0 +1,35 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.TH DUDLC_CONF 5 "2006-01-22"
+.SH NAME
+~/.dudlc.conf \- config for dudl jukebox client
+.SH DESCRIPTION
+This manual page ddescribes the syntax of the dudlc configuration file.
+
+The file is read using the glib keyfile parser. This means it is roughly
+ini-like. Comments start with #.
+
+[dudlc]
+
+<key>=<value>
+
+.SH KEYS
+.TP
+\fBhost\fR
+hostname the dudld daemon is running on.
+.TP
+\fBport\fR
+TCP port to connect to.
+.TP
+\fBuser\fR
+default username to use for authentication.
+.TP
+\fBpass\fR
+default password to use for authentication.
+
+
+.SH SEE ALSO
+.BR dudlc (1),
+.BR dudld (8).
+.br
+.SH AUTHOR
+This manual page was written by Rainer Clasen.

@@ -10,12 +10,12 @@
 #include <stdio.h>
 #include <getopt.h>
 #include <string.h>
-     
+#include <pwd.h>
+#include <glib.h>
+
 #include "tty.h"
 #include "events.h"
 #include "main.h"
-
-// TODO: ~/.dudlc.conf
 
 dudlc *con = NULL;
 char *progname = NULL;
@@ -77,15 +77,47 @@ static void loop( void )
 	} while( ! terminate );
 }
 
+static void def_string( char **dst, GKeyFile *kf, char *key, char *def )
+{
+	GError *err = NULL;
+
+	if( *dst )
+		return;
+
+	if( kf )
+		*dst = g_key_file_get_string( kf, "dudlc", key, &err );
+
+	if( ! *dst )
+		*dst = def;
+}
+
+static void def_integer( int *dst, GKeyFile *kf, char *key, int def )
+{
+	GError *err = NULL;
+
+	if( *dst >= 0 )
+		return;
+
+	if( kf )
+		*dst = g_key_file_get_integer( kf, "dudlc", key, &err );
+	if( err && err->code == G_KEY_FILE_ERROR_INVALID_VALUE )
+		fprintf( stderr, "invalid data for %s: %s", key, err->message );
+
+	if( err || *dst < 0 )
+		*dst = def;
+}
+
+
 static void usage( void );
 
 int main( int argc, char **argv )
 {
-	char *host = "localhost";
-	int port = 4445;
-	char *user = "guest";
-	char *pass = "guest";
+	char *host = NULL;
+	int port = -1;
+	char *user = NULL;
+	char *pass = NULL;
 	char *command = NULL;
+	char *cfname = NULL;
 	int c;
 	int needhelp = 0;
 	struct option lopts[] = {
@@ -95,11 +127,14 @@ int main( int argc, char **argv )
 		{"user", required_argument, NULL, 'u' },
 		{"pass", required_argument, NULL, 'p' },
 		{"command", required_argument, NULL, 'c' },
+		{"config", required_argument, NULL, 'f' },
 		{ 0,0,0,0 }
 	};
+	GKeyFile *keyfile = NULL;
+	GError *err = NULL;
 
 	progname = argv[0];
-	while( -1 != ( c = getopt_long( argc, argv, "hH:P:u:p:c:",
+	while( -1 != ( c = getopt_long( argc, argv, "hH:P:u:p:c:f:",
 					lopts, NULL ))){
 		switch( c ){
 		  case 'h':
@@ -127,6 +162,10 @@ int main( int argc, char **argv )
 			  command = optarg;
 			  break;
 
+		  case 'f':
+			  cfname = optarg;
+			  break;
+
 		  default:
 			  needhelp++;
 		}
@@ -137,6 +176,32 @@ int main( int argc, char **argv )
 		exit(1);
 	}
 
+	if( ! cfname ){
+		struct passwd *pw;
+		if( NULL == (pw = getpwuid(getuid()))){
+			fprintf( stderr, "failed to determin home\n");
+		} else {
+			asprintf( &cfname, "%s/.dudlc.conf", pw->pw_dir );
+		}
+	}
+
+	keyfile = g_key_file_new();
+	if( ! g_key_file_load_from_file( keyfile, cfname, G_KEY_FILE_NONE, &err )){
+		if( err->domain == G_KEY_FILE_ERROR && 
+				err->code == G_KEY_FILE_ERROR_NOT_FOUND )
+			fprintf( stderr, "error reading config %s: %s", 
+					cfname, err->message );
+		g_key_file_free( keyfile );
+		keyfile = NULL;
+	}
+
+	def_string( &host, keyfile, "host", "localhost" );
+	def_integer( &port, keyfile, "port", 4445 );
+	def_string( &user, keyfile, "user", "guest" );
+	def_string( &pass, keyfile, "pass", "guest" );
+
+	if( keyfile )
+		g_key_file_free( keyfile );
 
 	dmsg_msg_cb = tty_vmsg;
 
