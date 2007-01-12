@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 AC_INIT
-AM_INIT_AUTOMAKE(dudlc,0.1.9)
+AM_INIT_AUTOMAKE(dudlc,0.1.10)
 AM_CONFIG_HEADER(lib/dudlc/config.h)
 
 # Checks for programs.
@@ -31,5 +31,5 @@ AC_CHECK_FUNCS([gethostbyname memmove memset select socket strcasecmp strcspn st
 AM_MAINTAINER_MODE
 
 AC_CONFIG_FILES([Makefile lib/Makefile lib/dudlc/Makefile
-	cmd/Makefile cli/Makefile ir/Makefile])
+	cmd/Makefile cli/Makefile ir/Makefile gtk/Makefile])
 AC_OUTPUT
