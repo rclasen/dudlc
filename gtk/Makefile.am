@@ -5,9 +5,9 @@ CFLAGS:= -g -Wall  -W -Wunused -Wmissing-prototypes -Wcast-qual -Wcast-align \
 
 # TODO: properly test for glib
 
-AM_CFLAGS=-g $(shell pkg-config --cflags glib-2.0 gtk+ ) 
+AM_CFLAGS=-g $(shell pkg-config --cflags glib-2.0 gtk+-2.0 ) 
 
-AM_LDFLAGS=$(shell pkg-config --libs glib-2.0 gtk+ )
+AM_LDFLAGS=$(shell pkg-config --libs glib-2.0 gtk+-2.0 )
 
 bin_PROGRAMS=gtkdudlc
 
@@ -15,6 +15,6 @@ bin_PROGRAMS=gtkdudlc
 
 EXTRA_DIST=$(MANS)
 
-gtkdudlc_LDFLAGS=-L../lib -L../cmd -ldudlc -ldudlccmd 
+gtkdudlc_LDFLAGS=-L../lib -L../cmd -ldudlc #-ldudlccmd 
 gtkdudlc_SOURCES= \
 	main.c
