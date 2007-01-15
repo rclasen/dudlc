@@ -1,24 +1,26 @@
 #include <string.h>
-#include <time.h>
 #include <gtk/gtk.h>
 #include <dudlc.h>
 #include <dudlccmd.h>
+
+#define PROG_MAX 10000
 
 dudlc *con = NULL;
 char *host = "localhost";
 int port = 4445;
 char *user = "lirc";
 char *pass = "lirc";
+
 int duration;
 
-GtkWidget *ctl_id, *ctl_dur, *ctl_artist, *ctl_album, *ctl_title, *ctl_status;
+GtkWidget *ctl_title, *ctl_album, *ctl_dur, *ctl_prog;
 GtkWidget *ctl_prev, *ctl_stop, *ctl_play, *ctl_pause, *ctl_next;
 
-static void set_status( duc_playstatus stat )
+static void status_set( duc_playstatus stat )
 {
 	switch(stat){
 	  case pl_offline:
-		gtk_entry_set_text( GTK_ENTRY(ctl_status), "offline" );
+		// TODO: gtk_entry_set_text( GTK_ENTRY(ctl_status), "offline" );
 		gtk_widget_set_sensitive( GTK_WIDGET(ctl_prev), TRUE );
 		gtk_widget_set_sensitive( GTK_WIDGET(ctl_stop), TRUE );
 		gtk_widget_set_sensitive( GTK_WIDGET(ctl_play), TRUE );
@@ -26,7 +28,7 @@ static void set_status( duc_playstatus stat )
 		gtk_widget_set_sensitive( GTK_WIDGET(ctl_next), TRUE );
 		break;
 	  case pl_stop:
-		gtk_entry_set_text( GTK_ENTRY(ctl_status), "stopped" );
+		// TODO: gtk_entry_set_text( GTK_ENTRY(ctl_status), "stopped" );
 		gtk_widget_set_sensitive( GTK_WIDGET(ctl_prev), TRUE );
 		gtk_widget_set_sensitive( GTK_WIDGET(ctl_stop), FALSE );
 		gtk_widget_set_sensitive( GTK_WIDGET(ctl_play), TRUE );
@@ -34,7 +36,7 @@ static void set_status( duc_playstatus stat )
 		gtk_widget_set_sensitive( GTK_WIDGET(ctl_next), TRUE );
 		break;
 	  case pl_play:
-		gtk_entry_set_text( GTK_ENTRY(ctl_status), "playing" );
+		// TODO: gtk_entry_set_text( GTK_ENTRY(ctl_status), "playing" );
 		gtk_widget_set_sensitive( GTK_WIDGET(ctl_prev), TRUE );
 		gtk_widget_set_sensitive( GTK_WIDGET(ctl_stop), TRUE );
 		gtk_widget_set_sensitive( GTK_WIDGET(ctl_play), FALSE );
@@ -42,7 +44,7 @@ static void set_status( duc_playstatus stat )
 		gtk_widget_set_sensitive( GTK_WIDGET(ctl_next), TRUE );
 		break;
 	  case pl_pause:
-		gtk_entry_set_text( GTK_ENTRY(ctl_status), "paused" );
+		// TODO: gtk_entry_set_text( GTK_ENTRY(ctl_status), "paused" );
 		gtk_widget_set_sensitive( GTK_WIDGET(ctl_prev), TRUE );
 		gtk_widget_set_sensitive( GTK_WIDGET(ctl_stop), TRUE );
 		gtk_widget_set_sensitive( GTK_WIDGET(ctl_play), TRUE );
@@ -54,36 +56,33 @@ static void set_status( duc_playstatus stat )
 
 static void track_clear( void )
 {
-	duration = 0;
-	gtk_entry_set_text( GTK_ENTRY(ctl_id), "" );
-	gtk_progress_bar_set_text( GTK_PROGRESS_BAR(ctl_dur), NULL );
-	gtk_progress_bar_set_fraction( GTK_PROGRESS_BAR(ctl_dur), 0 );
-	gtk_entry_set_text( GTK_ENTRY(ctl_artist), "" );
-	gtk_entry_set_text( GTK_ENTRY(ctl_album), "" );
-	gtk_entry_set_text( GTK_ENTRY(ctl_title), "" );
+	gtk_label_set_text( GTK_LABEL(ctl_title), "" );
+	gtk_label_set_text( GTK_LABEL(ctl_album), "" );
+	gtk_label_set_text( GTK_LABEL(ctl_dur), NULL );
+	gtk_range_set_value( GTK_RANGE(ctl_prog), 0 );
 }
 
 static void track_set( duc_track *t )
 {
-	struct tm *tm;
-	char buf[32];
+	gchar *buf;
+
+	buf = g_strdup_printf( "%s: %s", t->artist->artist, t->title );
+	gtk_label_set_text( GTK_LABEL(ctl_title), buf );
+	g_free(buf);
+
+	gtk_label_set_text( GTK_LABEL(ctl_album), t->album->album );
 
 	duration = t->duration;
-	snprintf( buf, 32, "%d/%d", t->album->id, t->albumnr );
-	gtk_entry_set_text( GTK_ENTRY(ctl_id), buf );
-	tm = gmtime( (time_t*)&t->duration );
-	strftime( buf, 32, "%M:%S", tm );
-	gtk_progress_bar_set_text( GTK_PROGRESS_BAR(ctl_dur), buf );
-	gtk_entry_set_text( GTK_ENTRY(ctl_artist), t->artist->artist );
-	gtk_entry_set_text( GTK_ENTRY(ctl_album), t->album->album );
-	gtk_entry_set_text( GTK_ENTRY(ctl_title), t->title );
+	buf = g_strdup_printf( "%d:%02d", (int)duration/60, duration % 60 );
+	gtk_label_set_text( GTK_LABEL(ctl_dur), buf );
+	g_free(buf);
 }
 
 static void cb_disc( dudlc *c )
 {
 	(void)c;
 
-	set_status( pl_offline );
+	status_set( pl_offline );
 	track_clear();
 }
 
@@ -94,7 +93,7 @@ static void cb_conn( dudlc *c )
 	duc_track *t;
 
 	stat = duc_cmd_status( c );
-	set_status( stat );
+	status_set( stat );
 	
 	if( NULL != (t = duc_cmd_curtrack( c ))){
 		track_set( t );
@@ -105,38 +104,39 @@ static void cb_conn( dudlc *c )
 static void cb_nexttrack( dudlc *c, duc_track *t )
 {
 	(void)c;
-	set_status( pl_play );
+	status_set( pl_play );
 	track_set( t );
 }
 
 static void cb_stopped( dudlc *c )
 {
 	(void)c;
-	set_status( pl_stop );
+	status_set( pl_stop );
 	track_clear();
 }
 
 static void cb_paused( dudlc *c )
 {
 	(void)c;
-	set_status( pl_pause );
+	status_set( pl_pause );
 }
 
 static void cb_resumed( dudlc *c )
 {
 	(void)c;
-	set_status( pl_play );
+	status_set( pl_play );
 }
 
 static void cb_elapsed( dudlc *c, int r )
 {
 	(void)c;
 	if( duration == 0 )
-		gtk_progress_bar_set_fraction( GTK_PROGRESS_BAR(ctl_dur), 0 );
+		gtk_range_set_value( GTK_RANGE(ctl_prog), 0 );
 	else if( duration < r )
-		gtk_progress_bar_set_fraction( GTK_PROGRESS_BAR(ctl_dur), 1 );
+		gtk_range_set_value( GTK_RANGE(ctl_prog), PROG_MAX );
 	else 
-		gtk_progress_bar_set_fraction( GTK_PROGRESS_BAR(ctl_dur), r / duration );
+		gtk_range_set_value( GTK_RANGE(ctl_prog), 
+				PROG_MAX * r / duration );
 }
 
 static int ctl__delete( GtkWidget *widget, GdkEvent  *event, gpointer   data )
@@ -152,6 +152,31 @@ static void ctl__destroy( GtkWidget *widget, gpointer data )
 	(void)widget;
 	(void)data;
 	gtk_main_quit();
+}
+
+static gchar *ctl_prog__format( GtkWidget *widget, gdouble value )
+{
+	GtkAdjustment *adj;
+	int val;
+
+	(void)widget;
+	(void)value;
+	adj = gtk_range_get_adjustment( GTK_RANGE(widget) );
+	val = gtk_adjustment_get_value( GTK_ADJUSTMENT(adj) ) / PROG_MAX * duration;
+	g_print( "dur/jump: %d/%d\n", duration, val );
+	return g_strdup_printf( "%d:%02d", (int)val/60, (int)val % 60 );
+}
+
+static void ctl_prog__changed( GtkButton *widget, gpointer data )
+{
+	GtkAdjustment *adj;
+	int val;
+
+	(void)data;
+	adj = gtk_range_get_adjustment( GTK_RANGE(widget) );
+	val = gtk_adjustment_get_value( GTK_ADJUSTMENT(adj) ) / PROG_MAX * duration;
+	g_print( "dur/jump: %d/%d\n", duration, val );
+	duc_cmd_jump( con, val );
 }
 
 static void ctl_prev__click( GtkButton *widget, gpointer data )
@@ -193,8 +218,6 @@ int main( int argc, char **argv )
 {
 	GtkWidget *ctl;
 	GtkWidget *ctl_tab;
-	GtkWidget *ctl_id_l, *ctl_dur_l, *ctl_artist_l, *ctl_album_l, 
-		  *ctl_title_l, *ctl_status_l;
 	GtkWidget *ctl_buttons;
 	duc_events events;
 
@@ -212,70 +235,47 @@ int main( int argc, char **argv )
 	gtk_signal_connect( GTK_OBJECT( ctl ), "destroy", 
 			GTK_SIGNAL_FUNC( ctl__destroy ), NULL);
 
-	ctl_tab = gtk_table_new( 2, 7, FALSE );
+	ctl_tab = gtk_table_new( 4, 7, FALSE );
 	gtk_container_add( GTK_CONTAINER( ctl ), ctl_tab );
 	gtk_widget_show( ctl_tab );
 
 	/* status info */
-	ctl_id_l = gtk_label_new("ID:");
-	gtk_misc_set_alignment( GTK_MISC(ctl_id_l), 1, 0 );
-	gtk_table_attach( GTK_TABLE( ctl_tab ), ctl_id_l,
-			0, 1, 0, 1, GTK_FILL, GTK_EXPAND | GTK_FILL, 0, 0 );
-	gtk_widget_show( ctl_id_l );
-	ctl_id = gtk_entry_new();
-	gtk_editable_set_editable( GTK_EDITABLE(ctl_id), FALSE );
-	gtk_entry_set_max_length( GTK_ENTRY(ctl_id), 12 );
-	gtk_table_attach( GTK_TABLE( ctl_tab ), ctl_id,
-			1, 2, 0, 1, GTK_FILL | GTK_SHRINK, 0, 0, 0);
-	gtk_widget_show( ctl_id );
+	ctl_title = gtk_label_new("");
+	gtk_misc_set_alignment( GTK_MISC(ctl_title), 0, 0 );
+	gtk_table_attach( GTK_TABLE( ctl_tab ), ctl_title,
+			0, 4, 0, 1, GTK_EXPAND | GTK_SHRINK | GTK_FILL, 0, 0, 0);
+	gtk_widget_show( ctl_title );
 
-	ctl_dur_l = gtk_label_new("Duration:");
-	gtk_misc_set_alignment( GTK_MISC(ctl_dur_l), 1, 0 );
-	gtk_table_attach( GTK_TABLE( ctl_tab ), ctl_dur_l,
-			0, 1, 1, 2, GTK_FILL, GTK_EXPAND | GTK_FILL, 0, 0 );
-	gtk_widget_show( ctl_dur_l );
-	ctl_dur = gtk_progress_bar_new(); /* TODO: use GtkScale, make it clickable */
-	gtk_table_attach( GTK_TABLE( ctl_tab ), ctl_dur,
-			1, 2, 1, 2, GTK_EXPAND | GTK_FILL | GTK_SHRINK, 0, 0, 0);
-	gtk_widget_show( ctl_dur );
-
-	ctl_album_l = gtk_label_new("Album:");
-	gtk_misc_set_alignment( GTK_MISC(ctl_album_l), 1, 0 );
-	gtk_table_attach( GTK_TABLE( ctl_tab ), ctl_album_l,
-			0, 1, 2, 3, GTK_FILL, GTK_EXPAND | GTK_FILL, 0, 0 );
-	gtk_widget_show( ctl_album_l );
-	ctl_album = gtk_entry_new();
-	gtk_editable_set_editable( GTK_EDITABLE(ctl_album), FALSE );
+	ctl_album = gtk_label_new("");
+	gtk_misc_set_alignment( GTK_MISC(ctl_album), 0, 0 );
 	gtk_table_attach( GTK_TABLE( ctl_tab ), ctl_album,
-			1, 2, 2, 3, GTK_EXPAND | GTK_SHRINK | GTK_FILL, 0, 0, 0);
+			0, 2, 1, 2, GTK_EXPAND | GTK_SHRINK | GTK_FILL, 0, 0, 0);
 	gtk_widget_show( ctl_album );
 
-	ctl_artist_l = gtk_label_new("Artist:");
-	gtk_misc_set_alignment( GTK_MISC(ctl_artist_l), 1, 0 );
-	gtk_table_attach( GTK_TABLE( ctl_tab ), ctl_artist_l,
-			0, 1, 3, 4, GTK_FILL, GTK_EXPAND | GTK_FILL, 0, 0 );
-	gtk_widget_show( ctl_artist_l );
-	ctl_artist = gtk_entry_new();
-	gtk_editable_set_editable( GTK_EDITABLE(ctl_artist), FALSE );
-	gtk_table_attach( GTK_TABLE( ctl_tab ), ctl_artist,
-			1, 2, 3, 4, GTK_EXPAND | GTK_SHRINK | GTK_FILL, 0, 0, 0);
-	gtk_widget_show( ctl_artist );
+	ctl_dur = gtk_label_new("");
+	gtk_misc_set_alignment( GTK_MISC(ctl_dur), 1, 0 );
+	gtk_table_attach( GTK_TABLE( ctl_tab ), ctl_dur,
+			2, 3, 1, 2, GTK_FILL, 0, 0, 0);
+	gtk_widget_show( ctl_dur );
 
-	ctl_title_l = gtk_label_new("Title:");
-	gtk_misc_set_alignment( GTK_MISC(ctl_title_l), 1, 0 );
-	gtk_table_attach( GTK_TABLE( ctl_tab ), ctl_title_l,
-			0, 1, 4, 5, GTK_FILL, GTK_EXPAND | GTK_FILL, 0, 0 );
-	gtk_widget_show( ctl_title_l );
-	ctl_title = gtk_entry_new();
-	gtk_editable_set_editable( GTK_EDITABLE(ctl_title), FALSE );
-	gtk_table_attach( GTK_TABLE( ctl_tab ), ctl_title,
-			1, 2, 4, 5, GTK_EXPAND | GTK_SHRINK | GTK_FILL, 0, 0, 0);
-	gtk_widget_show( ctl_title );
+	// TODO: more details
+
+	ctl_prog = gtk_hscale_new_with_range(0, PROG_MAX, 1);
+	gtk_scale_set_value_pos( GTK_SCALE(ctl_prog), GTK_POS_RIGHT );
+	//gtk_scale_set_draw_value( GTK_SCALE(ctl_prog), FALSE );
+	gtk_range_set_update_policy( GTK_RANGE(ctl_prog), GTK_UPDATE_DISCONTINUOUS );
+	gtk_signal_connect( GTK_OBJECT( ctl_prog ), "format-value",
+			GTK_SIGNAL_FUNC( ctl_prog__format ), NULL);
+	gtk_signal_connect( GTK_OBJECT( ctl_prog ), "value-changed",
+			GTK_SIGNAL_FUNC( ctl_prog__changed ), NULL);
+	gtk_table_attach( GTK_TABLE( ctl_tab ), ctl_prog,
+			0, 4, 2, 3, GTK_EXPAND | GTK_FILL | GTK_SHRINK, 0, 0, 0);
+	gtk_widget_show( ctl_prog );
 
 	/* buttons */
 	ctl_buttons = gtk_hbox_new( TRUE, 0 );
 	gtk_table_attach( GTK_TABLE( ctl_tab ), ctl_buttons,
-			0, 2, 5, 6, GTK_EXPAND, GTK_EXPAND, 0, 0);
+			0, 4, 3, 4, GTK_EXPAND, GTK_EXPAND, 0, 0);
 	gtk_widget_show( ctl_buttons );
 
 	ctl_prev = gtk_button_new_with_label( "<<" );
@@ -313,18 +313,7 @@ int main( int argc, char **argv )
 			FALSE, TRUE, 0);
 	gtk_widget_show( ctl_next );
 
-	/* status */
-	ctl_status_l = gtk_label_new("Status:");
-	gtk_misc_set_alignment( GTK_MISC(ctl_status_l), 1, 0 );
-	gtk_table_attach( GTK_TABLE( ctl_tab ), ctl_status_l,
-			0, 1, 6, 7, GTK_FILL, GTK_EXPAND | GTK_FILL, 0, 0 );
-	gtk_widget_show( ctl_status_l );
-	ctl_status = gtk_entry_new();
-	gtk_editable_set_editable( GTK_EDITABLE(ctl_status), FALSE );
-	gtk_table_attach( GTK_TABLE( ctl_tab ), ctl_status,
-			1, 2, 6, 7, GTK_EXPAND | GTK_SHRINK | GTK_FILL, 0, 0, 0);
-	gtk_widget_show( ctl_status );
-
+	// TODO: statusbar
 
 	/* dudl */
 	con = duc_new( host, port );
