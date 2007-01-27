@@ -51,6 +51,11 @@ int duc_fd( dudlc *p )
 	return duc_sock_fd( p->con );
 }
 
+int duc_connected( dudlc *p )
+{
+	return duc_sock_fd( p->con ) != -1;
+}
+
 int duc_open( dudlc *p )
 {
 	char *s, *e;

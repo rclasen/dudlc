@@ -10,6 +10,7 @@ typedef enum {
 	pl_stop,
 	pl_play,
 	pl_pause,
+	pl_offline,
 } duc_playstatus;
 
 duc_playstatus duc_cmd_status( dudlc *c );

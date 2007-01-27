@@ -6,6 +6,8 @@
 
 duc_playstatus duc_cmd_status( dudlc *c )
 {
+	if( ! duc_connected(c) )
+		return pl_offline;
 	return _duc_cmd_int(c, "status");
 }
 

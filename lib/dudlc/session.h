@@ -30,8 +30,7 @@ void duc_close( dudlc *p );
 int duc_fd( dudlc *p );
 void duc_poll( dudlc *p );
 
-
-
+int duc_connected( dudlc *p );
 
 int duc_cmd_auth( dudlc *p );
 
