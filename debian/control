@@ -37,6 +37,16 @@ Description: command line client for dudl jukebox
  This client uses readline to implement a comfortable textmode client for
  the dudl jukebox.
 
+Package: dudl-gtk
+Section: sound
+Architecture: any
+Depends: ${shlibs:Depends}
+Description: GTK client for dudl jukebox
+ The dudl jukebox is a network oriented MP3 server you can connect to with
+ multiple clients. 
+ .
+ This client offers a graphic GTK interfce.
+
 Package: dudl-lirc
 Section: sound
 Architecture: any

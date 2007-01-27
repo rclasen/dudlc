@@ -1,3 +1,16 @@
+dudlc (0.1.11) unstable; urgency=low
+
+  * added pl_offline status
+  * added initial GTK client
+
+ -- Rainer Clasen <bj@zuto.de>  Mon, 15 Jan 2007 17:15:10 +0100
+
+dudlc (0.1.10) unstable; urgency=low
+
+  * added config file for dudlc
+
+ -- Rainer Clasen <bj@zuto.de>  Mon, 15 Jan 2007 16:31:55 +0100
+
 dudlc (0.1.9) unstable; urgency=low
 
   * made lintian clean

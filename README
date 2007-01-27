@@ -13,3 +13,6 @@ cli	dudlc
 
 ir	irdudl
 	LIRC controlled client. Uses libdudlccmd.
+
+gtk	gtkdudlc
+	X11 client using the GTK toolkit

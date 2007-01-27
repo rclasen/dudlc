@@ -1,6 +1,12 @@
+lib: enum item names are not prefixed
+
+convert events, errors, signals, ... to glib-2.0
+
 error handling in lib and cmd is horrible
 
 print error messages to stderr
+
+cli: keep trying to reconnect
 
 cli: readline handling is clumsy
 
@@ -17,15 +23,20 @@ implement all lib commands
 implement all cli commands
 
 GTK client
+ + gtkdudlc.1 manpage
+ + commandline options
+ + config file
  + visual progress indication
  + jump on click
  + pick search result for queue/tagging/...
  + "visual" "drag/drop" queue manipulation
  + single-key actions for play/pause/stop/next
+ + cli-like command-window
  - tagging
  - filter manipulation (sfilter*/filterset)
 
 ncurses client (extra window for current track/status)
+ - conflicts with readline
 
 method to find command mismatches: db-backend, server, lib, cmd
 
@@ -33,3 +44,5 @@ find way to feed search results to other commands
  - tracksearch -> queueadd
  - queuesearch -> queuedel
  - ...
+ - maybe maintain a hidden idlist, that's updated for each command.
+
