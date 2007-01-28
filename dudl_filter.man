@@ -30,18 +30,19 @@ Als Sonderfall existiert die genaue Prüfung gegen eine Liste von werten:
 Im einzelnen werden die folgenden Felder mit den aufgeführten Vergleichen
 unterstützt:
 
- Feld		Wert	=	~	<><=>=	IN
+ Feld            Wert     =  ~  <><=>=  IN
 
- duration	nummer	*	-	*	-
- lastplay	nummer	*	-	*	-
- tag		nummer	*	-	-	*
- 		string	*	*	-	*
- artist		string	*	*	-	-
- 		nummer	*	-	-	TODO
- title		string	*	*	-	-
- album		string	*	*	-	-
- 		nummer	*	-	-	TODO
- year		nummer	*	-	*	-
+ duration        nummer   *  -  *       -
+ lastplay        nummer   *  -  *       -
+ tag             nummer   *  -  -       *
+                 string   *  *  -       *
+ artist          string   *  *  -       -
+                 nummer   *  -  -       TODO
+ title           string   *  *  -       -
+ album           string   *  *  -       -
+                 nummer   *  -  -       TODO
+ year            nummer   *  -  *       -
+ pos             nummer   *  -  *       -
 
 Die Ausdrücke dürfen mit beliebig vielen Whitespaces ausgeschmückt werden
 (natürlich nicht innerhalb von strings).
@@ -57,7 +58,8 @@ Beispiele:
  duration > 300		# 5 minuten
  year > 1990
  tag in "foo", "bar", 4
- lastplay > 1135968969	# sekunden seit 1970-1-1 - klappt nicht?
+ lastplay > 1135968969	# sekunden seit 1970-1-1
+ pos=1
 
 
 Einzelne Ausdrücke lassen sich auch mittels vorangestelltem ! verneinen.
