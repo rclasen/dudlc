@@ -156,18 +156,6 @@ static gboolean cb_read( GIOChannel *source, GIOCondition cond, gpointer data)
 	return TRUE;
 }
 
-static gboolean cb_time( gpointer data )
-{
-	int elapsed;
-
-	if( 0 <= (elapsed = duc_cmd_elapsed( (dudlc*)data )))
-		progress_set( elapsed );
-	else
-		return FALSE;
-
-	return TRUE;
-}
-
 static void cb_disc( dudlc *c )
 {
 	while( g_source_remove_by_user_data( c ) );
@@ -184,9 +172,6 @@ static void cb_conn( dudlc *c )
 
 	cchan = g_io_channel_unix_new(duc_fd(c));
 	g_io_add_watch(cchan, G_IO_IN | G_IO_HUP | G_IO_ERR, cb_read, c );
-
-	/* TODO: remove hack to retrieve elapsed time */
-	g_timeout_add( 2, cb_time, c );
 
 	stat = duc_cmd_status( c );
 	status_set( stat );
