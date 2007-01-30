@@ -383,6 +383,13 @@ int val_tag( dudlc *con, char *in, char **end )
 	return id;
 }
 
+/* TODO: cannot specify multiple symbolic tags:
+ * - val_tag takes up all non-space characters
+ * - ... because idl_addclist passes the whole list as string
+ * 
+ * either make addclist split the list before calling val_tag
+ * or make val_tag onle look for alphnum chars
+ */
 t_idlist *val_taglist( dudlc *con, char *in, char **end )
 {
 	t_idlist *idl;

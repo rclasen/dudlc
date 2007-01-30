@@ -21,6 +21,7 @@ static size_t minutes( char *s, size_t max, time_t time )
 {
 	struct tm *t;
 
+	/* TODO: use plain snprintf + modulo divison % instead of strftime */
 	t = gmtime( &time );
 	return strftime( s, max, "%M:%S", t );
 	/*                        MM:SS */
@@ -83,6 +84,7 @@ char *dfmt_trackhead( char *buf, unsigned int len )
 	return buf;
 }
 
+/* TODO: make escape codes configurable */
 #define BF	"\x1B[1m"
 #define NF	"\x1B[0m"
 char *dfmt_track( char *buf, unsigned int len, duc_track *t )

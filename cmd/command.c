@@ -1409,7 +1409,7 @@ t_cmd cmds_top[] = {
 	{ "albumlist",		NULL,
 		c_albumlist,		args_none,
 		"show all albums" },
-	{ "albumget",		NULL,
+	{ "albumget",		NULL, // TODO: support "c" as ID
 		c_albumget,		args_idlist,
 		"show album details" },
 	{ "albumsearch",	NULL,
@@ -1432,7 +1432,7 @@ t_cmd cmds_top[] = {
 	{ "artistlist",		NULL,
 		c_artistlist,		args_none,
 		"show all artists" },
-	{ "artistget",		NULL,
+	{ "artistget",		NULL,	// TODO: support "c" as ID
 		c_artistget,		args_idlist,
 		"show artist details" },
 	{ "artistsearch",	NULL,

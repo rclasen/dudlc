@@ -388,6 +388,7 @@ int main( int argc, char **argv )
 	 */
 	/* TODO: command window: classic/using gtk for results */
 	/* TODO: context menu */
+	/* TODO: retry connect every x seconds */
 
 	if( ! gtk_init_with_args( &argc, &argv, "dudl jukebox client for X11",
 			option_entries, NULL, &err )){

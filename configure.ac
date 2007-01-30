@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 AC_INIT
-AM_INIT_AUTOMAKE(dudlc,0.1.10)
+AM_INIT_AUTOMAKE(dudlc,0.1.12)
 AM_CONFIG_HEADER(lib/dudlc/config.h)
 
 # Checks for programs.
@@ -13,7 +13,21 @@ AC_PROG_LIBTOOL
 AC_HEADER_STDC
 AC_CHECK_HEADERS([netdb.h stdlib.h string.h sys/socket.h sys/time.h unistd.h])
 
-dnl TODO: check for libncc, readline, curses, lirc
+dnl TODO: enhance checks for libncc, readline, curses, lirc
+AC_CHECK_LIB([ncc], [pidfile_ftake])
+AC_CHECK_LIB([readline], [readline])
+AC_CHECK_LIB([curses], [initscr])
+AC_CHECK_LIB([lirc_client], [lirc_init])
+
+
+PKG_CHECK_MODULES([GLIB], [glib-2.0 >= 2.12.4])
+AC_SUBST(GLIB_LIBS)
+AC_SUBST(GLIB_CFLAGS)
+
+PKG_CHECK_MODULES([GTK], [gtk+-2.0 >= 2.8.20 ])
+AC_SUBST(GTK_LIBS)
+AC_SUBST(GTK_CFLAGS)
+
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
