@@ -537,19 +537,19 @@ int main( int argc, char **argv )
 			FALSE, TRUE, 0);
 	gtk_widget_show( ctl_stop );
 
-	ctl_play = gtk_button_new_with_label( ">" );
-	gtk_signal_connect( GTK_OBJECT( ctl_play ), "clicked",
-			G_CALLBACK( ctl_play__click ), con);
-	gtk_box_pack_start( GTK_BOX( ctl_buttons ), ctl_play,
-			FALSE, TRUE, 0);
-	gtk_widget_show( ctl_play );
-
 	ctl_pause = gtk_button_new_with_label( "\"" );
 	gtk_signal_connect( GTK_OBJECT( ctl_pause ), "clicked",
 			G_CALLBACK( ctl_pause__click ), con);
 	gtk_box_pack_start( GTK_BOX( ctl_buttons ), ctl_pause,
 			FALSE, TRUE, 0);
 	gtk_widget_show( ctl_pause );
+
+	ctl_play = gtk_button_new_with_label( ">" );
+	gtk_signal_connect( GTK_OBJECT( ctl_play ), "clicked",
+			G_CALLBACK( ctl_play__click ), con);
+	gtk_box_pack_start( GTK_BOX( ctl_buttons ), ctl_play,
+			FALSE, TRUE, 0);
+	gtk_widget_show( ctl_play );
 
 	ctl_next = gtk_button_new_with_label( ">>" );
 	gtk_signal_connect( GTK_OBJECT( ctl_next ), "clicked",
