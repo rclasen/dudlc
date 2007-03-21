@@ -303,18 +303,21 @@ CMD(c_pause)
 
 CMD(c_status)
 {
-	int stat;
+	duc_playstatus stat;
 
 	(void)argv;
 	switch( stat = duc_cmd_status(dudl)){
-		case 0:
+		case pl_stop:
 			dmsg_msg("stopped\n");
 			break;
-		case 1:
+		case pl_play:
 			dmsg_msg("playing\n");
 			break;
-		case 2:
+		case pl_pause:
 			dmsg_msg("paused\n");
+			break;
+		case pl_offline:
+			dmsg_msg("not connected\n");
 			break;
 
 		default:
@@ -399,8 +402,6 @@ CMD(c_elapsed)
 	struct tm *t;
 	char buf[10];
 
-
-
 	(void)argv;
 	if( 0 > (pos = duc_cmd_elapsed(dudl)))
 		return -1;
@@ -417,6 +418,64 @@ CMD(c_jump)
 	int pos = (int)argv[0];
 	return duc_cmd_jump(dudl, pos);
 }
+
+CMD(c_cut)
+{
+	int x;
+
+	(void)argv;
+	if( 0 > (x = duc_cmd_cut(dudl)))
+		return -1;
+
+	dmsg_msg( "silence suppression is %s\n", 
+			x ? "on" : "off" );
+	return 0;
+}
+
+CMD(c_cutset)
+{
+	int i = (int)argv[0];
+	return duc_cmd_cutset(dudl, i);
+}
+
+CMD(c_replaygain)
+{
+	int x;
+
+	(void)argv;
+	if( 0 > (x = duc_cmd_replaygain(dudl)))
+		return -1;
+	
+	/* TODO: replaygain method names */
+	dmsg_msg( "replaygain method in use: %d\n", x );
+	return 0;
+}
+
+CMD(c_replaygainset)
+{
+	int i = (int)argv[0];
+	/* TODO: check replaygain value */
+	return duc_cmd_replaygainset(dudl, i);
+}
+
+CMD(c_rgpreamp)
+{
+	double x;
+
+	(void)argv;
+	if( 0 > (x = duc_cmd_rgpreamp(dudl)))
+		return -1;
+
+	dmsg_msg( "replaygain pre-amplification: %f dB\n", x );
+	return 0;
+}
+
+CMD(c_rgpreampset)
+{
+	double i = (int)argv[0];
+	return duc_cmd_rgpreampset(dudl, i);
+}
+
 
 /************************************************************
  *
@@ -1183,6 +1242,10 @@ CMD(c_sfiltersave)
 	{ "sfilter",	0, AP(val_sfilter),	NULL,		NULL }
 #define arg_year	\
 	{ "year",	0, AP(val_year),	NULL,		NULL }
+#define arg_rgtype	\
+	{ "rgtype",	0, AP(val_rgtype),	NULL,		NULL }
+#define arg_decibel	\
+	{ "decibel",	0, AP(val_double),	NULL,		NULL }
 
 t_cmd_arg args_none[]		= { arg_end };
 t_cmd_arg args_time[]		= { arg_time, arg_end };
@@ -1214,6 +1277,8 @@ t_cmd_arg args_artistname[]	= { arg_artist, arg_string, arg_end };
 t_cmd_arg args_artistmerge[]	= { arg_artist, arg_artist, arg_end };
 t_cmd_arg args_sfiltername[]	= { arg_sfilter, arg_name, arg_end };
 t_cmd_arg args_sfilterfilter[]	= { arg_sfilter, arg_string, arg_end };
+t_cmd_arg args_rgtype[]		= { arg_rgtype, arg_end };
+t_cmd_arg args_decibel[]	= { arg_decibel, arg_end };
 
 t_cmd cmds_top[] = {
 	{ "open",		NULL,
@@ -1299,6 +1364,24 @@ t_cmd cmds_top[] = {
 		c_jump,			args_time,
 		"jump to specified position in current track" },
 	// TODO: c_seek
+	{ "cut",		NULL,
+		c_cut,			args_none,
+		"get automatic silence suppression/cutting status" },
+	{ "cutset",		NULL,
+		c_cutset,		args_bool,
+		"en-/disable automatic silence suppression/cutting" },
+	{ "replaygain",		NULL,
+		c_replaygain,		args_none,
+		"get replaygain mode" },
+	{ "replaygainset",	NULL,
+		c_replaygainset,	args_rgtype,
+		"set replaygain mode (0=disable)" },
+	{ "rgpreamp",		NULL,
+		c_rgpreamp,		args_none,
+		"get replaygain pre-amplification (dB)" },
+	{ "rgpreampset",		NULL,
+		c_rgpreampset,		args_decibel,
+		"set replaygain pre-amplification (dB)" },
 
 	{ "trackcount",		NULL,
 		c_trackcount,		args_none,

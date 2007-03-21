@@ -26,6 +26,7 @@ char *_duc_rline( dudlc *p );
 int _duc_cmd( dudlc *p, const char *fmt, ... );
 int _duc_cmd_succ( dudlc *c, const char *fmt, ... );
 int _duc_cmd_int( dudlc *c, const char *fmt, ... );
+double _duc_cmd_double( dudlc *c, const char *fmt, ... );
 char *_duc_cmd_string( dudlc *c, const char *fmt, ... );
 void *_duc_cmd_conv( dudlc *c, _duc_converter conv, 
 		const char *fmt, ... );

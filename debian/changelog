@@ -1,3 +1,10 @@
+dudlc (0.1.13) unstable; urgency=low
+
+  * added replaygain support
+  * added support for skipping begin/end of track
+
+ -- Rainer Clasen <bj@zuto.de>  Wed, 21 Mar 2007 11:49:07 +0100
+
 dudlc (0.1.12) unstable; urgency=low
 
   * rebuild for etch

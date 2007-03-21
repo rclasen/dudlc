@@ -97,6 +97,20 @@ t_enum rights[] = {
 	{ NULL, 0 },
 };
 
+t_enum rgtypes[] = {
+	{ "none",	0 },
+	{ "trackpeak",	2 },
+	{ "track",	1 },
+	{ "albumpeak",	4 },
+	{ "album",	3 },
+	{ "0",		0 },
+	{ "1",		1 },
+	{ "2",		2 },
+	{ "3",		3 },
+	{ "4",		4 },
+	{ NULL, 0 },
+};
+
 static int val_enum( t_enum *lst, char *in, char **end )
 {
 	t_enum *it;
@@ -106,12 +120,21 @@ static int val_enum( t_enum *lst, char *in, char **end )
 	/* TODO: accept numeric values, too */
 	for( it = lst; it && it->text; it++ ){
 		int len;
+		int ilen;
 
 		len = strlen(it->text);
-		if( 0 == strncasecmp(it->text, in, len)){
-			if( end ) *end = in+len;
-			return it->val;
-		}
+		ilen = strlen(in);
+		if( len > ilen )
+			continue;
+
+		if( 0 != strncasecmp(it->text, in, len) )
+			continue;
+			
+		if( ilen > len && isalnum(in[len]))
+			continue;
+
+		if( end ) *end = in+len;
+		return it->val;
 	}
 
 	return -1;
@@ -131,10 +154,23 @@ int val_right( dudlc *con, char *in, char **end )
 	return val_enum( rights, in, end );
 }
 
+int val_rgtype( dudlc *con, char *in, char **end )
+{
+	(void)con;
+
+	return val_enum( rgtypes, in, end );
+}
+
 int val_uint( dudlc *con, char *in, char **end )
 {
 	(void)con;
 	return strtoul(in, end, 10 );
+}
+
+int val_double( dudlc *con, char *in, char **end )
+{
+	(void)con;
+	return strtod(in, end );
 }
 
 int val_year( dudlc *con, char *in, char **end ) // TODO

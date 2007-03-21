@@ -31,6 +31,13 @@ int duc_cmd_randomset( dudlc *c, int r );
 int duc_cmd_elapsed( dudlc *c );
 int duc_cmd_jump( dudlc *c, int r );
 
+int duc_cmd_cut( dudlc *c );
+int duc_cmd_cutset( dudlc *c, int r );
+int duc_cmd_replaygain( dudlc *c );
+int duc_cmd_replaygainset( dudlc *c, int r );
+int duc_cmd_rgpreamp( dudlc *c );
+int duc_cmd_rgpreampset( dudlc *c, double r );
+
 void _duc_bcast_player( dudlc *c, char *line );
 
 #endif

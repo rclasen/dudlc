@@ -27,15 +27,17 @@ libdudlc_la_SOURCES= album.c \
 	user.c \
 	sfilter.c 
 
+.PHONY: commands.txt
 commands.txt:
 	grep duc_cmd_ dudlc/*.h  | \
 		sed -e 's/.*\(duc_cmd_[a-z]*\).*/\1/' | \
 		sort -u > $@
 
+.PHONY: checkserver
 checkserver:
 	make -C ../../dudld commands.txt
 	while read cmd; do \
-		grep duc_$$cmd *.c > /dev/null || echo $$cmd ; \
+		grep duc_cmd_$$cmd *.c > /dev/null || echo $$cmd ; \
 	done < ../../dudld/commands.txt
 
 	

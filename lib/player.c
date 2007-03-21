@@ -75,6 +75,35 @@ int duc_cmd_jump( dudlc *c, int r )
 	return _duc_cmd_succ(c, "jump %d", r );
 }
 
+int duc_cmd_cut( dudlc *c )
+{
+	return _duc_cmd_int(c, "cut" );
+}
+
+int duc_cmd_cutset( dudlc *c, int r )
+{
+	return _duc_cmd_succ(c, "cutset %d", r );
+}
+
+int duc_cmd_replaygain( dudlc *c )
+{
+	return _duc_cmd_int(c, "replaygain" );
+}
+
+int duc_cmd_replaygainset( dudlc *c, int r )
+{
+	return _duc_cmd_succ(c, "replaygainset %d", r );
+}
+
+int duc_cmd_rgpreamp( dudlc *c )
+{
+	return _duc_cmd_double(c, "rgpreamp" );
+}
+
+int duc_cmd_rgpreampset( dudlc *c, double r )
+{
+	return _duc_cmd_succ(c, "rgpreampset %f", r );
+}
 
 static void _duc_bcast_newtrack( dudlc *c, char *line )
 {

@@ -33,5 +33,8 @@ t_idlist *val_taglist( dudlc *con, char *in, char **end );
 
 int val_sfilter( dudlc *con, char *in, char **end );
 
+int val_rgtype( dudlc *con, char *in, char **end );
+int val_double( dudlc *con, char *in, char **end );
+
 
 #endif

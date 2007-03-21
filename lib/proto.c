@@ -125,6 +125,26 @@ int _duc_cmd_int( dudlc *c, const char *fmt, ... )
 	return  -1;
 }
 
+double _duc_cmd_double( dudlc *c, const char *fmt, ... )
+{
+	va_list ap;
+
+	va_start(ap, fmt );
+	if( _duc_vsend(c, fmt, ap ) ){
+		va_end(ap);
+		return -1;
+	}
+	va_end(ap);
+
+	if( _duc_rlast(c) )
+		return -1;
+
+	if( *_duc_rcode(c) == '2' )
+		return strtod(_duc_rline(c), NULL);
+
+	return  -1;
+}
+
 void *_duc_cmd_conv( dudlc *c, _duc_converter conv, 
 		const char *fmt, ... )
 {

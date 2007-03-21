@@ -7,7 +7,7 @@
 #include "dudlc/proto.h"
 
 #define DUC_PROTO_MAJOR	1
-#define DUC_PROTO_MINOR	0
+#define DUC_PROTO_MINOR	1
 
 // TODO: better error-reporting than stderr!!!
 
