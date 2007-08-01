@@ -20,6 +20,7 @@ duc_tag *duc_cmd_tagget( dudlc *c, int id );
 int duc_cmd_tag2id( dudlc *c, const char *name );
 
 duc_it_tag *duc_cmd_taglist( dudlc *c );
+duc_it_tag *duc_cmd_tagsartist( dudlc *c, int aid );
 
 int duc_cmd_tagadd( dudlc *c, const char *name );
 int duc_cmd_tagsetname( dudlc *c, int id, const char *name );

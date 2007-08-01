@@ -77,6 +77,12 @@ duc_it_album *duc_cmd_albumsartist( dudlc *c, int artistid )
 			"albumsartist %d", artistid );
 }
 
+duc_it_album *duc_cmd_albumstag( dudlc *c, int tid )
+{
+	return _duc_iterate( c, (_duc_converter)_duc_album_parse, 
+			"albumstag %d", tid );
+}
+
 int duc_cmd_albumsetname( dudlc *c, int id, const char *name )
 {
 	return _duc_cmd_succ(c, "albumsetname %d %s", id, name );

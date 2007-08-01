@@ -2,6 +2,7 @@
 release:
 - debian/changelog: Version, changes
 - configure.ac: Version
+- lib/session.c: adjust Proto version
 - autoremake
 - fakeroot debian/rules binary; fakeroot debian/rules binary
 - make dist

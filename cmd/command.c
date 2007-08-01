@@ -766,6 +766,19 @@ CMD(c_taglist)
 	return 0;
 }
 
+CMD(c_tagsartist)
+{
+	duc_it_tag *it;
+
+	if( NULL == (it = duc_cmd_tagsartist( dudl, (int)argv[0] )))
+		return -1;
+
+	dmsg_dump_tags(it);
+	duc_it_tag_done(it);
+
+	return 0;
+}
+
 static int i_tagget( dudlc *dudl, int id, void *data )
 {
 	char buf[BUFLENTAG];
@@ -921,6 +934,19 @@ CMD(c_albumlist)
 	return 0;
 }
 
+CMD(c_albumstag)
+{
+	duc_it_album *it;
+
+	if( NULL == (it = duc_cmd_albumstag( dudl, (int)argv[0] )))
+		return -1;
+
+	dmsg_dump_albums(it);
+	duc_it_album_done(it);
+
+	return 0;
+}
+
 static int i_albumget( dudlc *dudl, int id, void *data )
 {
 	char buf[BUFLENALBUM];
@@ -1008,6 +1034,19 @@ CMD(c_artistlist)
 
 	(void)argv;
 	if( NULL == (it = duc_cmd_artistlist( dudl )))
+		return -1;
+
+	dmsg_dump_artists(it);
+	duc_it_artist_done(it);
+
+	return 0;
+}
+
+CMD(c_artiststag)
+{
+	duc_it_artist *it;
+
+	if( NULL == (it = duc_cmd_artiststag( dudl, (int)argv[0] )))
 		return -1;
 
 	dmsg_dump_artists(it);
@@ -1260,6 +1299,7 @@ t_cmd_arg args_trackname[]	= { arg_track, arg_string, arg_end };
 t_cmd_arg args_trackartist[]	= { arg_tracklist, arg_artist, arg_end };
 t_cmd_arg args_string[]		= { arg_string, arg_end };
 t_cmd_arg args_onum[]		= { arg_onum, arg_end };
+t_cmd_arg args_tag[]		= { arg_tag, arg_end };
 t_cmd_arg args_taglist[]	= { arg_taglist, arg_end };
 t_cmd_arg args_sfilter[]	= { arg_sfilter, arg_end };
 t_cmd_arg args_artist[]		= { arg_artist, arg_end };
@@ -1462,6 +1502,9 @@ t_cmd cmds_top[] = {
 	{ "taglist",		NULL,
 		c_taglist,		args_none,
 		"show all tags" },
+	{ "tagsartist",		NULL,
+		c_tagsartist,		args_artist,
+		"show tags somwhow linked to an artist" },
 	{ "tagget",		NULL,
 		c_tagget,		args_taglist,
 		"show tag details" },
@@ -1501,6 +1544,9 @@ t_cmd cmds_top[] = {
 	{ "albumsartist",	NULL,
 		c_albumsartist,		args_artist,
 		"search albums by artist" },
+	{ "albumstag",	NULL,
+		c_albumstag,		args_tag,
+		"search albums by tags on it's tracks" },
 	{ "albumsetartist",	NULL,
 		c_albumsetartist,	args_albumartist,
 		"change artist" },
@@ -1515,6 +1561,9 @@ t_cmd cmds_top[] = {
 	{ "artistlist",		NULL,
 		c_artistlist,		args_none,
 		"show all artists" },
+	{ "artiststag",	NULL,
+		c_artiststag,		args_tag,
+		"search artists by tags on it's tracks" },
 	{ "artistget",		NULL,	// TODO: support "c" as ID
 		c_artistget,		args_idlist,
 		"show artist details" },

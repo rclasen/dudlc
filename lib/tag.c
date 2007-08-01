@@ -68,6 +68,11 @@ duc_it_tag *duc_cmd_taglist( dudlc *c )
 	return _duc_iterate(c, (_duc_converter)_duc_tag_parse, "taglist" );
 }
 
+duc_it_tag *duc_cmd_tagsartist( dudlc *c, int aid )
+{
+	return _duc_iterate(c, (_duc_converter)_duc_tag_parse, "tagsartist %d", aid );
+}
+
 int duc_cmd_tagadd( dudlc *c, const char *name )
 {
 	return _duc_cmd_int(c, "tagadd %s", name );

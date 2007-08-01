@@ -20,6 +20,7 @@ void duc_artist_free( duc_artist *a );
 duc_artist *duc_cmd_artistget( dudlc *c, int id );
 
 duc_it_artist *duc_cmd_artistlist( dudlc *c );
+duc_it_artist *duc_cmd_artiststag( dudlc *c, int tid );
 duc_it_artist *duc_cmd_artistsearch( dudlc *c, const char *substr );
 
 int duc_cmd_artistsetname( dudlc *c, int id, const char *name );

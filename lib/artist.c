@@ -53,6 +53,12 @@ duc_it_artist *duc_cmd_artistlist( dudlc *c )
 			"artistlist" );
 }
 
+duc_it_artist *duc_cmd_artiststag( dudlc *c, int tid )
+{
+	return _duc_iterate( c, (_duc_converter)_duc_artist_parse, 
+			"artiststag %d", tid );
+}
+
 duc_it_artist *duc_cmd_artistsearch( dudlc *c, const char *str )
 {
 	return _duc_iterate( c, (_duc_converter)_duc_artist_parse, 
