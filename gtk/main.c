@@ -312,7 +312,7 @@ static void def_integer( int *dst, GKeyFile *kf, char *key, int def )
 int main( int argc, char **argv )
 {
 	char *opt_host = NULL;
-	int opt_port;
+	int opt_port = -1;
 	char *opt_user = NULL;
 	char *opt_pass = NULL;
 	char *opt_cfg = NULL;
