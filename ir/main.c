@@ -1,4 +1,5 @@
 
+#define _GNU_SOURCE
 #include <errno.h>
 #include <unistd.h>
 #include <stdarg.h>
@@ -15,7 +16,7 @@
 #include <signal.h>
 #include <sys/time.h>
 
-#include <libncc/pidfile.h>
+#include <lockfile.h>
 
 #include <lirc/lirc_client.h>
 #include <dudlc.h>
@@ -229,7 +230,7 @@ int main(int argc, char *argv[])
 	int port = 0;
 	char *user = NULL;
 	char *pass = NULL;
-	int pidfile = 0;
+	char *pidfile = NULL;
 
 	progname = strrchr( argv[0], '/' );
 	if( NULL != progname ){
@@ -284,7 +285,9 @@ int main(int argc, char *argv[])
 			pass = strdup(optarg);
 			break;
 		case 'l':
-			pidfile++;
+			if( ! pidfile )
+				asprintf( &pidfile, 
+				"/var/run/%s.pid", progname ); 
 			break;
 		default:
 			needhelp++;
@@ -332,7 +335,7 @@ int main(int argc, char *argv[])
 		setlogmask( LOG_UPTO(LOG_INFO) );
 	}
 
-	if( pidfile && pidfile_lock(progname)){
+	if( pidfile && ! lockfile_check(pidfile, L_PID)){
 		syslog( LOG_ERR, "cannot create pidfile: %m"); 
 		exit( EXIT_FAILURE );
 	}
@@ -353,8 +356,8 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	if( pidfile && pidfile_take(progname, pid)){
-		syslog( LOG_ERR, "cannot update pidfile: %m"); 
+	if( pidfile && lockfile_create(pidfile, 0, L_PID)){
+		syslog( LOG_ERR, "cannot create pidfile: %m"); 
 		exit( EXIT_FAILURE );
 	}
 
@@ -367,7 +370,7 @@ int main(int argc, char *argv[])
 
 	/* cleanup */
 	duc_free( dudl );
-	pidfile_unlock( progname );
+	lockfile_remove(pidfile);
 
 	exit(EXIT_SUCCESS);
 }

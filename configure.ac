@@ -13,8 +13,8 @@ AC_PROG_LIBTOOL
 AC_HEADER_STDC
 AC_CHECK_HEADERS([netdb.h stdlib.h string.h sys/socket.h sys/time.h unistd.h])
 
-dnl TODO: enhance checks for libncc, readline, curses, lirc
-AC_CHECK_LIB([ncc], [pidfile_ftake])
+dnl TODO: enhance checks for liblockfile, readline, curses, lirc
+AC_CHECK_LIB([lockfile], [lockfile_create])
 AC_CHECK_LIB([readline], [readline])
 AC_CHECK_LIB([curses], [initscr])
 AC_CHECK_LIB([lirc_client], [lirc_init])

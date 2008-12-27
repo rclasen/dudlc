@@ -9,4 +9,4 @@ EXTRA_DIST=$(MANS)
 
 bin_PROGRAMS = irdudl
 irdudl_SOURCES = main.c
-irdudl_LDFLAGS=-L../lib -L../cmd -ldudlc -ldudlccmd -llirc_client -lncc
+irdudl_LDFLAGS=-L../lib -L../cmd -ldudlc -ldudlccmd -llirc_client -llockfile
