@@ -1,4 +1,5 @@
 Source: dudlc
+Section: sound
 Priority: optional
 Maintainer: Rainer Clasen <bj@zuto.de>
 Build-Depends: debhelper (>> 3.0.0), liblircclient-dev, libreadline-dev, libgtk2.0-dev
