@@ -14,16 +14,25 @@ AC_HEADER_STDC
 AC_CHECK_HEADERS([netdb.h stdlib.h string.h sys/socket.h sys/time.h unistd.h])
 
 dnl TODO: enhance checks for liblockfile, readline, curses, lirc
+
+# LGPL
 AC_CHECK_LIB([lockfile], [lockfile_create])
+
+# GPL
 AC_CHECK_LIB([readline], [readline])
+
+# BSD-mod
 AC_CHECK_LIB([curses], [initscr])
+
+# GPL
 AC_CHECK_LIB([lirc_client], [lirc_init])
 
-
+# LGPL
 PKG_CHECK_MODULES([GLIB], [glib-2.0 >= 2.12.4])
 AC_SUBST(GLIB_LIBS)
 AC_SUBST(GLIB_CFLAGS)
 
+# LGPL
 PKG_CHECK_MODULES([GTK], [gtk+-2.0 >= 2.8.20 ])
 AC_SUBST(GTK_LIBS)
 AC_SUBST(GTK_CFLAGS)
