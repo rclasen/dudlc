@@ -1,4 +1,6 @@
 
+/* TODO: GPL license */
+
 #define _GNU_SOURCE
      
 #include <stdlib.h>
@@ -66,12 +68,10 @@ static void loop( void )
 		
 		if( -1 != duc_fd(con) && FD_ISSET(duc_fd(con), &rfds)){
 			duc_poll(con);
-			tty_redraw();
 		}
 
 		if( FD_ISSET(0,&rfds) ){
 			tty_poll();
-			tty_redraw();
 		}
 
 	} while( ! terminate );
@@ -203,7 +203,6 @@ int main( int argc, char **argv )
 	if( keyfile )
 		g_key_file_free( keyfile );
 
-	dmsg_msg_cb = tty_vmsg;
 
 	con = duc_new( host, port );
 	duc_setauth( con, user, pass );

@@ -1,7 +1,11 @@
+
 #ifndef _DUDLCCMD_H
 #define _DUDLCCMD_H
 
 #include <dudlc.h>
+
+char *dfmt_bf;
+char *dfmt_nf;
 
 char *dfmt_clienthead( char *buf, unsigned int len );
 char *dfmt_client( char *buf, unsigned int len, duc_client *c );

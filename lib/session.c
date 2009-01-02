@@ -1,3 +1,4 @@
+
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -79,7 +80,7 @@ int duc_open( dudlc *p )
 
 	s = _duc_rline(p);
 	if( 0 != strncmp("dudld", s, 5 )){
-		fprintf( stderr, "contacted server is no dudl server\n" );
+		fprintf( stderr, "contacted server is no dudl server\n" ); /* TODO */
 		goto clean1;
 	}
 
@@ -96,16 +97,16 @@ int duc_open( dudlc *p )
 	}
 
 	if( p->vmajor != DUC_PROTO_MAJOR ){
-		fprintf( stderr, "invalid major protocol version: got %d, want %d\n", 
+		fprintf( stderr, "invalid major protocol version: got %d, want %d\n",  /* TODO */
 				p->vmajor, DUC_PROTO_MAJOR );
 		goto clean1;
 	}
 
 	if( p->vminor < DUC_PROTO_MINOR )
-		fprintf( stderr, "minor protocol version mismatch - some features won't work\n" );
+		fprintf( stderr, "minor protocol version mismatch - some features won't work\n" ); /* TODO */
 
 	if( p->user && duc_cmd_auth( p )){
-		fprintf( stderr, "login failed\n" );
+		fprintf( stderr, "login failed\n" ); /* TODO */
 		goto clean1;
 	}
 

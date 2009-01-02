@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <time.h>
 
@@ -5,6 +6,9 @@
 
 // TODO: give user chance to influence column width
 // TODO: adjust column width to window size
+
+char *dfmt_bf = NULL;
+char *dfmt_nf = NULL;
 
 static size_t isotime( char *s, size_t max, time_t time )
 {
@@ -84,9 +88,8 @@ char *dfmt_trackhead( char *buf, unsigned int len )
 	return buf;
 }
 
-/* TODO: make escape codes configurable */
-#define BF	"\x1B[1m"
-#define NF	"\x1B[0m"
+#define BF	(dfmt_bf ? dfmt_bf : "")
+#define NF	(dfmt_nf ? dfmt_nf : "")
 char *dfmt_track( char *buf, unsigned int len, duc_track *t )
 {
 	char tim[10];
@@ -94,12 +97,15 @@ char *dfmt_track( char *buf, unsigned int len, duc_track *t )
 	minutes(tim, 10, t->duration);
 	snprintf( buf, len, 
 			"%7s "
-			BF "%-18.18s " NF
+			"%s%-18.18s%s "
 			"%-5.5s "
-			BF "%-16.16s " NF
+			"%s%-16.16s%s " 
 			"%-29s",
 			dfmt_trackid(t->album->id, t->albumnr), 
-			t->album->album, tim, t->artist->artist, t->title );
+			BF, t->album->album, NF,
+			tim, 
+			BF, t->artist->artist, NF,
+			t->title );
 
 	return buf;
 }

@@ -1,4 +1,5 @@
 
+
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -181,7 +182,7 @@ char *duc_sock_getline( t_duc_sock *s )
 		}
 
 		fprintf( stderr, "line too long for BUFLENRCV, " 
-				"truncating\n" );
+				"truncating\n" ); /* TODO */
 	}
 
 	/* split buffer in found line and remainig stuff */

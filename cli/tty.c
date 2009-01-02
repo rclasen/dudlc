@@ -7,6 +7,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <signal.h>
+#include <term.h>
      
 #include <readline/readline.h>
 #include <readline/history.h>
@@ -15,8 +16,16 @@
 #include "main.h"
 #include "tty.h"     
 
-static int redisplay = 0;
-static int inprompt = 0;
+static char tent[4096];
+static struct {
+	char *clreol;
+	char *abold;
+	char *anorm;
+} tcap = {
+	.clreol = "",
+	.abold = "",
+	.anorm = "",
+};
 
 /* 
  * pointer function that builds the list of completions for current
@@ -139,7 +148,6 @@ static void tty_executor( char *input )
 	add_history(input);
 
 	/* execute action - if one is defined */
-	inprompt = 0;
 
 	len = strcspn( input, "\t " );
 	if( 0 == strcasecmp( input, "quit" ) ){
@@ -154,7 +162,6 @@ static void tty_executor( char *input )
 	} else {
 		duc_cmd( con, input );
 	}
-	inprompt = 1;
 
 	free(input);
 }
@@ -162,7 +169,25 @@ static void tty_executor( char *input )
 
 void tty_init( const char *name, const char *prompt )
 {
-	inprompt = 1;
+
+	if( isatty(STDOUT_FILENO)){
+		char *term;
+		char *area = tent;
+
+		if( NULL == (term = getenv("TERM") )){
+			term="dumb";
+		}
+
+		if( 0 <= tgetent( tent, term ) ){
+			tcap.clreol = tgetstr("ce", &area );
+			tcap.abold = tgetstr("md", &area );
+			tcap.anorm = tgetstr("me", &area );
+		}
+	}
+
+	dmsg_msg_cb = tty_vmsg;
+	dfmt_bf = tcap.abold;
+	dfmt_nf = tcap.anorm;
 
 	rl_readline_name = name;
 	rl_attempted_completion_function = tty_completer;
@@ -172,10 +197,8 @@ void tty_init( const char *name, const char *prompt )
 
 void tty_redraw( void )
 {
-	if( redisplay ){
-		rl_forced_update_display();
-		redisplay = 0;
-	}
+	rl_on_new_line();
+	rl_redisplay();
 }
 
 void tty_poll( void )
@@ -187,12 +210,13 @@ int tty_vmsg( const char *fmt, va_list ap )
 {
 	int r;
 
-	if( ! redisplay && inprompt )
-		printf( "\n" );
-
+	putchar(13);
+	putp( tcap.clreol );
 	r = vprintf( fmt, ap );
-	if( inprompt )
-		redisplay++;
+	rl_on_new_line();
+
+	if(! RL_ISSTATE(RL_STATE_DONE) )
+		rl_redisplay();
 
 	return r;
 }
