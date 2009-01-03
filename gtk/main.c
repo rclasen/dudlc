@@ -11,11 +11,10 @@
 #include <string.h>
 #include <gtk/gtk.h>
 #include <dudlc.h>
-#include <dudlccmd.h>
 
-#include "options.h"
-#include "playbox.h"
+#include "common.h"
 
+dudlc *con = NULL;
 static GtkWidget *ctl, *ctl_menu /*, *ctl_status */;
 
 /************************************************************
@@ -121,6 +120,31 @@ static void buttons_toggle( GtkAction *action, gpointer data )
 		shrink_y(GTK_WINDOW(ctl));
 }
 
+static void show_album( GtkAction *action, gpointer data ) 
+{
+	duc_track *track;
+	duc_it_track *it;
+	GtkWidget *win;
+
+	(void)action;
+	(void)data;
+
+	if( NULL == (track = duc_cmd_curtrack( con )))
+		return;
+
+	if( NULL == (it = duc_cmd_tracksalbum( con, track->album->id ))){
+		duc_track_free(track);
+		return;
+	}
+
+	win = childwindow_new( "track list", track_list_new_with_list(it) );
+	gtk_window_set_default_size(GTK_WINDOW(win), 500, 300);
+	gtk_widget_show( win );
+
+	duc_track_free(track);
+	duc_it_track_done(it);
+}
+
 /*
 static void status_toggle( GtkAction *action, gpointer data ) 
 {
@@ -154,7 +178,6 @@ int main( int argc, char **argv )
 	options opt;
 	char *opt_cfg = NULL;
 	duc_events events;
-	dudlc *con = NULL;
 	GtkWidget *ctl_mainbox;
 	GtkWidget *ctl_playbox;
 	GError *err = NULL;
@@ -185,7 +208,12 @@ int main( int argc, char **argv )
 		{ "FileMenu", NULL, "_File", NULL, NULL, NULL },
 		{ "Quit", GTK_STOCK_QUIT, "_Quit", "<control>Q", 
 			"Quit the program", G_CALLBACK(gtk_main_quit) },
+
 		{ "OptionMenu", NULL, "_Options", NULL, NULL, NULL },
+
+		{ "ShowMenu", NULL, "_Show", NULL, NULL, NULL },
+		{ "ShowAlbum", NULL, "show _Album", "<control>L",
+			"show tracks of current album", G_CALLBACK(show_album) },
 	};
 	GtkToggleActionEntry action_tentries[] = {
 		{ "OptButtons", NULL, "show _Buttons", "<control>B", 
@@ -202,6 +230,9 @@ int main( int argc, char **argv )
 		"  <menubar name='MainMenu'>"
 		"    <menu action='FileMenu'>"
 		"      <menuitem action='Quit'/>"
+		"    </menu>"
+		"    <menu action='ShowMenu'>"
+		"      <menuitem action='ShowAlbum'/>"
 		"    </menu>"
 		"    <menu action='OptionMenu'>"
 		"      <menuitem action='OptMenu'/>"
@@ -289,7 +320,7 @@ int main( int argc, char **argv )
 	gtk_widget_hide( ctl_menu );
 
 	/* player controls */
-	ctl_playbox = playbox_new( con );
+	ctl_playbox = playbox_new();
 	gtk_box_pack_start( GTK_BOX( ctl_mainbox ), ctl_playbox, FALSE, FALSE, 0 );
 	gtk_widget_show( ctl_playbox );
 

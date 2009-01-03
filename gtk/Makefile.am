@@ -12,11 +12,13 @@ bin_PROGRAMS=gtkdudlc
 
 EXTRA_DIST=$(MANS)
 
-gtkdudlc_LDFLAGS=-L../lib -L../cmd -ldudlc #-ldudlccmd 
+gtkdudlc_LDFLAGS=-L../lib -L../cmd -ldudlc
 gtkdudlc_SOURCES= \
 	main.c \
 	options.c \
 	playbox.c \
+	childwindow.c \
+	sortfunc.c \
+	track.c \
 	\
-	options.h \
-	playbox.h
+	common.h

@@ -9,9 +9,8 @@
 
 #include <gtk/gtk.h>
 #include <dudlc.h>
-#include <dudlccmd.h>
 
-#include "playbox.h"
+#include "common.h"
 
 /* TODO: make this a widget */
 
@@ -137,41 +136,47 @@ static void ctl_prog__changed( GtkButton *widget, gpointer data )
 	GtkAdjustment *adj;
 	int val;
 
+	(void)data;
 	if( progress_seekable ){
 		adj = gtk_range_get_adjustment( GTK_RANGE(widget) );
 		val = gtk_adjustment_get_value( GTK_ADJUSTMENT(adj) );
-		duc_cmd_jump( (dudlc*)data, val );
+		duc_cmd_jump( con, val );
 	}
 }
 
 static void ctl_prev__click( GtkButton *widget, gpointer data )
 {
 	(void)widget;
-	duc_cmd_prev( (dudlc*)data );
+	(void)data;
+	duc_cmd_prev( con );
 }
 
 static void ctl_stop__click( GtkButton *widget, gpointer data )
 {
 	(void)widget;
-	duc_cmd_stop( (dudlc*)data );
+	(void)data;
+	duc_cmd_stop( con );
 }
 
 static void ctl_play__click( GtkButton *widget, gpointer data )
 {
 	(void)widget;
-	duc_cmd_play( (dudlc*)data );
+	(void)data;
+	duc_cmd_play( con );
 }
 
 static void ctl_pause__click( GtkButton *widget, gpointer data )
 {
 	(void)widget;
-	duc_cmd_pause( (dudlc*)data );
+	(void)data;
+	duc_cmd_pause( con );
 }
 
 static void ctl_next__click( GtkButton *widget, gpointer data )
 {
 	(void)widget;
-	duc_cmd_next( (dudlc*)data );
+	(void)data;
+	duc_cmd_next( con );
 }
 
 
@@ -203,7 +208,7 @@ static GtkWidget *detail2_new( void )
 	return box;
 }
 
-static GtkWidget *playbox_buttons_new( dudlc *con )
+static GtkWidget *playbox_buttons_new( void )
 {
 	GtkWidget *box;
 
@@ -216,35 +221,35 @@ static GtkWidget *playbox_buttons_new( dudlc *con )
 
 	ctl_prev = gtk_button_new_with_label( "<<" );
 	gtk_signal_connect( GTK_OBJECT( ctl_prev ), "clicked",
-			G_CALLBACK( ctl_prev__click ), con);
+			G_CALLBACK( ctl_prev__click ), NULL);
 	gtk_box_pack_start( GTK_BOX( ctl_buttons ), ctl_prev,
 			FALSE, TRUE, 0);
 	gtk_widget_show( ctl_prev );
 
 	ctl_stop = gtk_button_new_with_label( "[]" );
 	gtk_signal_connect( GTK_OBJECT( ctl_stop ), "clicked",
-			G_CALLBACK( ctl_stop__click ), con);
+			G_CALLBACK( ctl_stop__click ), NULL);
 	gtk_box_pack_start( GTK_BOX( ctl_buttons ), ctl_stop,
 			FALSE, TRUE, 0);
 	gtk_widget_show( ctl_stop );
 
 	ctl_pause = gtk_button_new_with_label( "\"" );
 	gtk_signal_connect( GTK_OBJECT( ctl_pause ), "clicked",
-			G_CALLBACK( ctl_pause__click ), con);
+			G_CALLBACK( ctl_pause__click ), NULL);
 	gtk_box_pack_start( GTK_BOX( ctl_buttons ), ctl_pause,
 			FALSE, TRUE, 0);
 	gtk_widget_show( ctl_pause );
 
 	ctl_play = gtk_button_new_with_label( ">" );
 	gtk_signal_connect( GTK_OBJECT( ctl_play ), "clicked",
-			G_CALLBACK( ctl_play__click ), con);
+			G_CALLBACK( ctl_play__click ), NULL);
 	gtk_box_pack_start( GTK_BOX( ctl_buttons ), ctl_play,
 			FALSE, TRUE, 0);
 	gtk_widget_show( ctl_play );
 
 	ctl_next = gtk_button_new_with_label( ">>" );
 	gtk_signal_connect( GTK_OBJECT( ctl_next ), "clicked",
-			G_CALLBACK( ctl_next__click ), con);
+			G_CALLBACK( ctl_next__click ), NULL);
 	gtk_box_pack_start( GTK_BOX( ctl_buttons ), ctl_next,
 			FALSE, TRUE, 0);
 	gtk_widget_show( ctl_next );
@@ -252,7 +257,7 @@ static GtkWidget *playbox_buttons_new( dudlc *con )
 	return box;
 }
 
-GtkWidget *playbox_new( dudlc *con )
+GtkWidget *playbox_new( void )
 {
 	GtkWidget *ctl_rowa, *ctl_buttons;
 	GtkWidget *box;
@@ -285,13 +290,13 @@ GtkWidget *playbox_new( dudlc *con )
 	gtk_signal_connect( GTK_OBJECT( ctl_prog ), "format-value",
 			G_CALLBACK( ctl_prog__format ), NULL);
 	gtk_signal_connect( GTK_OBJECT( ctl_prog ), "value-changed",
-			G_CALLBACK( ctl_prog__changed ), con);
+			G_CALLBACK( ctl_prog__changed ), NULL);
 	gtk_box_pack_start_defaults( GTK_BOX( box ), ctl_prog );
 	gtk_widget_show( ctl_prog );
 
 	/* buttons */
 	/* TODO: add button images */
-	ctl_buttons = playbox_buttons_new( con );
+	ctl_buttons = playbox_buttons_new();
 	gtk_box_pack_start( GTK_BOX( box ), ctl_buttons,
 			TRUE, FALSE, 0 );
 	gtk_widget_show( ctl_buttons );

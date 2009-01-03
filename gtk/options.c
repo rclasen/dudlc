@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include <glib.h>
 
-#include "options.h"
+#include "common.h"
 
 static void def_string( char **dst, GKeyFile *kf, char *key, char *def )
 {
