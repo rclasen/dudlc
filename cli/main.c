@@ -32,10 +32,10 @@
 #include <getopt.h>
 #include <string.h>
 #include <pwd.h>
-#include <glib.h>
 
 #include "tty.h"
 #include "events.h"
+#include "options.h"
 #include "main.h"
 
 dudlc *con = NULL;
@@ -96,45 +96,12 @@ static void loop( void )
 	} while( ! terminate );
 }
 
-static void def_string( char **dst, GKeyFile *kf, char *key, char *def )
-{
-	GError *err = NULL;
-
-	if( *dst )
-		return;
-
-	if( kf )
-		*dst = g_key_file_get_string( kf, "dudlc", key, &err );
-
-	if( ! *dst )
-		*dst = def;
-}
-
-static void def_integer( int *dst, GKeyFile *kf, char *key, int def )
-{
-	GError *err = NULL;
-
-	if( *dst >= 0 )
-		return;
-
-	if( kf )
-		*dst = g_key_file_get_integer( kf, "dudlc", key, &err );
-	if( err && err->code == G_KEY_FILE_ERROR_INVALID_VALUE )
-		fprintf( stderr, "invalid data for %s: %s", key, err->message );
-
-	if( err || *dst < 0 )
-		*dst = def;
-}
-
-
 static void usage( void );
+
 
 int main( int argc, char **argv )
 {
-	char *host = NULL;
-	int port = -1;
-	char *user = NULL;
-	char *pass = NULL;
+	options cfg;
 	char *command = NULL;
 	char *cfname = NULL;
 	int c;
@@ -149,8 +116,8 @@ int main( int argc, char **argv )
 		{"config", required_argument, NULL, 'f' },
 		{ 0,0,0,0 }
 	};
-	GKeyFile *keyfile = NULL;
-	GError *err = NULL;
+
+	options_init( &cfg );
 
 	progname = argv[0];
 	while( -1 != ( c = getopt_long( argc, argv, "hH:P:u:p:c:f:",
@@ -162,19 +129,19 @@ int main( int argc, char **argv )
 			  break;
 
 		  case 'H':
-			  host = optarg;
+			  cfg.host = strdup(optarg);
 			  break;
 
 		  case 'P':
-			  port = atoi(optarg);
+			  cfg.port = atoi(optarg);
 			  break;
 
 		  case 'u':
-			  user = optarg;
+			  cfg.user = strdup(optarg);
 			  break;
 
 		  case 'p':
-			  pass = optarg;
+			  cfg.pass = strdup(optarg);
 			  break;
 
 		  case 'c':
@@ -204,28 +171,11 @@ int main( int argc, char **argv )
 		}
 	}
 
-	keyfile = g_key_file_new();
-	if( ! g_key_file_load_from_file( keyfile, cfname, G_KEY_FILE_NONE, &err )){
-		if( err->domain == G_KEY_FILE_ERROR && 
-				err->code == G_KEY_FILE_ERROR_NOT_FOUND )
-			fprintf( stderr, "error reading config %s: %s", 
-					cfname, err->message );
-		g_key_file_free( keyfile );
-		keyfile = NULL;
-	}
 
-	def_string( &host, keyfile, "host", "localhost" );
-	def_integer( &port, keyfile, "port", 4445 );
-	def_string( &user, keyfile, "user", "guest" );
-	def_string( &pass, keyfile, "pass", "guest" );
+	options_read( &cfg, cfname );
 
-	if( keyfile )
-		g_key_file_free( keyfile );
-
-
-	con = duc_new( host, port );
-	duc_setauth( con, user, pass );
-
+	con = duc_new( cfg.host, cfg.port );
+	duc_setauth( con, cfg.user, cfg.pass );
 
 	if( command ){
 		if( duc_open( con ) ){
