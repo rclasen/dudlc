@@ -14,4 +14,9 @@ EXTRA_DIST=$(MANS)
 
 gtkdudlc_LDFLAGS=-L../lib -L../cmd -ldudlc #-ldudlccmd 
 gtkdudlc_SOURCES= \
-	main.c
+	main.c \
+	options.c \
+	playbox.c \
+	\
+	options.h \
+	playbox.h
