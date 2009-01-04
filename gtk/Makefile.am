@@ -18,7 +18,10 @@ gtkdudlc_SOURCES= \
 	options.c \
 	playbox.c \
 	childwindow.c \
+	context.c \
 	sortfunc.c \
+	cellfunc.c \
 	track.c \
+	album.c \
 	\
 	common.h

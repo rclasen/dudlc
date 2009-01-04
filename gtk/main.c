@@ -15,13 +15,15 @@
 #include "common.h"
 
 dudlc *con = NULL;
-static GtkWidget *ctl, *ctl_menu /*, *ctl_status */;
+static GtkWidget *main_win, *main_menu /*, *ctl_status */;
+
+/* TODO: auto updating windows with current album + artist list */
 
 /************************************************************
  * dudl interaction
  */
 
-static gboolean cb_dudl_poll( GIOChannel *source, GIOCondition cond, gpointer data)
+static gboolean iowatch_dudl( GIOChannel *source, GIOCondition cond, gpointer data)
 {
 	(void)source;
 	(void)cond;
@@ -43,7 +45,7 @@ static void ev_conn( dudlc *c )
 	duc_track *t;
 
 	cchan = g_io_channel_unix_new(duc_fd(c));
-	g_io_add_watch(cchan, G_IO_IN | G_IO_HUP | G_IO_ERR, cb_dudl_poll, c );
+	g_io_add_watch(cchan, G_IO_IN | G_IO_HUP | G_IO_ERR, iowatch_dudl, c );
 
 	stat = duc_cmd_status( c );
 	playbox_buttons_enable( stat );
@@ -101,10 +103,10 @@ static void menu_toggle( GtkAction *action, gpointer data )
 {
 	(void)data;
 	if( gtk_toggle_action_get_active( GTK_TOGGLE_ACTION(action)))
-		gtk_widget_show(GTK_WIDGET(ctl_menu));
+		gtk_widget_show(GTK_WIDGET(main_menu));
 	else {
-		gtk_widget_hide(GTK_WIDGET(ctl_menu));
-		shrink_y(GTK_WINDOW(ctl));
+		gtk_widget_hide(GTK_WIDGET(main_menu));
+		shrink_y(GTK_WINDOW(main_win));
 	}
 }
 
@@ -117,14 +119,14 @@ static void buttons_toggle( GtkAction *action, gpointer data )
 
 	playbox_buttons_show( show );
 	if(! show )
-		shrink_y(GTK_WINDOW(ctl));
+		shrink_y(GTK_WINDOW(main_win));
 }
 
-static void show_album( GtkAction *action, gpointer data ) 
+static void show_current_album_tracks( GtkAction *action, gpointer data ) 
 {
 	duc_track *track;
 	duc_it_track *it;
-	GtkWidget *win;
+	GtkWidget *list, *scroll, *win;
 
 	(void)action;
 	(void)data;
@@ -137,12 +139,51 @@ static void show_album( GtkAction *action, gpointer data )
 		return;
 	}
 
-	win = childwindow_new( "track list", track_list_new_with_list(it) );
+	list = track_list_new_with_list(it);
+
+	scroll = gtk_scrolled_window_new( GTK_ADJUSTMENT(NULL), GTK_ADJUSTMENT(NULL) );
+	gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW(scroll), 
+		GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC );
+	gtk_container_add( GTK_CONTAINER(scroll), list );
+
+	win = childwindow_new( "track list", scroll );
 	gtk_window_set_default_size(GTK_WINDOW(win), 500, 300);
 	gtk_widget_show( win );
 
 	duc_track_free(track);
 	duc_it_track_done(it);
+}
+
+static void show_current_artist_albums( GtkAction *action, gpointer data ) 
+{
+	duc_track *track;
+	duc_it_album *it;
+	GtkWidget *list, *scroll, *win;
+
+	(void)action;
+	(void)data;
+
+	if( NULL == (track = duc_cmd_curtrack( con )))
+		return;
+
+	if( NULL == (it = duc_cmd_albumsartist( con, track->artist->id ))){
+		duc_track_free(track);
+		return;
+	}
+
+	list = album_list_new_with_list(it);
+
+	scroll = gtk_scrolled_window_new( GTK_ADJUSTMENT(NULL), GTK_ADJUSTMENT(NULL) );
+	gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW(scroll), 
+		GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC );
+	gtk_container_add( GTK_CONTAINER(scroll), list );
+
+	win = childwindow_new( "album list", scroll );
+	gtk_window_set_default_size(GTK_WINDOW(win), 500, 300);
+	gtk_widget_show( win );
+
+	duc_track_free(track);
+	duc_it_album_done(it);
 }
 
 /*
@@ -153,12 +194,12 @@ static void status_toggle( GtkAction *action, gpointer data )
 		gtk_widget_show(ctl_status);
 	else {
 		gtk_widget_hide(ctl_status);
-		shrink_y(GTK_WINDOW(ctl));
+		shrink_y(GTK_WINDOW(main_win));
 	}
 }
 */
 
-static int ctl__delete( GtkWidget *widget, GdkEvent  *event, gpointer   data )
+static int main_win_on_delete( GtkWidget *widget, GdkEvent  *event, gpointer   data )
 {
 	(void)widget;
 	(void)event;
@@ -166,7 +207,7 @@ static int ctl__delete( GtkWidget *widget, GdkEvent  *event, gpointer   data )
 	return FALSE;
 }
 
-static void ctl__destroy( GtkWidget *widget, gpointer data )
+static void main_win_on_destroy( GtkWidget *widget, gpointer data )
 {
 	(void)widget;
 	(void)data;
@@ -178,8 +219,8 @@ int main( int argc, char **argv )
 	options opt;
 	char *opt_cfg = NULL;
 	duc_events events;
-	GtkWidget *ctl_mainbox;
-	GtkWidget *ctl_playbox;
+	GtkWidget *mainbox;
+	GtkWidget *playbox;
 	GError *err = NULL;
 	GOptionEntry option_entries[] = {
 		{ "host",	'H', 0,
@@ -212,8 +253,12 @@ int main( int argc, char **argv )
 		{ "OptionMenu", NULL, "_Options", NULL, NULL, NULL },
 
 		{ "ShowMenu", NULL, "_Show", NULL, NULL, NULL },
-		{ "ShowAlbum", NULL, "show _Album", "<control>L",
-			"show tracks of current album", G_CALLBACK(show_album) },
+		{ "ShowArtist", NULL, "show _Artist", "<control>A",
+			"show ablums of current artist", 
+			G_CALLBACK(show_current_artist_albums) },
+		{ "ShowAlbum", NULL, "show A_lbum", "<control>L",
+			"show tracks of current album", 
+			G_CALLBACK(show_current_album_tracks) },
 	};
 	GtkToggleActionEntry action_tentries[] = {
 		{ "OptButtons", NULL, "show _Buttons", "<control>B", 
@@ -233,6 +278,7 @@ int main( int argc, char **argv )
 		"    </menu>"
 		"    <menu action='ShowMenu'>"
 		"      <menuitem action='ShowAlbum'/>"
+		"      <menuitem action='ShowArtist'/>"
 		"    </menu>"
 		"    <menu action='OptionMenu'>"
 		"      <menuitem action='OptMenu'/>"
@@ -284,16 +330,16 @@ int main( int argc, char **argv )
 
 
 	/* main window */
-	ctl = gtk_window_new( GTK_WINDOW_TOPLEVEL );
-	gtk_window_set_title( GTK_WINDOW(ctl), "dudlc" );
-	gtk_signal_connect( GTK_OBJECT( ctl ), "delete_event", 
-			G_CALLBACK( ctl__delete ), NULL);
-	gtk_signal_connect( GTK_OBJECT( ctl ), "destroy", 
-			G_CALLBACK( ctl__destroy ), NULL);
+	main_win = gtk_window_new( GTK_WINDOW_TOPLEVEL );
+	gtk_window_set_title( GTK_WINDOW(main_win), "dudlc" );
+	gtk_signal_connect( GTK_OBJECT( main_win ), "delete_event", 
+			G_CALLBACK( main_win_on_delete ), NULL);
+	gtk_signal_connect( GTK_OBJECT( main_win ), "destroy", 
+			G_CALLBACK( main_win_on_destroy ), NULL);
 
-	ctl_mainbox = gtk_vbox_new( FALSE, 0 );
-	gtk_container_add( GTK_CONTAINER( ctl ), ctl_mainbox );
-	gtk_widget_show( ctl_mainbox );
+	mainbox = gtk_vbox_new( FALSE, 0 );
+	gtk_container_add( GTK_CONTAINER( main_win ), mainbox );
+	gtk_widget_show( mainbox );
 
 	/* hotkeys */
 	agroup_main = gtk_action_group_new("MainWindowActions");
@@ -312,17 +358,17 @@ int main( int argc, char **argv )
 		exit(EXIT_FAILURE);
         }
 
-        ctl_menu = gtk_ui_manager_get_widget(ui_manager, "/MainMenu");
-	gtk_box_pack_start( GTK_BOX( ctl_mainbox ), ctl_menu, FALSE, FALSE, 0 );
+        main_menu = gtk_ui_manager_get_widget(ui_manager, "/MainMenu");
+	gtk_box_pack_start( GTK_BOX( mainbox ), main_menu, FALSE, FALSE, 0 );
 	accels = gtk_ui_manager_get_accel_group( ui_manager );
-	gtk_window_add_accel_group( GTK_WINDOW(ctl), accels );
+	gtk_window_add_accel_group( GTK_WINDOW(main_win), accels );
 
-	gtk_widget_hide( ctl_menu );
+	gtk_widget_hide( main_menu );
 
 	/* player controls */
-	ctl_playbox = playbox_new();
-	gtk_box_pack_start( GTK_BOX( ctl_mainbox ), ctl_playbox, FALSE, FALSE, 0 );
-	gtk_widget_show( ctl_playbox );
+	playbox = playbox_new();
+	gtk_box_pack_start( GTK_BOX( mainbox ), playbox, FALSE, FALSE, 0 );
+	gtk_widget_show( playbox );
 
 	/* TODO: statusbar
 	 * servername, username, play_status, sleep, random, gap, filterstat */
@@ -341,7 +387,7 @@ int main( int argc, char **argv )
 	duc_open( con );
 
 	/* run */
-	gtk_widget_show( ctl );
+	gtk_widget_show( main_win );
 	gtk_main();
 
 	return 0;

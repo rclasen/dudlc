@@ -51,3 +51,19 @@ gint sortfunc_int( GtkTreeModel *model,
 	return ( val1 < val2 ) ? -1 : 1;
 }
 
+gint sortfunc_albumpos( GtkTreeModel *model,
+                          GtkTreeIter  *a,
+                          GtkTreeIter  *b,
+                          gpointer      data)
+{
+	gint ret;
+
+	/* album ID - from previous column */
+	if( 0 != (ret = sortfunc_int( model, a, b, (gpointer)( (int)data -1) )))
+		return ret;
+
+	/* album pos */
+	return sortfunc_int( model, a, b, data );
+}	
+
+
