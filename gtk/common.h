@@ -79,11 +79,19 @@ void cellfunc_duration(
 	GtkTreeIter *iter,
 	gpointer data );
 
+void cellfunc_time( 
+	GtkTreeViewColumn *col,
+	GtkCellRenderer *cell,
+	GtkTreeModel *model,
+	GtkTreeIter *iter,
+	gpointer data );
+
 /*
  * childwindow.c
  */
 
 GtkWidget *childwindow_new( const char *title, GtkWidget *contents );
+GtkWidget *child_queue( GtkWidget *list );
 
 /*
  * context.c
@@ -112,5 +120,18 @@ GtkWidget *album_list_new_with_list( duc_it_album *in );
 void album_list_populate( GtkTreeView *list, duc_it_album *in );
 gint album_list_select_count( GtkTreeView *list );
 void album_list_select_queuealbum( GtkTreeView *list );
+
+/*
+ * queue.c
+ */
+
+GtkWidget *queue_list_new( void );
+void queue_list_populate( GtkTreeModel *store, duc_it_queue *in );
+void queue_list_add( GtkTreeModel *store, duc_queue *item );
+void queue_list_del( GtkTreeModel *store, int queueid );
+void queue_list_clear( GtkTreeModel *store );
+
+gint queue_list_select_count( GtkTreeView *list );
+void queue_list_select_deltrack( GtkTreeView *list );
 
 #endif //_COMMON_H

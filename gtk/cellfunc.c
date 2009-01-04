@@ -7,6 +7,8 @@
  *
  */
 
+#include <time.h>
+
 #include "common.h"
 
 void cellfunc_trackid( 
@@ -46,5 +48,25 @@ void cellfunc_duration(
 
 	g_object_set(cell, "text", buf, NULL );
 }
+
+void cellfunc_time( 
+	GtkTreeViewColumn *col,
+	GtkCellRenderer *cell,
+	GtkTreeModel *model,
+	GtkTreeIter *iter,
+	gpointer data )
+{
+	time_t queued;
+	struct tm tm;
+	gchar buf[100];
+
+	(void)col;
+	gtk_tree_model_get( model, iter, (int)data, &queued, -1 );
+	localtime_r( &queued, &tm );
+	strftime( buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", &tm );
+
+	g_object_set(cell, "text", buf, NULL );
+}
+
 
 

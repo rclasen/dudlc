@@ -24,3 +24,19 @@ GtkWidget *childwindow_new( const char *title, GtkWidget *contents )
 	return me;
 }
 
+GtkWidget *child_queue( GtkWidget *list )
+{
+	GtkWidget *scroll, *win;
+
+	scroll = gtk_scrolled_window_new( GTK_ADJUSTMENT(NULL), GTK_ADJUSTMENT(NULL) );
+	gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW(scroll), 
+		GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC );
+	gtk_container_add( GTK_CONTAINER(scroll), list );
+
+	win = childwindow_new( "queue", scroll );
+	gtk_window_set_default_size(GTK_WINDOW(win), 600, 300);
+
+	return win;
+}
+
+

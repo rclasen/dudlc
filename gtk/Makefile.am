@@ -23,5 +23,6 @@ gtkdudlc_SOURCES= \
 	cellfunc.c \
 	track.c \
 	album.c \
+	queue.c \
 	\
 	common.h

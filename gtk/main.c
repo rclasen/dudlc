@@ -16,6 +16,8 @@
 
 dudlc *con = NULL;
 static GtkWidget *main_win, *main_menu /*, *ctl_status */;
+static GtkWidget *queue_win;
+static GtkTreeModel *queue_store;
 
 /* TODO: auto updating windows with current album + artist list */
 
@@ -36,6 +38,7 @@ static void ev_disc( dudlc *c )
 	while( g_source_remove_by_user_data( c ) );
 	playbox_buttons_enable( pl_offline );
 	playbox_detail_clear();
+	queue_list_clear( queue_store );
 }
 
 static void ev_conn( dudlc *c )
@@ -43,6 +46,7 @@ static void ev_conn( dudlc *c )
 	GIOChannel *cchan;
 	duc_playstatus stat;
 	duc_track *t;
+	duc_it_queue *q;
 
 	cchan = g_io_channel_unix_new(duc_fd(c));
 	g_io_add_watch(cchan, G_IO_IN | G_IO_HUP | G_IO_ERR, iowatch_dudl, c );
@@ -53,6 +57,11 @@ static void ev_conn( dudlc *c )
 	if( NULL != (t = duc_cmd_curtrack( c ))){
 		playbox_detail_update( t );
 		duc_track_free( t );
+	}
+
+	if( NULL != (q = duc_cmd_queuelist(c))){
+		queue_list_populate( queue_store, q );
+		duc_it_queue_done( q );
 	}
 }
 
@@ -88,6 +97,30 @@ static void ev_elapsed( dudlc *c, int r )
 	playbox_progress_update( r );
 }
 
+static void ev_queuefetch( dudlc *c, duc_queue *queue )
+{
+	(void)c;
+	queue_list_del( queue_store, queue->id );
+}
+
+static void ev_queueadd( dudlc *c, duc_queue *queue )
+{
+	(void)c;
+	queue_list_add( queue_store, queue );
+}
+
+static void ev_queuedel( dudlc *c, duc_queue *queue )
+{
+	(void)c;
+	queue_list_del( queue_store, queue->id );
+}
+
+static void ev_queueclear( dudlc *c )
+{
+	(void)c;
+	queue_list_clear( queue_store );
+}
+
 /************************************************************
  * widget signal handler
  */
@@ -120,6 +153,16 @@ static void buttons_toggle( GtkAction *action, gpointer data )
 	playbox_buttons_show( show );
 	if(! show )
 		shrink_y(GTK_WINDOW(main_win));
+}
+
+static void queue_toggle( GtkAction *action, gpointer data ) 
+{
+	(void)data;
+	if( gtk_toggle_action_get_active( GTK_TOGGLE_ACTION(action)))
+		gtk_widget_show(GTK_WIDGET(queue_win));
+	else {
+		gtk_widget_hide(GTK_WIDGET(queue_win));
+	}
 }
 
 static void show_current_album_tracks( GtkAction *action, gpointer data ) 
@@ -221,6 +264,7 @@ int main( int argc, char **argv )
 	duc_events events;
 	GtkWidget *mainbox;
 	GtkWidget *playbox;
+	GtkWidget *queueview;
 	GError *err = NULL;
 	GOptionEntry option_entries[] = {
 		{ "host",	'H', 0,
@@ -269,6 +313,8 @@ int main( int argc, char **argv )
 */
 		{ "OptMenu", NULL, "show _Menu", "<control>M", 
 			"show/hide menu", G_CALLBACK(menu_toggle), 0 },
+		{ "OptQueue", NULL, "show Q_ueue", "<control>U",
+			"show queue contents", G_CALLBACK(queue_toggle), 0},
 	};
 	const char * ui_description =
 		"<ui>"
@@ -284,6 +330,7 @@ int main( int argc, char **argv )
 		"      <menuitem action='OptMenu'/>"
 		"      <menuitem action='OptButtons'/>"
 		/* TODO: "      <menuitem action='OptionStatusbar'/>" */
+		"      <menuitem action='OptQueue'/>"
 		"    </menu>"
 		"  </menubar>"	
 		"</ui>";
@@ -297,7 +344,7 @@ int main( int argc, char **argv )
 	/* TODO: icon */
 	/* TODO: check window/icon names */
 	/* TODO: view/edit frontend for user, clients, tags, filtertop,
-	 * history, queue, track_search, album_search, artist_search,
+	 * history, track_search, album_search, artist_search,
 	 */
 	/* TODO: command window: classic/using gtk for results */
 	/* TODO: context menu */
@@ -370,6 +417,11 @@ int main( int argc, char **argv )
 	gtk_box_pack_start( GTK_BOX( mainbox ), playbox, FALSE, FALSE, 0 );
 	gtk_widget_show( playbox );
 
+	/* queue window */
+	queueview = queue_list_new();
+	queue_store = gtk_tree_view_get_model( GTK_TREE_VIEW(queueview) );
+	queue_win = child_queue( queueview );
+
 	/* TODO: statusbar
 	 * servername, username, play_status, sleep, random, gap, filterstat */
 
@@ -377,11 +429,17 @@ int main( int argc, char **argv )
 	memset(&events, 0, sizeof(events));
 	events.connect = ev_conn;
 	events.disconnect = ev_disc;
+
 	events.nexttrack = ev_nexttrack;
 	events.stopped = ev_stopped;
 	events.paused = ev_paused;
 	events.resumed = ev_resumed;
 	events.elapsed = ev_elapsed;
+
+	events.queuefetch = ev_queuefetch;
+	events.queueadd = ev_queueadd;
+	events.queuedel = ev_queuedel;
+	events.queueclear = ev_queueclear;
 
 	duc_setevents( con, &events );
 	duc_open( con );
