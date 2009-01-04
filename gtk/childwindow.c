@@ -36,6 +36,8 @@ GtkWidget *child_queue( GtkWidget *list )
 	win = childwindow_new( "queue", scroll );
 	gtk_window_set_default_size(GTK_WINDOW(win), 600, 300);
 
+	/* TODO: DEL hotkey */
+
 	return win;
 }
 

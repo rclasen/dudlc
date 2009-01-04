@@ -94,6 +94,12 @@ GtkWidget *childwindow_new( const char *title, GtkWidget *contents );
 GtkWidget *child_queue( GtkWidget *list );
 
 /*
+ * tracksearch.c
+ */
+GtkWidget *tracksearch_window( void );
+
+
+/*
  * context.c
  */
 

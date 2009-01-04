@@ -165,6 +165,17 @@ static void queue_toggle( GtkAction *action, gpointer data )
 	}
 }
 
+static void open_tracksearch( GtkAction *action, gpointer data ) 
+{
+	GtkWidget *win;
+
+	(void)action;
+	(void)data;
+
+	win = tracksearch_window();
+	gtk_widget_show( win );
+}
+
 static void show_current_album_tracks( GtkAction *action, gpointer data ) 
 {
 	duc_track *track;
@@ -303,6 +314,8 @@ int main( int argc, char **argv )
 		{ "ShowAlbum", NULL, "show A_lbum", "<control>L",
 			"show tracks of current album", 
 			G_CALLBACK(show_current_album_tracks) },
+		{ "SearchTrack", NULL, "_Search Track", "<control>S",
+			"search tracks", G_CALLBACK(open_tracksearch) },
 	};
 	GtkToggleActionEntry action_tentries[] = {
 		{ "OptButtons", NULL, "show _Buttons", "<control>B", 
@@ -325,6 +338,7 @@ int main( int argc, char **argv )
 		"    <menu action='ShowMenu'>"
 		"      <menuitem action='ShowAlbum'/>"
 		"      <menuitem action='ShowArtist'/>"
+		"      <menuitem action='SearchTrack'/>"
 		"    </menu>"
 		"    <menu action='OptionMenu'>"
 		"      <menuitem action='OptMenu'/>"
@@ -339,12 +353,13 @@ int main( int argc, char **argv )
 	GtkUIManager *ui_manager;
 
 
+	/* TODO: do not hide menu by default, make this optional */
 	/* *TODO: error handling */
 	/* TODO: keyboard shortcuts */
 	/* TODO: icon */
 	/* TODO: check window/icon names */
 	/* TODO: view/edit frontend for user, clients, tags, filtertop,
-	 * history, track_search, album_search, artist_search,
+	 * history, album_search, artist_search,
 	 */
 	/* TODO: command window: classic/using gtk for results */
 	/* TODO: context menu */

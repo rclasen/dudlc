@@ -24,5 +24,6 @@ gtkdudlc_SOURCES= \
 	track.c \
 	album.c \
 	queue.c \
+	tracksearch.c \
 	\
 	common.h

@@ -304,9 +304,12 @@ void queue_list_populate( GtkTreeModel *store, duc_it_queue *in )
 {
 	duc_queue *queue;
 
+	/* TODO unbind store from view,
+	 * disable sorting: gtk_tree_sortable_set_sort_column_id */
 	for( queue = duc_it_queue_cur(in); queue; queue = duc_it_queue_next(in)){
 		queue_list_add( store, queue );
 	}
+	/* TODO rebind store to view */
 }
 
 
