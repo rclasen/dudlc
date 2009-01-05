@@ -114,26 +114,25 @@ void *_duc_it_next( _duc_iter *i )
 	 * gives away ownership of data, so don't free it:
 	 * (*i->freefunc)(cur->data);
 	 */
+	free(cur);
 
-	return i->list->data;
+	return _duc_it_cur( i );
 }
 
 void _duc_it_done( _duc_iter *i )
 {
-	struct _duc_it_datalist *cur;
 
 	if( ! i )
 		return;
 	
-	cur = i->list; 
-	while( cur ){
+	while( i->list ){
+		struct _duc_it_datalist *cur = i->list;
+
 		if( i->freefunc)
 			(*i->freefunc)(cur->data);
 
 		i->list = cur->next;
 		free(cur);
-
-		cur=i->list;
 	}
 
 	free(i);
