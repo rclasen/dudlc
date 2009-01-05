@@ -272,6 +272,8 @@ int main( int argc, char **argv )
 {
 	options opt;
 	char *opt_cfg = NULL;
+	gboolean opt_hmenu = FALSE;
+	gboolean opt_hbuttons = FALSE;
 	duc_events events;
 	GtkWidget *mainbox;
 	GtkWidget *playbox;
@@ -298,6 +300,12 @@ int main( int argc, char **argv )
 			G_OPTION_ARG_FILENAME,	&opt_cfg,
 			"alternate config file",
 			"config" },
+		{ "hidemenu",	'm', 0,
+			G_OPTION_ARG_NONE,	&opt_hmenu,
+			"hide menu on startup", NULL },
+		{ "hidebuttons",	'b', 0,
+			G_OPTION_ARG_NONE,	&opt_hbuttons,
+			"hide buttons on startup", NULL },
 		{ NULL, 0, 0, 0, NULL, NULL, NULL } 
 	};
 	GtkActionEntry action_entries[] = {
@@ -325,26 +333,26 @@ int main( int argc, char **argv )
 			"show/hide status bar", G_CALLBACK(status_toggle), 0 },
 */
 		{ "OptMenu", NULL, "show _Menu", "<control>M", 
-			"show/hide menu", G_CALLBACK(menu_toggle), 0 },
+			"show/hide menu", G_CALLBACK(menu_toggle), 1 },
 		{ "OptQueue", NULL, "show Q_ueue", "<control>U",
 			"show queue contents", G_CALLBACK(queue_toggle), 0},
 	};
 	const char * ui_description =
 		"<ui>"
 		"  <menubar name='MainMenu'>"
-		"    <menu action='FileMenu'>"
-		"      <menuitem action='Quit'/>"
+		"    <menu name='File' action='FileMenu'>"
+		"      <menuitem name='Quit' action='Quit'/>"
 		"    </menu>"
-		"    <menu action='ShowMenu'>"
-		"      <menuitem action='ShowAlbum'/>"
-		"      <menuitem action='ShowArtist'/>"
-		"      <menuitem action='SearchTrack'/>"
+		"    <menu name='Show' action='ShowMenu'>"
+		"      <menuitem name='Album' action='ShowAlbum'/>"
+		"      <menuitem name='Artist' action='ShowArtist'/>"
+		"      <menuitem name='Track' action='SearchTrack'/>"
 		"    </menu>"
-		"    <menu action='OptionMenu'>"
-		"      <menuitem action='OptMenu'/>"
-		"      <menuitem action='OptButtons'/>"
-		/* TODO: "      <menuitem action='OptionStatusbar'/>" */
-		"      <menuitem action='OptQueue'/>"
+		"    <menu name='Option' action='OptionMenu'>"
+		"      <menuitem name='Menu' action='OptMenu'/>"
+		"      <menuitem name='Buttons' action='OptButtons'/>"
+		/* TODO: "      <menuitem name='Status' action='OptionStatusbar'/>" */
+		"      <menuitem name='Queue' action='OptQueue'/>"
 		"    </menu>"
 		"  </menubar>"	
 		"</ui>";
@@ -353,7 +361,6 @@ int main( int argc, char **argv )
 	GtkUIManager *ui_manager;
 
 
-	/* TODO: do not hide menu by default, make this optional */
 	/* *TODO: error handling */
 	/* TODO: keyboard shortcuts */
 	/* TODO: icon */
@@ -361,7 +368,6 @@ int main( int argc, char **argv )
 	/* TODO: view/edit frontend for user, clients, tags, filtertop,
 	 * history, album_search, artist_search,
 	 */
-	/* TODO: command window: classic/using gtk for results */
 	/* TODO: context menu */
 	/* TODO: retry connect every x seconds */
 
@@ -424,13 +430,29 @@ int main( int argc, char **argv )
 	gtk_box_pack_start( GTK_BOX( mainbox ), main_menu, FALSE, FALSE, 0 );
 	accels = gtk_ui_manager_get_accel_group( ui_manager );
 	gtk_window_add_accel_group( GTK_WINDOW(main_win), accels );
+	gtk_widget_show( main_menu );
 
-	gtk_widget_hide( main_menu );
+	if( opt_hmenu ){
+		GtkAction *act;
+		if( NULL != (act = gtk_ui_manager_get_action( ui_manager,
+			(gchar*)"/MainMenu/Option/Menu")))
+
+			gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(act), FALSE);
+	}
 
 	/* player controls */
 	playbox = playbox_new();
 	gtk_box_pack_start( GTK_BOX( mainbox ), playbox, FALSE, FALSE, 0 );
 	gtk_widget_show( playbox );
+
+	if( opt_hbuttons ){
+		GtkAction *act;
+		if( NULL != (act = gtk_ui_manager_get_action( ui_manager,
+			"/MainMenu/Option/Buttons" )))
+
+			gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(act), FALSE);
+	}
+
 
 	/* queue window */
 	queueview = queue_list_new();
@@ -438,7 +460,7 @@ int main( int argc, char **argv )
 	queue_win = child_queue( queueview );
 
 	/* TODO: statusbar
-	 * servername, username, play_status, sleep, random, gap, filterstat */
+	 * trackid, servername, username, play_status, sleep, random, gap, filterstat */
 
 	/* dudl */
 	memset(&events, 0, sizeof(events));
