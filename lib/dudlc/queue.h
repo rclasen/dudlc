@@ -22,11 +22,7 @@ typedef struct {
 } duc_queue;
 
 void duc_queue_free( duc_queue *q );
-
-#define duc_it_queue	_duc_iter
-#define duc_it_queue_cur(x)	(duc_queue*)_duc_it_cur((_duc_iter*)x)
-#define duc_it_queue_next(x)	(duc_queue*)_duc_it_next((_duc_iter*)x)
-#define duc_it_queue_done(x)	_duc_it_done((_duc_iter*)x)
+DEFINE_DUC_ITER_PARSE(queue);
 
 
 duc_it_queue *duc_cmd_queuelist( dudlc *c );

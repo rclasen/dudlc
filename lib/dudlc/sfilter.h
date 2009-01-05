@@ -18,12 +18,8 @@ typedef struct {
 	char *filter;
 } duc_sfilter;
 
-#define duc_it_sfilter	_duc_iter
-#define duc_it_sfilter_cur(x)	(duc_sfilter*)_duc_it_cur((_duc_iter*)x)
-#define duc_it_sfilter_next(x)	(duc_sfilter*)_duc_it_next((_duc_iter*)x)
-#define duc_it_sfilter_done(x)	_duc_it_done((_duc_iter*)x)
-
 void duc_sfilter_free( duc_sfilter *t );
+DEFINE_DUC_ITER_PARSE(sfilter);
 
 duc_sfilter *duc_cmd_sfilterget( dudlc *c, int id );
 int duc_cmd_sfilter2id( dudlc *c, const char *name );

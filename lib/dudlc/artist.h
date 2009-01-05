@@ -18,13 +18,9 @@ typedef struct {
 	char *artist;
 } duc_artist;
 
-#define duc_it_artist	_duc_iter
-#define duc_it_artist_cur(x)	(duc_artist*)_duc_it_cur((_duc_iter*)x)
-#define duc_it_artist_next(x)	(duc_artist*)_duc_it_next((_duc_iter*)x)
-#define duc_it_artist_done(x)	_duc_it_done((_duc_iter*)x)
-
 duc_artist *_duc_artist_parse( char *line, char **end );
 void duc_artist_free( duc_artist *a );
+DEFINE_DUC_ITER_PARSE(artist);
 
 duc_artist *duc_cmd_artistget( dudlc *c, int id );
 

@@ -23,11 +23,7 @@ typedef struct {
 } duc_client;
 
 void duc_client_free( duc_client *c );
-
-#define duc_it_client	_duc_iter
-#define duc_it_client_cur(x)	(duc_client*)_duc_it_cur((_duc_iter*)x)
-#define duc_it_client_next(x)	(duc_client*)_duc_it_next((_duc_iter*)x)
-#define duc_it_client_done(x)	_duc_it_done((_duc_iter*)x)
+DEFINE_DUC_ITER(client);
 
 duc_it_client *duc_cmd_clientlist( dudlc *p );
 

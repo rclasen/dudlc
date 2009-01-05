@@ -21,13 +21,9 @@ typedef struct {
 	int year;
 } duc_album;
 
-#define duc_it_album	_duc_iter
-#define duc_it_album_cur(x)	(duc_album*)_duc_it_cur((_duc_iter*)x)
-#define duc_it_album_next(x)	(duc_album*)_duc_it_next((_duc_iter*)x)
-#define duc_it_album_done(x)	_duc_it_done((_duc_iter*)x)
-
 duc_album *_duc_album_parse( char *line, char **end );
 void duc_album_free( duc_album *a );
+DEFINE_DUC_ITER_PARSE(album);
 
 duc_album *duc_cmd_albumget( dudlc *c, int id );
 

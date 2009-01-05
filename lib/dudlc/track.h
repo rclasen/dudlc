@@ -24,13 +24,9 @@ typedef struct {
 	int duration;
 } duc_track;
 
-#define duc_it_track	_duc_iter
-#define duc_it_track_cur(x)	(duc_track*)_duc_it_cur((_duc_iter*)x)
-#define duc_it_track_next(x)	(duc_track*)_duc_it_next((_duc_iter*)x)
-#define duc_it_track_done(x)	_duc_it_done((_duc_iter*)x)
-
 duc_track *_duc_track_parse( char *line, char **end );
 void duc_track_free( duc_track *t );
+DEFINE_DUC_ITER_PARSE(track);
 
 int duc_cmd_tracks( dudlc *c );
 int duc_cmd_track2id( dudlc *c, int albumid, int nr );

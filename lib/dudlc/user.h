@@ -21,13 +21,7 @@ typedef struct {
 
 duc_user *_duc_user_parse( char *line, char **end );
 void duc_user_free( duc_user *u );
-
-#define duc_it_user	_duc_iter
-#define duc_it_user_cur(x)	(duc_user*)_duc_it_cur((_duc_iter*)x)
-#define duc_it_user_next(x)	(duc_user*)_duc_it_next((_duc_iter*)x)
-#define duc_it_user_done(x)	_duc_it_done((_duc_iter*)x)
-
-
+DEFINE_DUC_ITER_PARSE(user);
 
 duc_it_user *duc_cmd_userlist( dudlc *c );
 duc_user *duc_cmd_userget( dudlc *c, int uid );

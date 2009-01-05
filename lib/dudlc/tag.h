@@ -18,12 +18,8 @@ typedef struct {
 	char *desc;
 } duc_tag;
 
-#define duc_it_tag	_duc_iter
-#define duc_it_tag_cur(x)	(duc_tag*)_duc_it_cur((_duc_iter*)x)
-#define duc_it_tag_next(x)	(duc_tag*)_duc_it_next((_duc_iter*)x)
-#define duc_it_tag_done(x)	_duc_it_done((_duc_iter*)x)
-
 void duc_tag_free( duc_tag *t );
+DEFINE_DUC_ITER_PARSE(tag);
 
 duc_tag *duc_cmd_tagget( dudlc *c, int id );
 int duc_cmd_tag2id( dudlc *c, const char *name );
