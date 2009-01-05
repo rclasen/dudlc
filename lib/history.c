@@ -37,9 +37,9 @@ duc_history *_duc_history_parse( char *line, char **end )
 
 	e = s = line;
 
-	if( NULL == (n = malloc(sizeof(duc_history)))){
+	if( NULL == (n = malloc(sizeof(duc_history))))
 		goto clean1;
-	}
+	memset( n, 0, sizeof(duc_history) );
 
 	n->played = strtol( s, &e, 10 );
 	if( s == e )

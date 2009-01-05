@@ -37,9 +37,9 @@ duc_artist *_duc_artist_parse( char *line, char **end )
 
 	e = s = line;
 
-	if( NULL == (n = malloc(sizeof(duc_artist)))){
+	if( NULL == (n = malloc(sizeof(duc_artist))))
 		goto clean1;
-	}
+	memset( n, 0, sizeof(duc_artist) );
 
 	n->id = strtol( s, &e, 10 );
 	if( s == e )
@@ -61,6 +61,8 @@ clean1:
 
 void duc_artist_free( duc_artist *a )
 {
+	if( ! a )
+		return;
 	free(a->artist);
 	free(a);
 }

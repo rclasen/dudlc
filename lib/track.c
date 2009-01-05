@@ -37,9 +37,9 @@ duc_track *_duc_track_parse( char *line, char **end )
 
 	e = s = line;
 
-	if( NULL == (t = malloc(sizeof(duc_track)))){
+	if( NULL == (t = malloc(sizeof(duc_track))))
 		goto clean1;
-	}
+	memset( t, 0, sizeof(duc_track) );
 
 	t->id = strtol( s, &e, 10 );
 	if( s == e )

@@ -37,9 +37,9 @@ duc_queue *_duc_queue_parse( char *line, char **end )
 
 	e = s = line;
 
-	if( NULL == (n = malloc(sizeof(duc_queue)))){
+	if( NULL == (n = malloc(sizeof(duc_queue))))
 		goto clean1;
-	}
+	memset( n, 0, sizeof(duc_queue) );
 
 	n->id = strtol( s, &e, 10 );
 	if( s == e )

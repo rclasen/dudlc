@@ -8,6 +8,7 @@
  */
 
 #include <stdlib.h>
+#include <string.h>
 
 #include "dudlc/proto.h"
 #include "dudlc/event.h"
@@ -39,6 +40,7 @@ duc_user *_duc_user_parse( char *line, char **end )
 
 	if( NULL == (c = malloc(sizeof(duc_user))))
 		goto clean1;
+	memset( c, 0, sizeof(duc_user) );
 
 	c->id = strtol(s, &e, 10 );
 	if( s == e )

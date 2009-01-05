@@ -37,9 +37,9 @@ duc_sfilter *_duc_sfilter_parse( char *line, char **end )
 
 	e = s = line;
 
-	if( NULL == (n = malloc(sizeof(duc_sfilter)))){
+	if( NULL == (n = malloc(sizeof(duc_sfilter))))
 		goto clean1;
-	}
+	memset( n, 0, sizeof(duc_sfilter) );
 
 	n->id = strtol( s, &e, 10 );
 	if( s == e )

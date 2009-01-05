@@ -37,9 +37,9 @@ duc_tag *_duc_tag_parse( char *line, char **end )
 
 	e = s = line;
 
-	if( NULL == (n = malloc(sizeof(duc_tag)))){
+	if( NULL == (n = malloc(sizeof(duc_tag))))
 		goto clean1;
-	}
+	memset( n, 0, sizeof(duc_tag) );
 
 	n->id = strtol( s, &e, 10 );
 	if( s == e )

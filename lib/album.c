@@ -37,9 +37,9 @@ duc_album *_duc_album_parse( char *line, char **end )
 
 	e = s = line;
 
-	if( NULL == (n = malloc(sizeof(duc_album)))){
+	if( NULL == (n = malloc(sizeof(duc_album))))
 		goto clean1;
-	}
+	memset( n, 0, sizeof(duc_album) );
 
 	n->id = strtol( s, &e, 10 );
 	if( s == e )
@@ -52,7 +52,7 @@ duc_album *_duc_album_parse( char *line, char **end )
 	s = e+1;
 	n->year = strtol( s, &e, 10 );
 	if( s == e )
-		goto clean2;
+		goto clean3;
 
 	s = e+1;
 	if( NULL == (n->artist = _duc_artist_parse(s, &e )))
@@ -72,6 +72,8 @@ clean1:
 
 void duc_album_free( duc_album *a )
 {
+	if( ! a )
+		return;
 	duc_artist_free(a->artist);
 	free(a->album);
 	free(a);
