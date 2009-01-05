@@ -1,0 +1,52 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.TH GTKDUDLC 1 "2009-01-05"
+.SH NAME
+gtkdudlc \- gui client for dudld jukebox
+.SH SYNOPSIS
+.B gtkdudlc
+.RI [ options ]
+.SH DESCRIPTION
+This manual page documents briefly the
+.B gtkdudlc
+command.
+.PP
+\fBgtkdudlc\fP is a client to access a dudld jukebox using the GTK widget
+set.
+.SH OPTIONS
+It follows the usual GNU command line syntax, with long
+options starting with two dashes (`-').
+A summary of options is included below.
+.TP
+.B \-h, \-\-help
+Show summary of options.
+.TP
+.B \-H, \-\-host <hostname>
+Specify host to connect to.
+.TP
+.B \-P, \-\-port <port>
+dudld port.
+.TP
+.B \-u, \-\-user <name>
+dudld user.
+.TP
+.B \-p, \-\-pass <pass>
+dudld password.
+.TP
+.B \-m, \-\-hidemenu
+start with menu hidden. Use CTRL-M to unhide.
+.TP
+.B \-b, \-\-hidebuttons
+start with player control buttons hidden. Use CTRL-B to unhide.
+
+.SH FILES
+$HOME/.dudlc.conf
+
+.SH SEE ALSO
+.BR dudlc.conf (5),
+.BR dudl_cmd (1),
+.BR dudl_filter (1),
+.BR irdudl (1),
+.BR dudld (8).
+.br
+.SH AUTHOR
+This manual page was written by Rainer Clasen.

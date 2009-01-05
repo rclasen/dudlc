@@ -8,7 +8,7 @@ AM_LDFLAGS=${GLIB_LIBS} ${GTK_LIBS}
 
 bin_PROGRAMS=gtkdudlc
 
-#man1_MANS=gtkdudlc.man
+man1_MANS=gtkdudlc.man
 
 EXTRA_DIST=$(MANS)
 
@@ -24,6 +24,6 @@ gtkdudlc_SOURCES= \
 	track.c \
 	album.c \
 	queue.c \
-	tracksearch.c \
-	\
+	tracksearch.c
+gtkdudlc_HEADERS= \
 	common.h
