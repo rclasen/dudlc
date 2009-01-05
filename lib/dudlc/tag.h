@@ -18,6 +18,7 @@ typedef struct {
 	char *desc;
 } duc_tag;
 
+duc_tag *_duc_tag_parse( char *line, char **end );
 void duc_tag_free( duc_tag *t );
 DEFINE_DUC_ITER_PARSE(tag);
 

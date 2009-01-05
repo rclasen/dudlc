@@ -14,7 +14,22 @@
 #include "dudlc/event.h"
 #include "dudlc/sfilter.h"
 
-static duc_sfilter *_duc_sfilter_parse( char *line, char **end )
+duc_it_sfilter *_duc_it_sfilter_new( dudlc *p, const char *cmd, ... )
+{
+	_duc_iter *it;
+	va_list ap;
+
+	va_start(ap,cmd);
+	it = _duc_it_newv(p, 
+		(_duc_converter)_duc_sfilter_parse,
+		(_duc_free_func)duc_sfilter_free,
+		cmd, ap );
+	va_end(ap);
+
+	return it;
+}
+
+duc_sfilter *_duc_sfilter_parse( char *line, char **end )
 {
 	duc_sfilter *n;
 	char *s;
@@ -74,7 +89,7 @@ int duc_cmd_sfilter2id( dudlc *c, const char *name )
 
 duc_it_sfilter *duc_cmd_sfilterlist( dudlc *c )
 {
-	return _duc_iterate(c, (_duc_converter)_duc_sfilter_parse, "sfilterlist" );
+	return _duc_it_sfilter_new(c, "sfilterlist" );
 }
 
 int duc_cmd_sfilteradd( dudlc *c, const char *name )

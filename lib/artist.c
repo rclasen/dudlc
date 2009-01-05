@@ -14,6 +14,21 @@
 #include "dudlc/event.h"
 #include "dudlc/artist.h"
 
+duc_it_artist *_duc_it_artist_new( dudlc *p, const char *cmd, ... )
+{
+	_duc_iter *it;
+	va_list ap;
+
+	va_start(ap,cmd);
+	it = _duc_it_newv(p, 
+		(_duc_converter)_duc_artist_parse, 
+		(_duc_free_func)duc_artist_free,
+		cmd, ap );
+	va_end(ap);
+
+	return it;
+}
+
 duc_artist *_duc_artist_parse( char *line, char **end )
 {
 	duc_artist *n;
@@ -58,20 +73,17 @@ duc_artist *duc_cmd_artistget( dudlc *c, int id )
 
 duc_it_artist *duc_cmd_artistlist( dudlc *c )
 {
-	return _duc_iterate( c, (_duc_converter)_duc_artist_parse, 
-			"artistlist" );
+	return _duc_it_artist_new( c, "artistlist" );
 }
 
 duc_it_artist *duc_cmd_artiststag( dudlc *c, int tid )
 {
-	return _duc_iterate( c, (_duc_converter)_duc_artist_parse, 
-			"artiststag %d", tid );
+	return _duc_it_artist_new( c, "artiststag %d", tid );
 }
 
 duc_it_artist *duc_cmd_artistsearch( dudlc *c, const char *str )
 {
-	return _duc_iterate( c, (_duc_converter)_duc_artist_parse, 
-			"artistsearch %s", str );
+	return _duc_it_artist_new( c, "artistsearch %s", str );
 }
 
 int duc_cmd_artistsetname( dudlc *c, int id, const char *name )

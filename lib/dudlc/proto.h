@@ -19,6 +19,7 @@
  ************************************************************/
 
 typedef void *(*_duc_converter)( const char *line, char **end );
+typedef void *(*_duc_free_func)( void * );
 
 int _duc_vsend( dudlc *p, const char *fmt, va_list ap );
 int _duc_send( dudlc *p, const char *fmt, ... );

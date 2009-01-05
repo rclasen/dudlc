@@ -14,7 +14,22 @@
 #include "dudlc/event.h"
 #include "dudlc/queue.h"
 
-static duc_queue *_duc_queue_parse( char *line, char **end )
+duc_it_queue *_duc_it_queue_new( dudlc *p, const char *cmd, ... )
+{
+	_duc_iter *it;
+	va_list ap;
+
+	va_start(ap,cmd);
+	it = _duc_it_newv(p, 
+		(_duc_converter)_duc_queue_parse,
+		(_duc_free_func)duc_queue_free,
+		cmd, ap );
+	va_end(ap);
+
+	return it;
+}
+
+duc_queue *_duc_queue_parse( char *line, char **end )
 {
 	duc_queue *n;
 	char *s;
@@ -67,8 +82,7 @@ void duc_queue_free( duc_queue *q )
 
 duc_it_queue *duc_cmd_queuelist( dudlc *c )
 {
-	return _duc_iterate( c, (_duc_converter)_duc_queue_parse, 
-			"queuelist" );
+	return _duc_it_queue_new( c, "queuelist" );
 }
 
 duc_queue *duc_cmd_queueget( dudlc *c, int qid )

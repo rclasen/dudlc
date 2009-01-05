@@ -18,6 +18,7 @@ typedef struct {
 	char *filter;
 } duc_sfilter;
 
+duc_sfilter *_duc_sfilter_parse( char *line, char **end );
 void duc_sfilter_free( duc_sfilter *t );
 DEFINE_DUC_ITER_PARSE(sfilter);
 

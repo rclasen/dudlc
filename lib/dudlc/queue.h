@@ -21,6 +21,7 @@ typedef struct {
 	duc_track *track;
 } duc_queue;
 
+duc_queue *_duc_queue_parse( char *line, char **end );
 void duc_queue_free( duc_queue *q );
 DEFINE_DUC_ITER_PARSE(queue);
 

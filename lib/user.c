@@ -13,6 +13,21 @@
 #include "dudlc/event.h"
 #include "dudlc/user.h"
 
+duc_it_user *_duc_it_user_new( dudlc *p, const char *cmd, ... )
+{
+	_duc_iter *it;
+	va_list ap;
+
+	va_start(ap,cmd);
+	it = _duc_it_newv(p, 
+		(_duc_converter)_duc_user_parse,
+		(_duc_free_func)duc_user_free,
+		cmd, ap );
+	va_end(ap);
+
+	return it;
+}
+
 duc_user *_duc_user_parse( char *line, char **end )
 {
 	duc_user *c;
@@ -63,8 +78,7 @@ void duc_user_free( duc_user *c )
 
 duc_it_user *duc_cmd_userlist( dudlc *c )
 {
-	return _duc_iterate( c, (_duc_converter)_duc_user_parse, 
-			"userlist" );
+	return _duc_it_user_new( c, "userlist" );
 }
 
 duc_user *duc_cmd_userget( dudlc *c, int uid )

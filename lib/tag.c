@@ -14,7 +14,22 @@
 #include "dudlc/event.h"
 #include "dudlc/tag.h"
 
-static duc_tag *_duc_tag_parse( char *line, char **end )
+duc_it_tag *_duc_it_tag_new( dudlc *p, const char *cmd, ... )
+{
+	_duc_iter *it;
+	va_list ap;
+
+	va_start(ap,cmd);
+	it = _duc_it_newv(p, 
+		(_duc_converter)_duc_tag_parse,
+		(_duc_free_func)duc_tag_free,
+		cmd, ap );
+	va_end(ap);
+
+	return it;
+}
+
+duc_tag *_duc_tag_parse( char *line, char **end )
 {
 	duc_tag *n;
 	char *s;
@@ -74,12 +89,12 @@ int duc_cmd_tag2id( dudlc *c, const char *name )
 
 duc_it_tag *duc_cmd_taglist( dudlc *c )
 {
-	return _duc_iterate(c, (_duc_converter)_duc_tag_parse, "taglist" );
+	return _duc_it_tag_new(c, "taglist" );
 }
 
 duc_it_tag *duc_cmd_tagsartist( dudlc *c, int aid )
 {
-	return _duc_iterate(c, (_duc_converter)_duc_tag_parse, "tagsartist %d", aid );
+	return _duc_it_tag_new(c, "tagsartist %d", aid );
 }
 
 int duc_cmd_tagadd( dudlc *c, const char *name )
@@ -105,8 +120,7 @@ int duc_cmd_tagdel( dudlc *c, int id )
 
 duc_it_tag *duc_cmd_tracktaglist( dudlc *c, int tid )
 {
-	return _duc_iterate(c, (_duc_converter)_duc_tag_parse, 
-			"tracktaglist %d", tid );
+	return _duc_it_tag_new(c, "tracktaglist %d", tid );
 }
 
 int duc_cmd_tracktagged( dudlc *c, int tid, int id )

@@ -20,6 +20,7 @@ typedef struct {
 	duc_user *user;
 } duc_history;
 
+duc_history *_duc_history_parse( char *line, char **end );
 void duc_history_free( duc_history *h );
 DEFINE_DUC_ITER_PARSE(history);
 

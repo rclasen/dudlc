@@ -14,6 +14,21 @@
 #include "dudlc/event.h"
 #include "dudlc/album.h"
 
+duc_it_album *_duc_it_album_new( dudlc *p, const char *cmd, ... )
+{
+	_duc_iter *it;
+	va_list ap;
+
+	va_start(ap,cmd);
+	it = _duc_it_newv(p, 
+		(_duc_converter)_duc_album_parse, 
+		(_duc_free_func)duc_album_free, 
+		cmd, ap );
+	va_end(ap);
+
+	return it;
+}
+
 duc_album *_duc_album_parse( char *line, char **end )
 {
 	duc_album *n;
@@ -64,32 +79,28 @@ void duc_album_free( duc_album *a )
 
 duc_album *duc_cmd_albumget( dudlc *c, int id )
 {
-	return _duc_cmd_conv( c, (_duc_converter)_duc_album_parse,
-			"albumget %d", id );
+	return _duc_cmd_conv( c, (_duc_converter)_duc_album_parse, 
+		"albumget %d", id );
 }
 
 duc_it_album *duc_cmd_albumlist( dudlc *c )
 {
-	return _duc_iterate( c, (_duc_converter)_duc_album_parse, 
-			"albumlist" );
+	return _duc_it_album_new( c, "albumlist" );
 }
 
 duc_it_album *duc_cmd_albumsearch( dudlc *c, const char *str )
 {
-	return _duc_iterate( c, (_duc_converter)_duc_album_parse, 
-			"albumsearch %s", str );
+	return _duc_it_album_new( c, "albumsearch %s", str );
 }
 
 duc_it_album *duc_cmd_albumsartist( dudlc *c, int artistid )
 {
-	return _duc_iterate( c, (_duc_converter)_duc_album_parse, 
-			"albumsartist %d", artistid );
+	return _duc_it_album_new( c, "albumsartist %d", artistid );
 }
 
 duc_it_album *duc_cmd_albumstag( dudlc *c, int tid )
 {
-	return _duc_iterate( c, (_duc_converter)_duc_album_parse, 
-			"albumstag %d", tid );
+	return _duc_it_album_new( c, "albumstag %d", tid );
 }
 
 int duc_cmd_albumsetname( dudlc *c, int id, const char *name )

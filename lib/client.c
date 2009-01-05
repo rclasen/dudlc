@@ -13,7 +13,22 @@
 #include "dudlc/event.h"
 #include "dudlc/client.h"
 
-static duc_client *_duc_client_parse( char *line, char **end )
+duc_it_client *_duc_it_client_new( dudlc *p, const char *cmd, ... )
+{
+	_duc_iter *it;
+	va_list ap;
+
+	va_start(ap,cmd);
+	it = _duc_it_newv(p, 
+		(_duc_converter)_duc_client_parse, 
+		(_duc_free_func)duc_client_free,
+		cmd, ap );
+	va_end(ap);
+
+	return it;
+}
+
+duc_client *_duc_client_parse( char *line, char **end )
 {
 	duc_client *c;
 
@@ -61,8 +76,7 @@ void duc_client_free( duc_client *c )
 
 duc_it_client *duc_cmd_clientlist( dudlc *c )
 {
-	return _duc_iterate( c, (_duc_converter)_duc_client_parse, 
-			"clientlist" );
+	return _duc_it_client_new( c, "clientlist" );
 }
 
 int duc_cmd_clientclose( dudlc *c, int id )

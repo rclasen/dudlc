@@ -22,6 +22,7 @@ typedef struct {
 	char *addr;
 } duc_client;
 
+duc_client *_duc_client_parse( char *line, char **end );
 void duc_client_free( duc_client *c );
 DEFINE_DUC_ITER(client);
 

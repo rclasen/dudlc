@@ -13,11 +13,11 @@
 #include "session.h"
 #include "iterate.h"
 
-/* TODO: use macro to define iterator methods */
-#define duc_it_help	_duc_iter
-#define duc_it_help_cur(x)	(char*)_duc_it_cur((_duc_iter*)x)
-#define duc_it_help_next(x)	(char*)_duc_it_next((_duc_iter*)x)
-#define duc_it_help_done(x)	_duc_it_done((_duc_iter*)x)
+typedef char duc_help;
+
+duc_help *_duc_help_parse( char *line, char **end );
+void duc_help_free( duc_help *h );
+DEFINE_DUC_ITER_PARSE(help);
 
 duc_it_help *duc_cmd_help( dudlc *con );
 

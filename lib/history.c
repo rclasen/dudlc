@@ -14,7 +14,22 @@
 #include "dudlc/event.h"
 #include "dudlc/history.h"
 
-static duc_history *_duc_history_parse( char *line, char **end )
+duc_it_history *_duc_it_history_new( dudlc *p, const char *cmd, ... )
+{
+	_duc_iter *it;
+	va_list ap;
+
+	va_start(ap,cmd);
+	it = _duc_it_newv(p, 
+		(_duc_converter)_duc_history_parse,
+		(_duc_free_func)duc_history_free,
+		cmd, ap );
+	va_end(ap);
+
+	return it;
+}
+
+duc_history *_duc_history_parse( char *line, char **end )
 {
 	duc_history *n;
 	char *s;
@@ -62,14 +77,12 @@ void duc_history_free( duc_history *q )
 
 duc_it_history *duc_cmd_history( dudlc *c, int num )
 {
-	return _duc_iterate( c, (_duc_converter)_duc_history_parse, 
-			"history %d", num );
+	return _duc_it_history_new( c, "history %d", num );
 }
 
 duc_it_history *duc_cmd_historytrack( dudlc *c, int tid, int num )
 {
-	return _duc_iterate( c, (_duc_converter)_duc_history_parse,
-			"historytrack %d %d", tid, num );
+	return _duc_it_history_new( c, "historytrack %d %d", tid, num );
 }
 
 

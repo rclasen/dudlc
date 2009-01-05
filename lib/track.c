@@ -14,6 +14,21 @@
 #include "dudlc/proto.h"
 #include "dudlc/track.h"
 
+duc_it_track *_duc_it_track_new( dudlc *p, const char *cmd, ... )
+{
+	_duc_iter *it;
+	va_list ap;
+
+	va_start(ap,cmd);
+	it = _duc_it_newv(p, 
+		(_duc_converter)_duc_track_parse, 
+		(_duc_free_func)duc_track_free,
+		cmd, ap );
+	va_end(ap);
+
+	return it;
+}
+
 duc_track *_duc_track_parse( char *line, char **end )
 {
 	duc_track *t;
@@ -97,26 +112,22 @@ duc_track *duc_cmd_trackget( dudlc *c, int id )
 
 duc_it_track *duc_cmd_tracksearch( dudlc *c, const char *substr )
 {
-	return _duc_iterate( c, (_duc_converter)_duc_track_parse, 
-			"tracksearch %s", substr );
+	return _duc_it_track_new( c, "tracksearch %s", substr );
 }
 
 duc_it_track *duc_cmd_tracksearchf( dudlc *c, const char *filter )
 {
-	return _duc_iterate( c, (_duc_converter)_duc_track_parse, 
-			"tracksearchf %s", filter );
+	return _duc_it_track_new( c, "tracksearchf %s", filter );
 }
 
 duc_it_track *duc_cmd_tracksalbum( dudlc *c, int id )
 {
-	return _duc_iterate( c, (_duc_converter)_duc_track_parse, 
-			"tracksalbum %d", id );
+	return _duc_it_track_new( c, "tracksalbum %d", id );
 }
 
 duc_it_track *duc_cmd_tracksartist( dudlc *c, int id )
 {
-	return _duc_iterate( c, (_duc_converter)_duc_track_parse, 
-			"tracksartist %d", id );
+	return _duc_it_track_new( c, "tracksartist %d", id );
 }
 
 int duc_cmd_tracksetname( dudlc *c, int id, const char *name )

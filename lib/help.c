@@ -13,14 +13,34 @@
 #include "dudlc/proto.h"
 #include "dudlc/help.h"
 
-static char *_duc_help_parse( char *line, char **end )
+duc_it_help *_duc_it_help_new( dudlc *p, const char *cmd, ... )
+{
+	_duc_iter *it;
+	va_list ap;
+
+	va_start(ap,cmd);
+	it = _duc_it_newv(p, 
+		(_duc_converter)_duc_help_parse,
+		(_duc_free_func)duc_help_free,
+		cmd, ap );
+	va_end(ap);
+
+	return it;
+}
+
+duc_help *_duc_help_parse( char *line, char **end )
 {
 	if( end ) *end = line + strlen(line);
 	return strdup(line);
 }
 
+void duc_help_free( duc_help *h )
+{
+	free(h);
+}
+
 duc_it_help *duc_cmd_help( dudlc *c )
 {
-	return _duc_iterate(c, (_duc_converter)_duc_help_parse, "help");
+	return _duc_it_help_new(c, "help");
 }
 
