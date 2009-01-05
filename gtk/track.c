@@ -260,6 +260,7 @@ void track_list_populate( GtkTreeView *view, duc_it_track *in )
 		g_free(album);
 		g_free(title);
 		g_free(artist);
+		duc_track_free(track);
 	}
 
 	gtk_tree_sortable_set_sort_func( GTK_TREE_SORTABLE(store),

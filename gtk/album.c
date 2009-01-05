@@ -200,6 +200,7 @@ void album_list_populate( GtkTreeView *view, duc_it_album *in )
 
 		g_free(salbum);
 		g_free(sartist);
+		duc_album_free( album );
 	}
 
 	gtk_tree_sortable_set_sort_func( GTK_TREE_SORTABLE(store),
