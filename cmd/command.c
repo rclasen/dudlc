@@ -1890,6 +1890,7 @@ int duc_cmd( dudlc *dudl, char *line )
 		dmsg_msg( "no such command\n" );
 		return -1;
 	}
+	free(scmd);
 
 	return cmd_arg_parse( dudl, cmd, line );
 }
