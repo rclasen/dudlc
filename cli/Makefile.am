@@ -19,8 +19,8 @@ dudlc_LDFLAGS=-L../lib -L../cmd -ldudlc -ldudlccmd -lreadline -lcurses
 dudlc_SOURCES= events.c \
 	main.c \
 	tty.c \
-	options.c \
-	\
+	options.c
+dudlc_HEADERS=\
 	events.h \
 	main.h \
 	tty.h \
