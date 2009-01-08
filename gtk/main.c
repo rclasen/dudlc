@@ -174,6 +174,7 @@ static void open_browse( GtkAction *action, gpointer data )
 	(void)data;
 
 	win = browse_window();
+	gtk_window_set_default_size(GTK_WINDOW(win), 700, 400);
 	gtk_widget_show( win );
 }
 
@@ -495,11 +496,11 @@ int main( int argc, char **argv )
 	queue_win = child_queue( queueview );
 	queue_action = gtk_ui_manager_get_action( ui_manager,
 			(gchar*)"/MainMenu/Option/Queue");
-
-
 	gtk_signal_connect( GTK_OBJECT(queue_win), "delete_event", 
 			G_CALLBACK( queue_win_on_delete ), NULL);
+	gtk_window_set_default_size(GTK_WINDOW(queue_win), 800, 300);
 
+	
 	/* TODO: statusbar
 	 * trackid, servername, username, play_status, sleep, random, gap, filterstat */
 
