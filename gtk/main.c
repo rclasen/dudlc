@@ -18,6 +18,7 @@ dudlc *con = NULL;
 static GtkWidget *main_win, *main_menu /*, *ctl_status */;
 static GtkWidget *queue_win;
 static GtkTreeModel *queue_store;
+static GtkAction *queue_action;
 
 /* TODO: auto updating windows with current album + artist list */
 
@@ -165,6 +166,17 @@ static void queue_toggle( GtkAction *action, gpointer data )
 	}
 }
 
+static void open_browse( GtkAction *action, gpointer data ) 
+{
+	GtkWidget *win;
+
+	(void)action;
+	(void)data;
+
+	win = browse_window();
+	gtk_widget_show( win );
+}
+
 static void open_tracksearch( GtkAction *action, gpointer data ) 
 {
 	GtkWidget *win;
@@ -181,6 +193,7 @@ static void show_current_album_tracks( GtkAction *action, gpointer data )
 	duc_track *track;
 	duc_it_track *it;
 	GtkWidget *list, *scroll, *win;
+	GtkTreeSelection *sel;
 
 	(void)action;
 	(void)data;
@@ -193,7 +206,9 @@ static void show_current_album_tracks( GtkAction *action, gpointer data )
 		return;
 	}
 
-	list = track_list_new_with_list(it);
+	list = track_list_new_with_list(TRUE, it);
+	sel = gtk_tree_view_get_selection( GTK_TREE_VIEW(list));
+	gtk_tree_selection_set_mode( GTK_TREE_SELECTION(sel), GTK_SELECTION_MULTIPLE );
 
 	scroll = gtk_scrolled_window_new( GTK_ADJUSTMENT(NULL), GTK_ADJUSTMENT(NULL) );
 	gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW(scroll), 
@@ -213,6 +228,7 @@ static void show_current_artist_albums( GtkAction *action, gpointer data )
 	duc_track *track;
 	duc_it_album *it;
 	GtkWidget *list, *scroll, *win;
+	GtkTreeSelection *sel;
 
 	(void)action;
 	(void)data;
@@ -225,7 +241,9 @@ static void show_current_artist_albums( GtkAction *action, gpointer data )
 		return;
 	}
 
-	list = album_list_new_with_list(it);
+	list = album_list_new_with_list(TRUE, it);
+	sel = gtk_tree_view_get_selection( GTK_TREE_VIEW(list));
+	gtk_tree_selection_set_mode( GTK_TREE_SELECTION(sel), GTK_SELECTION_MULTIPLE );
 
 	scroll = gtk_scrolled_window_new( GTK_ADJUSTMENT(NULL), GTK_ADJUSTMENT(NULL) );
 	gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW(scroll), 
@@ -252,6 +270,15 @@ static void status_toggle( GtkAction *action, gpointer data )
 	}
 }
 */
+
+static int queue_win_on_delete( GtkWidget *widget, GdkEvent  *event, gpointer   data )
+{
+	(void)widget;
+	(void)event;
+	(void)data;
+	gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(queue_action), FALSE);
+	return TRUE;
+}
 
 static int main_win_on_delete( GtkWidget *widget, GdkEvent  *event, gpointer   data )
 {
@@ -324,6 +351,8 @@ int main( int argc, char **argv )
 			G_CALLBACK(show_current_album_tracks) },
 		{ "SearchTrack", NULL, "_Search Track", "<control>S",
 			"search tracks", G_CALLBACK(open_tracksearch) },
+		{ "Browse", NULL, "B_rowse Archive", "<control>R",
+			"browse Archive", G_CALLBACK(open_browse) },
 	};
 	GtkToggleActionEntry action_tentries[] = {
 		{ "OptButtons", NULL, "show _Buttons", "<control>B", 
@@ -347,6 +376,7 @@ int main( int argc, char **argv )
 		"      <menuitem name='Album' action='ShowAlbum'/>"
 		"      <menuitem name='Artist' action='ShowArtist'/>"
 		"      <menuitem name='Track' action='SearchTrack'/>"
+		"      <menuitem name='Browse' action='Browse'/>"
 		"    </menu>"
 		"    <menu name='Option' action='OptionMenu'>"
 		"      <menuitem name='Menu' action='OptMenu'/>"
@@ -456,8 +486,19 @@ int main( int argc, char **argv )
 
 	/* queue window */
 	queueview = queue_list_new();
+	{ 
+	GtkTreeSelection *sel;
+	sel = gtk_tree_view_get_selection( GTK_TREE_VIEW(queueview));
+	gtk_tree_selection_set_mode( GTK_TREE_SELECTION(sel), GTK_SELECTION_MULTIPLE );
+	}
 	queue_store = gtk_tree_view_get_model( GTK_TREE_VIEW(queueview) );
 	queue_win = child_queue( queueview );
+	queue_action = gtk_ui_manager_get_action( ui_manager,
+			(gchar*)"/MainMenu/Option/Queue");
+
+
+	gtk_signal_connect( GTK_OBJECT(queue_win), "delete_event", 
+			G_CALLBACK( queue_win_on_delete ), NULL);
 
 	/* TODO: statusbar
 	 * trackid, servername, username, play_status, sleep, random, gap, filterstat */

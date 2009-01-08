@@ -12,7 +12,7 @@ man1_MANS=gtkdudlc.man
 
 EXTRA_DIST=$(MANS)
 
-gtkdudlc_LDFLAGS=-L../lib -L../cmd -ldudlc
+gtkdudlc_LDFLAGS=-L../lib -ldudlc
 gtkdudlc_SOURCES= \
 	main.c \
 	options.c \
@@ -21,9 +21,12 @@ gtkdudlc_SOURCES= \
 	context.c \
 	sortfunc.c \
 	cellfunc.c \
+	treehelper.c \
 	track.c \
 	album.c \
 	queue.c \
-	tracksearch.c
-gtkdudlc_HEADERS= \
+	tracksearch.c \
+	artist.c \
+	browse.c
+noinst_HEADERS= \
 	common.h

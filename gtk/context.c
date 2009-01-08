@@ -43,7 +43,7 @@ static gboolean context_on_button( GtkWidget *view, GdkEventButton *event, gpoin
 	if( event->type != GDK_BUTTON_PRESS || event->button != 3)
 		return FALSE;
 
-        if( track_list_select_count(GTK_TREE_VIEW(view)) <= 1 ){
+        if( tree_view_select_count(GTK_TREE_VIEW(view)) <= 1 ){
 		GtkTreePath *path;
 
 		if( gtk_tree_view_get_path_at_pos(GTK_TREE_VIEW(view),

@@ -54,6 +54,7 @@ GtkWidget *tracksearch_window( void )
 	GtkWidget *search_label;
 	GtkWidget *search_button;
 	GtkWidget *scroll;
+	GtkTreeSelection *sel;
 	search_widgets *wg;
 
 
@@ -101,7 +102,9 @@ GtkWidget *tracksearch_window( void )
 	gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW(scroll), 
 		GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC );
 
-	wg->list = track_list_new_with_list( NULL );
+	wg->list = track_list_new_with_list( TRUE, NULL );
+	sel = gtk_tree_view_get_selection( GTK_TREE_VIEW(wg->list) );
+	gtk_tree_selection_set_mode( GTK_TREE_SELECTION(sel), GTK_SELECTION_MULTIPLE );
 	gtk_container_add( GTK_CONTAINER(scroll), wg->list );
 	gtk_widget_show( wg->list );
 

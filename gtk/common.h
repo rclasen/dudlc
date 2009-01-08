@@ -107,13 +107,31 @@ typedef gint (*context_populate_func)( GtkWidget *view, GtkWidget *menu );
 void context_add( GtkTreeView *view, context_populate_func func );
 
 /*
+ * treehelper
+ */
+
+gint tree_view_select_count( GtkTreeView *list );
+void tree_view_column_on_clicked( GtkWidget *col, GtkTreeView *view );
+
+/*
  * track.c
  */
 
-GtkWidget *track_list_new( void );
-GtkWidget *track_list_new_with_list( duc_it_track *in );
+enum {
+	TRACKLIST_ID,
+	TRACKLIST_ALBUM_ID,
+	TRACKLIST_ALBUM_POS,
+	TRACKLIST_ALBUM,
+	TRACKLIST_DURATION,
+	TRACKLIST_ARTIST_ID,
+	TRACKLIST_ARTIST,
+	TRACKLIST_TITLE,
+	TRACKLIST_N_COLUMNS,
+};
+
+GtkWidget *track_list_new( gboolean full );
+GtkWidget *track_list_new_with_list( gboolean full, duc_it_track *in );
 void track_list_populate( GtkTreeView *list, duc_it_track *in );
-gint track_list_select_count( GtkTreeView *list );
 void track_list_select_queueadd( GtkTreeView *list );
 void track_list_select_queuealbum( GtkTreeView *list );
 
@@ -121,15 +139,52 @@ void track_list_select_queuealbum( GtkTreeView *list );
  * album.c
  */
 
-GtkWidget *album_list_new( void );
-GtkWidget *album_list_new_with_list( duc_it_album *in );
+enum {
+	ALBUMLIST_ID,
+	ALBUMLIST_YEAR,
+	ALBUMLIST_ARTIST_ID,
+	ALBUMLIST_ARTIST,
+	ALBUMLIST_ALBUM,
+	ALBUMLIST_N_COLUMNS,
+};
+
+GtkWidget *album_list_new( gboolean full );
+GtkWidget *album_list_new_with_list( gboolean full, duc_it_album *in );
 void album_list_populate( GtkTreeView *list, duc_it_album *in );
-gint album_list_select_count( GtkTreeView *list );
 void album_list_select_queuealbum( GtkTreeView *list );
+
+/*
+ * artist.c
+ */
+
+enum {
+	ARTISTLIST_ID,
+	ARTISTLIST_ARTIST,
+	ARTISTLIST_N_COLUMNS,
+};
+
+GtkWidget *artist_list_new( void );
+GtkWidget *artist_list_new_with_list( duc_it_artist *in );
+void artist_list_populate( GtkTreeView *list, duc_it_artist *in );
 
 /*
  * queue.c
  */
+
+enum {
+	QUEUELIST_ID,
+	QUEUELIST_USER_ID,
+	QUEUELIST_USER,
+	QUEUELIST_QUEUED,
+	QUEUELIST_ALBUM_ID,
+	QUEUELIST_ALBUM_POS,
+	QUEUELIST_ALBUM,
+	QUEUELIST_DURATION,
+	QUEUELIST_ARTIST_ID,
+	QUEUELIST_ARTIST,
+	QUEUELIST_TITLE,
+	QUEUELIST_N_COLUMNS,
+};
 
 GtkWidget *queue_list_new( void );
 void queue_list_populate( GtkTreeModel *store, duc_it_queue *in );
@@ -137,7 +192,12 @@ void queue_list_add( GtkTreeModel *store, duc_queue *item );
 void queue_list_del( GtkTreeModel *store, int queueid );
 void queue_list_clear( GtkTreeModel *store );
 
-gint queue_list_select_count( GtkTreeView *list );
 void queue_list_select_deltrack( GtkTreeView *list );
+
+/*
+ * brows.c
+ */
+
+GtkWidget *browse_window( void );
 
 #endif //_COMMON_H

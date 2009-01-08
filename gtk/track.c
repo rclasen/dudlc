@@ -11,33 +11,9 @@
 
 #include "common.h"
 
-enum {
-	TRACKLIST_ID,
-	TRACKLIST_ALBUM_ID,
-	TRACKLIST_ALBUM_POS,
-	TRACKLIST_ALBUM,
-	TRACKLIST_DURATION,
-	TRACKLIST_ARTIST_ID,
-	TRACKLIST_ARTIST,
-	TRACKLIST_TITLE,
-	TRACKLIST_N_COLUMNS,
-};
-
 /*
  * helper for selection processing
  */
-
-static void track_list_each_count(
-	GtkTreeModel  *model,
-	GtkTreePath   *path,
-	GtkTreeIter   *iter,
-	gpointer       data)
-{
-	(void)model;
-	(void)path;
-	(void)iter;
-	(*(gint*)data)++;
-}
 
 static void track_list_each_queueadd( 
 	GtkTreeModel  *model,
@@ -70,16 +46,6 @@ static void track_list_each_queuealbum(
 /*
  * selection processing
  */
-
-gint track_list_select_count( GtkTreeView *list )
-{
-	gint selected = 0;
-	gtk_tree_selection_selected_foreach(
-		gtk_tree_view_get_selection(list),
-		track_list_each_count, &selected);
-
-	return selected;
-}
 
 void track_list_select_queueadd( GtkTreeView *list )
 {
@@ -117,7 +83,7 @@ static gint track_list_context_populate( GtkWidget *view, GtkWidget *menu )
 	gint numitems = 0;
 
 
-	if( 0 >= (selected = track_list_select_count(GTK_TREE_VIEW(view))))
+	if( 0 >= (selected = tree_view_select_count(GTK_TREE_VIEW(view))))
 		return 0;
 
 
@@ -151,24 +117,23 @@ static gint track_list_context_populate( GtkWidget *view, GtkWidget *menu )
  * the list view
  */
 
-GtkWidget *track_list_new( void )
+GtkWidget *track_list_new( gboolean full )
 {
 	GtkTreeView *view;
-	GtkTreeSelection *sel;
 	GtkTreeViewColumn *col;
 	GtkCellRenderer *renderer;
 
 	view = GTK_TREE_VIEW(gtk_tree_view_new());
 
-	sel = gtk_tree_view_get_selection(view);
-	gtk_tree_selection_set_mode( sel, GTK_SELECTION_MULTIPLE );
-
 	context_add( view, track_list_context_populate );
 
 
 
+	/* TODO: gtk_tree_view_column_set_resizable () */
 	renderer = gtk_cell_renderer_text_new();
 	col = gtk_tree_view_column_new();
+	g_object_set_data( G_OBJECT(col), "columnum", (gpointer)TRACKLIST_ALBUM_POS);
+	g_signal_connect(col, "clicked", (GCallback)tree_view_column_on_clicked, view );
 	gtk_tree_view_column_set_title( col, "Id" );
 	gtk_tree_view_column_pack_start( col, renderer, TRUE );
 	gtk_tree_view_column_set_cell_data_func( col, renderer, 
@@ -178,6 +143,8 @@ GtkWidget *track_list_new( void )
 	
 	renderer = gtk_cell_renderer_text_new();
 	col = gtk_tree_view_column_new();
+	g_object_set_data( G_OBJECT(col), "columnum", (gpointer)TRACKLIST_DURATION);
+	g_signal_connect(col, "clicked", (GCallback)tree_view_column_on_clicked, view );
 	gtk_tree_view_column_set_title( col, "Duration" );
 	gtk_tree_view_column_pack_start( col, renderer, TRUE );
 	gtk_tree_view_column_set_cell_data_func( col, renderer, 
@@ -185,36 +152,47 @@ GtkWidget *track_list_new( void )
 	gtk_tree_view_column_set_sort_column_id(col, TRACKLIST_DURATION);
 	gtk_tree_view_append_column( view, col );
 
+	if( full ){ /* TODO: select columns */
+
 	renderer = gtk_cell_renderer_text_new();
 	col = gtk_tree_view_column_new_with_attributes(
 			"Artist", renderer, "text", TRACKLIST_ARTIST, NULL );
+	g_object_set_data( G_OBJECT(col), "columnum", (gpointer)TRACKLIST_ARTIST);
+	g_signal_connect(col, "clicked", (GCallback)tree_view_column_on_clicked, view );
 	gtk_tree_view_column_set_sort_column_id(col, TRACKLIST_ARTIST);
 	gtk_tree_view_append_column( view, col );
 
 	renderer = gtk_cell_renderer_text_new();
 	col = gtk_tree_view_column_new_with_attributes(
 			"Album", renderer, "text", TRACKLIST_ALBUM, NULL );
+	g_object_set_data( G_OBJECT(col), "columnum", (gpointer)TRACKLIST_ALBUM);
+	g_signal_connect(col, "clicked", (GCallback)tree_view_column_on_clicked, view );
 	gtk_tree_view_column_set_sort_column_id(col, TRACKLIST_ALBUM);
 	gtk_tree_view_append_column( view, col );
+	
+	}
 	
 	renderer = gtk_cell_renderer_text_new();
 	col = gtk_tree_view_column_new_with_attributes(
 			"Title", renderer, "text", TRACKLIST_TITLE, NULL );
+	g_object_set_data( G_OBJECT(col), "columnum", (gpointer)TRACKLIST_TITLE);
+	g_signal_connect(col, "clicked", (GCallback)tree_view_column_on_clicked, view );
 	gtk_tree_view_column_set_sort_column_id(col, TRACKLIST_TITLE);
 	gtk_tree_view_append_column( view, col );
 	
 	/* TODO: add column with tags of track */
 	
+	gtk_tree_view_set_search_column( GTK_TREE_VIEW(view), TRACKLIST_ALBUM_POS );
 	gtk_widget_show(GTK_WIDGET(view));
 
 	return GTK_WIDGET(view);
 }
 
-GtkWidget *track_list_new_with_list( duc_it_track *in )
+GtkWidget *track_list_new_with_list( gboolean full, duc_it_track *in )
 {
 	GtkWidget *view;
 
-	if( NULL == (view = track_list_new())) 
+	if( NULL == (view = track_list_new(full))) 
 		return NULL;
 
 	track_list_populate( GTK_TREE_VIEW(view), in );
