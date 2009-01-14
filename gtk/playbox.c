@@ -212,6 +212,17 @@ static GtkWidget *playbox_buttons_new( void )
 {
 	GtkWidget *box;
 
+	/*
+	 * TODO: add button images:
+	 * gtk_button_new_from_stock ()
+	 * GTK_STOCK_MEDIA_PREVIOUS
+	 * GTK_STOCK_MEDIA_STOP
+	 * GTK_STOCK_MEDIA_PAUSE
+	 * GTK_STOCK_MEDIA_PLAY
+	 * GTK_STOCK_MEDIA_NEXT
+	 * http://www.harshj.com/2007/11/17/setting-a-custom-label-for-a-button-with-stock-icon-in-pygtk/
+	 */
+
 	box = gtk_hbox_new( FALSE, 0 );
 
 	ctl_buttons = gtk_hbox_new( TRUE, 0 );
@@ -295,7 +306,6 @@ GtkWidget *playbox_new( void )
 	gtk_widget_show( ctl_prog );
 
 	/* buttons */
-	/* TODO: add button images */
 	ctl_buttons = playbox_buttons_new();
 	gtk_box_pack_start( GTK_BOX( box ), ctl_buttons,
 			TRUE, FALSE, 0 );

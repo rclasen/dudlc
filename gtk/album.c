@@ -93,12 +93,12 @@ GtkWidget *album_list_new( gboolean full )
 	context_add( view, album_list_context_populate );
 
 
-	/* TODO: gtk_tree_view_column_set_resizable () */
 	renderer = gtk_cell_renderer_text_new();
 	col = gtk_tree_view_column_new_with_attributes(
 			"ID", renderer, "text", ALBUMLIST_ID, NULL );
 	g_object_set_data( G_OBJECT(col), "columnum", (gpointer)ALBUMLIST_ID);
 	g_signal_connect(col, "clicked", (GCallback)tree_view_column_on_clicked, view );
+	gtk_tree_view_column_set_resizable( col, TRUE );
 	gtk_tree_view_column_set_sort_column_id(col, ALBUMLIST_ID);
 	gtk_tree_view_append_column( view, col );
 
@@ -107,6 +107,7 @@ GtkWidget *album_list_new( gboolean full )
 			"Year", renderer, "text", ALBUMLIST_YEAR, NULL );
 	g_object_set_data( G_OBJECT(col), "columnum", (gpointer)ALBUMLIST_YEAR);
 	g_signal_connect(col, "clicked", (GCallback)tree_view_column_on_clicked, view );
+	gtk_tree_view_column_set_resizable( col, TRUE );
 	gtk_tree_view_column_set_sort_column_id(col, ALBUMLIST_YEAR);
 	gtk_tree_view_append_column( view, col );
 	
@@ -117,6 +118,7 @@ GtkWidget *album_list_new( gboolean full )
 			"Artist", renderer, "text", ALBUMLIST_ARTIST, NULL );
 	g_object_set_data( G_OBJECT(col), "columnum", (gpointer)ALBUMLIST_ARTIST);
 	g_signal_connect(col, "clicked", (GCallback)tree_view_column_on_clicked, view );
+	gtk_tree_view_column_set_resizable( col, TRUE );
 	gtk_tree_view_column_set_sort_column_id(col, ALBUMLIST_ARTIST);
 	gtk_tree_view_append_column( view, col );
 
@@ -127,6 +129,7 @@ GtkWidget *album_list_new( gboolean full )
 			"Album", renderer, "text", ALBUMLIST_ALBUM, NULL );
 	g_object_set_data( G_OBJECT(col), "columnum", (gpointer)ALBUMLIST_ALBUM);
 	g_signal_connect(col, "clicked", (GCallback)tree_view_column_on_clicked, view );
+	gtk_tree_view_column_set_resizable( col, TRUE );
 	gtk_tree_view_column_set_sort_column_id(col, ALBUMLIST_ALBUM);
 	gtk_tree_view_append_column( view, col );
 	

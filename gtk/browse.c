@@ -100,7 +100,6 @@ GtkWidget *browse_window( void )
 
 	duc_it_artist_done( artists );
 
-	/* TODO: update album store when selection changes */
 	/* TODO: context menu? reread artist list? */
 
 	/* album list */
@@ -117,7 +116,6 @@ GtkWidget *browse_window( void )
 	gtk_container_add( GTK_CONTAINER(albwin), albview );
 	gtk_widget_show( albview );
 
-	/* TODO: update track store when selection changes */
 	/* TODO: context menu? */
 	/* TODO: un-/hide track artist column */
 

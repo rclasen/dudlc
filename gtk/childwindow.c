@@ -20,6 +20,7 @@ GtkWidget *childwindow_new( const char *title, GtkWidget *contents )
 	gtk_widget_show( contents );
 
 	/* TODO: ^W hotkey */
+	/* TODO: menu, toolbar */
 
 	return me;
 }

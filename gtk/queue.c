@@ -163,12 +163,12 @@ GtkWidget *queue_list_new( void )
 
 	/* columns */
 
-	/* TODO: gtk_tree_view_column_set_resizable () */
 	renderer = gtk_cell_renderer_text_new();
 	col = gtk_tree_view_column_new_with_attributes(
 			"Id", renderer, "text", QUEUELIST_ID, NULL );
 	g_object_set_data( G_OBJECT(col), "columnum", (gpointer)QUEUELIST_ID);
 	g_signal_connect(col, "clicked", (GCallback)tree_view_column_on_clicked, view );
+	gtk_tree_view_column_set_resizable( col, TRUE );
 	gtk_tree_view_column_set_sort_column_id(col, QUEUELIST_ID);
 	gtk_tree_view_append_column( view, col );
 
@@ -177,6 +177,7 @@ GtkWidget *queue_list_new( void )
 			"User", renderer, "text", QUEUELIST_USER, NULL );
 	g_object_set_data( G_OBJECT(col), "columnum", (gpointer)QUEUELIST_USER);
 	g_signal_connect(col, "clicked", (GCallback)tree_view_column_on_clicked, view );
+	gtk_tree_view_column_set_resizable( col, TRUE );
 	gtk_tree_view_column_set_sort_column_id(col, QUEUELIST_USER);
 	gtk_tree_view_append_column( view, col );
 
@@ -188,6 +189,7 @@ GtkWidget *queue_list_new( void )
 	gtk_tree_view_column_pack_start( col, renderer, TRUE );
 	gtk_tree_view_column_set_cell_data_func( col, renderer, 
 		cellfunc_time, (gpointer)QUEUELIST_QUEUED, NULL );
+	gtk_tree_view_column_set_resizable( col, TRUE );
 	gtk_tree_view_column_set_sort_column_id(col, QUEUELIST_QUEUED);
 	gtk_tree_view_append_column( view, col );
 
@@ -199,6 +201,7 @@ GtkWidget *queue_list_new( void )
 	gtk_tree_view_column_pack_start( col, renderer, TRUE );
 	gtk_tree_view_column_set_cell_data_func( col, renderer, 
 		cellfunc_trackid, (gpointer)QUEUELIST_ALBUM_POS, NULL );
+	gtk_tree_view_column_set_resizable( col, TRUE );
 	gtk_tree_view_column_set_sort_column_id(col, QUEUELIST_ALBUM_POS);
 	gtk_tree_view_append_column( view, col );
 	
@@ -210,6 +213,7 @@ GtkWidget *queue_list_new( void )
 	gtk_tree_view_column_pack_start( col, renderer, TRUE );
 	gtk_tree_view_column_set_cell_data_func( col, renderer, 
 		cellfunc_duration, (gpointer)QUEUELIST_DURATION, NULL );
+	gtk_tree_view_column_set_resizable( col, TRUE );
 	gtk_tree_view_column_set_sort_column_id(col, QUEUELIST_DURATION);
 	gtk_tree_view_append_column( view, col );
 
@@ -218,6 +222,7 @@ GtkWidget *queue_list_new( void )
 			"Artist", renderer, "text", QUEUELIST_ARTIST, NULL );
 	g_object_set_data( G_OBJECT(col), "columnum", (gpointer)QUEUELIST_ARTIST);
 	g_signal_connect(col, "clicked", (GCallback)tree_view_column_on_clicked, view );
+	gtk_tree_view_column_set_resizable( col, TRUE );
 	gtk_tree_view_column_set_sort_column_id(col, QUEUELIST_ARTIST);
 	gtk_tree_view_append_column( view, col );
 
@@ -226,6 +231,7 @@ GtkWidget *queue_list_new( void )
 			"Album", renderer, "text", QUEUELIST_ALBUM, NULL );
 	g_object_set_data( G_OBJECT(col), "columnum", (gpointer)QUEUELIST_ALBUM);
 	g_signal_connect(col, "clicked", (GCallback)tree_view_column_on_clicked, view );
+	gtk_tree_view_column_set_resizable( col, TRUE );
 	gtk_tree_view_column_set_sort_column_id(col, QUEUELIST_ALBUM);
 	gtk_tree_view_append_column( view, col );
 	
@@ -234,6 +240,7 @@ GtkWidget *queue_list_new( void )
 			"Title", renderer, "text", QUEUELIST_TITLE, NULL );
 	g_object_set_data( G_OBJECT(col), "columnum", (gpointer)QUEUELIST_TITLE);
 	g_signal_connect(col, "clicked", (GCallback)tree_view_column_on_clicked, view );
+	gtk_tree_view_column_set_resizable( col, TRUE );
 	gtk_tree_view_column_set_sort_column_id(col, QUEUELIST_TITLE);
 	gtk_tree_view_append_column( view, col );
 	

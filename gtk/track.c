@@ -129,7 +129,6 @@ GtkWidget *track_list_new( gboolean full )
 
 
 
-	/* TODO: gtk_tree_view_column_set_resizable () */
 	renderer = gtk_cell_renderer_text_new();
 	col = gtk_tree_view_column_new();
 	g_object_set_data( G_OBJECT(col), "columnum", (gpointer)TRACKLIST_ALBUM_POS);
@@ -138,6 +137,7 @@ GtkWidget *track_list_new( gboolean full )
 	gtk_tree_view_column_pack_start( col, renderer, TRUE );
 	gtk_tree_view_column_set_cell_data_func( col, renderer, 
 		cellfunc_trackid, (gpointer)TRACKLIST_ALBUM_POS, NULL );
+	gtk_tree_view_column_set_resizable( col, TRUE );
 	gtk_tree_view_column_set_sort_column_id(col, TRACKLIST_ALBUM_POS);
 	gtk_tree_view_append_column( view, col );
 	
@@ -149,6 +149,7 @@ GtkWidget *track_list_new( gboolean full )
 	gtk_tree_view_column_pack_start( col, renderer, TRUE );
 	gtk_tree_view_column_set_cell_data_func( col, renderer, 
 		cellfunc_duration, (gpointer)TRACKLIST_DURATION, NULL );
+	gtk_tree_view_column_set_resizable( col, TRUE );
 	gtk_tree_view_column_set_sort_column_id(col, TRACKLIST_DURATION);
 	gtk_tree_view_append_column( view, col );
 
@@ -159,6 +160,7 @@ GtkWidget *track_list_new( gboolean full )
 			"Artist", renderer, "text", TRACKLIST_ARTIST, NULL );
 	g_object_set_data( G_OBJECT(col), "columnum", (gpointer)TRACKLIST_ARTIST);
 	g_signal_connect(col, "clicked", (GCallback)tree_view_column_on_clicked, view );
+	gtk_tree_view_column_set_resizable( col, TRUE );
 	gtk_tree_view_column_set_sort_column_id(col, TRACKLIST_ARTIST);
 	gtk_tree_view_append_column( view, col );
 
@@ -167,6 +169,7 @@ GtkWidget *track_list_new( gboolean full )
 			"Album", renderer, "text", TRACKLIST_ALBUM, NULL );
 	g_object_set_data( G_OBJECT(col), "columnum", (gpointer)TRACKLIST_ALBUM);
 	g_signal_connect(col, "clicked", (GCallback)tree_view_column_on_clicked, view );
+	gtk_tree_view_column_set_resizable( col, TRUE );
 	gtk_tree_view_column_set_sort_column_id(col, TRACKLIST_ALBUM);
 	gtk_tree_view_append_column( view, col );
 	
@@ -177,6 +180,7 @@ GtkWidget *track_list_new( gboolean full )
 			"Title", renderer, "text", TRACKLIST_TITLE, NULL );
 	g_object_set_data( G_OBJECT(col), "columnum", (gpointer)TRACKLIST_TITLE);
 	g_signal_connect(col, "clicked", (GCallback)tree_view_column_on_clicked, view );
+	gtk_tree_view_column_set_resizable( col, TRUE );
 	gtk_tree_view_column_set_sort_column_id(col, TRACKLIST_TITLE);
 	gtk_tree_view_append_column( view, col );
 	
