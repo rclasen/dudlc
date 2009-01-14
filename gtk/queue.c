@@ -278,7 +278,7 @@ GtkWidget *queue_list_new( void )
 	return GTK_WIDGET(view);
 }
 
-void queue_list_add( GtkTreeModel *store, duc_queue *queue )
+static void queue_list_store_add( GtkTreeModel *store, duc_queue *queue )
 {
 	gchar *album, *title, *artist, *user;
 	GtkTreeIter add;
@@ -309,21 +309,24 @@ void queue_list_add( GtkTreeModel *store, duc_queue *queue )
 	g_free(user);
 }
 
-void queue_list_populate( GtkTreeModel *store, duc_it_queue *in )
+void queue_list_populate( GtkTreeView *view, duc_it_queue *in )
 {
 	duc_queue *queue;
+	GtkTreeModel *store;
 
+	store = gtk_tree_view_get_model( view );
 	/* TODO unbind store from view,
 	 * disable sorting: gtk_tree_sortable_set_sort_column_id */
+	gtk_list_store_clear( GTK_LIST_STORE(store) );
 	for( queue = duc_it_queue_cur(in); queue; queue = duc_it_queue_next(in)){
-		queue_list_add( store, queue );
+		queue_list_store_add( store, queue );
 		duc_queue_free(queue);
 	}
 	/* TODO rebind store to view */
 }
 
 
-void queue_list_del( GtkTreeModel *store, int queueid )
+static void queue_list_store_del( GtkTreeModel *store, int queueid )
 {
 	GtkTreeIter iter;
 
@@ -341,8 +344,29 @@ void queue_list_del( GtkTreeModel *store, int queueid )
 	} while( gtk_tree_model_iter_next( GTK_TREE_MODEL(store), &iter ));
 }
 
-void queue_list_clear( GtkTreeModel *store )
+void queue_list_clear( GtkTreeView *view )
 {
+	GtkTreeModel *store;
+
+	store = gtk_tree_view_get_model( view );
 	gtk_list_store_clear( GTK_LIST_STORE(store) );
 }
+
+void queue_list_add( GtkTreeView *view, duc_queue *queue )
+{
+	GtkTreeModel *store;
+
+	store = gtk_tree_view_get_model( view );
+	queue_list_store_add( store, queue );
+}
+
+void queue_list_del( GtkTreeView *view, int id )
+{
+	GtkTreeModel *store;
+
+	store = gtk_tree_view_get_model( view );
+	queue_list_store_del( store, id );
+}
+
+
 

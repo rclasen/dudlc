@@ -91,7 +91,6 @@ void cellfunc_time(
  */
 
 GtkWidget *childwindow_new( const char *title, GtkWidget *contents );
-GtkWidget *child_queue( GtkWidget *list );
 
 /*
  * tracksearch.c
@@ -131,7 +130,8 @@ enum {
 
 GtkWidget *track_list_new( gboolean full );
 GtkWidget *track_list_new_with_list( gboolean full, duc_it_track *in );
-void track_list_populate( GtkTreeView *list, duc_it_track *in );
+void track_list_populate( GtkTreeView *view, duc_it_track *in );
+void track_list_clear( GtkTreeView *view );
 void track_list_select_queueadd( GtkTreeView *list );
 void track_list_select_queuealbum( GtkTreeView *list );
 
@@ -150,7 +150,8 @@ enum {
 
 GtkWidget *album_list_new( gboolean full );
 GtkWidget *album_list_new_with_list( gboolean full, duc_it_album *in );
-void album_list_populate( GtkTreeView *list, duc_it_album *in );
+void album_list_populate( GtkTreeView *view, duc_it_album *in );
+void album_list_clear( GtkTreeView *view );
 void album_list_select_queuealbum( GtkTreeView *list );
 
 /*
@@ -165,7 +166,7 @@ enum {
 
 GtkWidget *artist_list_new( void );
 GtkWidget *artist_list_new_with_list( duc_it_artist *in );
-void artist_list_populate( GtkTreeView *list, duc_it_artist *in );
+void artist_list_populate( GtkTreeView *view, duc_it_artist *in );
 
 /*
  * queue.c
@@ -187,10 +188,10 @@ enum {
 };
 
 GtkWidget *queue_list_new( void );
-void queue_list_populate( GtkTreeModel *store, duc_it_queue *in );
-void queue_list_add( GtkTreeModel *store, duc_queue *item );
-void queue_list_del( GtkTreeModel *store, int queueid );
-void queue_list_clear( GtkTreeModel *store );
+void queue_list_populate( GtkTreeView *view, duc_it_queue *in );
+void queue_list_add( GtkTreeView *view, duc_queue *item );
+void queue_list_del( GtkTreeView *view, int queueid );
+void queue_list_clear( GtkTreeView *view );
 
 void queue_list_select_deltrack( GtkTreeView *list );
 

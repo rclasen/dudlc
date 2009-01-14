@@ -273,3 +273,12 @@ void track_list_populate( GtkTreeView *view, duc_it_track *in )
 	g_object_unref(store);
 }
 
+void track_list_clear( GtkTreeView *view )
+{
+	GtkTreeModel *store;
+
+	store = gtk_tree_view_get_model( view );
+	gtk_list_store_clear( GTK_LIST_STORE(store) );
+}
+
+
