@@ -12,8 +12,6 @@
 
 #include "common.h"
 
-/* TODO: make this a widget */
-
 /* track detail widgets */
 static GtkWidget *ctl_title, *ctl_album, *ctl_dur, *ctl_prog;
 

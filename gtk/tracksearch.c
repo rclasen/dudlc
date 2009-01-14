@@ -65,6 +65,7 @@ GtkWidget *tracksearch_window( void )
 	win = childwindow_new( "search tracks", winbox );
 	gtk_window_set_default_size(GTK_WINDOW(win), 600, 300);
 
+	/* TODO: use g_object_set_data() */
 	wg = g_malloc(sizeof(search_widgets));
 	memset(wg, 0, sizeof(search_widgets));
 
@@ -82,6 +83,7 @@ GtkWidget *tracksearch_window( void )
 	gtk_box_pack_start( GTK_BOX(search_box), search_label, FALSE, FALSE, 1 );
 	gtk_widget_show( search_label );
 
+	/* TODO: remember input, filter history */
 	wg->input = gtk_entry_new();
 	g_object_set( wg->input, "activates-default", TRUE, NULL );
 	gtk_box_pack_start( GTK_BOX(search_box), wg->input, TRUE, TRUE, 1 );

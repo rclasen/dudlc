@@ -9,6 +9,8 @@
 
 /* list queue */
 
+#include <gdk/gdkkeysyms.h>
+
 #include "common.h"
 
 /*
@@ -90,6 +92,28 @@ static gint queue_list_context_populate( GtkWidget *view, GtkWidget *menu )
 }
 
 /*
+ * keypress
+ */
+
+static gboolean queue_list_on_keypress(GtkTreeView *view, GdkEventKey *ev, gpointer data)
+{
+	(void) data;
+
+	switch( ev->keyval ){
+	 case GDK_Delete:
+		if( ! (GDK_MODIFIER_MASK & ev->state) )
+			queue_list_select_deltrack( view );
+		break;
+
+	 default: /* don't care */
+	 	break;
+	}
+
+	return FALSE;
+}
+
+
+/*
  * the list view
  */
 
@@ -159,6 +183,8 @@ GtkWidget *queue_list_new( void )
 	/* context menu */
 
 	context_add( view, queue_list_context_populate );
+	g_signal_connect(view, "key-press-event",
+		(GCallback)queue_list_on_keypress, NULL);
 
 
 	/* columns */
