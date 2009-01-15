@@ -83,7 +83,8 @@ GtkWidget *tracksearch_window( void )
 	gtk_box_pack_start( GTK_BOX(search_box), search_label, FALSE, FALSE, 1 );
 	gtk_widget_show( search_label );
 
-	/* TODO: remember input, filter history */
+	/* TODO: input history for filter */
+	/* TODO: auto complete for filter */
 	wg->input = gtk_entry_new();
 	g_object_set( wg->input, "activates-default", TRUE, NULL );
 	gtk_box_pack_start( GTK_BOX(search_box), wg->input, TRUE, TRUE, 1 );

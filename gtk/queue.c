@@ -13,6 +13,7 @@
 
 #include "common.h"
 
+
 /*
  * helper for selection processing
  */
@@ -99,6 +100,8 @@ static gboolean queue_list_on_keypress(GtkTreeView *view, GdkEventKey *ev, gpoin
 {
 	(void) data;
 
+	/* TODO: gtk_accelerator_get_default_mod_mask  
+	 * http://library.gnome.org/devel/gtk/stable/checklist-modifiers.html */
 	switch( ev->keyval ){
 	 case GDK_Delete:
 		if( ! (GDK_MODIFIER_MASK & ev->state) )
@@ -278,7 +281,7 @@ GtkWidget *queue_list_new( void )
 	return GTK_WIDGET(view);
 }
 
-static void queue_list_store_add( GtkTreeModel *store, duc_queue *queue )
+void queue_list_store_add( GtkTreeModel *store, duc_queue *queue )
 {
 	gchar *album, *title, *artist, *user;
 	GtkTreeIter add;
@@ -326,7 +329,7 @@ void queue_list_populate( GtkTreeView *view, duc_it_queue *in )
 }
 
 
-static void queue_list_store_del( GtkTreeModel *store, int queueid )
+void queue_list_store_del( GtkTreeModel *store, int queueid )
 {
 	GtkTreeIter iter;
 
@@ -367,6 +370,5 @@ void queue_list_del( GtkTreeView *view, int id )
 	store = gtk_tree_view_get_model( view );
 	queue_list_store_del( store, id );
 }
-
 
 

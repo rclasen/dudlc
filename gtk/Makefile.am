@@ -26,6 +26,9 @@ gtkdudlc_SOURCES= \
 	album.c \
 	queue.c \
 	tracksearch.c \
+	curtracks.c \
+	curalbums.c \
+	queuewin.c \
 	artist.c \
 	browse.c
 noinst_HEADERS= \

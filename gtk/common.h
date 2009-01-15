@@ -90,7 +90,9 @@ void cellfunc_time(
  * childwindow.c
  */
 
+int toggle_win_on_delete( GtkWidget *widget, GdkEvent  *event, GtkAction *action );
 GtkWidget *childwindow_new( const char *title, GtkWidget *contents );
+GtkWidget *childscroll_new( const char *title, GtkWidget *contents );
 
 /*
  * tracksearch.c
@@ -193,10 +195,39 @@ void queue_list_add( GtkTreeView *view, duc_queue *item );
 void queue_list_del( GtkTreeView *view, int queueid );
 void queue_list_clear( GtkTreeView *view );
 
+void queue_list_store_add( GtkTreeModel *store, duc_queue *queue );
+void queue_list_store_del( GtkTreeModel *store, int queueid );
+
 void queue_list_select_deltrack( GtkTreeView *list );
 
 /*
- * brows.c
+ * queuewin.c
+ */
+
+GtkWidget *queuewin_new( GtkAction *action );
+void queuewin_populate( duc_it_queue *queue );
+void queuewin_clear( void );
+void queuewin_add( duc_queue *item );
+void queuewin_del( int id );
+
+/*
+ * curalbums.c
+ */
+
+GtkWidget *curalbums_new( GtkAction *action );
+void curalbums_populate( duc_it_album *albums );
+void curalbums_clear( void );
+
+/*
+ * curtracks.c
+ */
+
+GtkWidget *curtracks_new( GtkAction *action );
+void curtracks_populate( duc_it_track *tracks );
+void curtracks_clear( void );
+
+/*
+ * browse.c
  */
 
 GtkWidget *browse_window( void );

@@ -290,7 +290,7 @@ GtkWidget *playbox_new( void )
 	gtk_widget_show( ctl_rowa );
 
 	/* TODO: more details 
-	 * IDs, Tags, filter, album_artist */
+	 * IDs (as tooltip?), Tags, filter, album_artist (as tooltip?) */
 
 	/* TODO: use fill-level instead of value for progress - req. gtk 2.12*/
 	ctl_prog = gtk_hscale_new_with_range(0, 1, 1);
