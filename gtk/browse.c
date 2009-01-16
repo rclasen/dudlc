@@ -126,7 +126,7 @@ static GtkActionEntry action_artist[] = {
 };
 
 static GtkActionEntry action_album[] = {
-	{ "QueueAlbum", NULL, "_Queue Album", NULL, 
+	{ "QueueAlbum", GTK_STOCK_CDROM, "_Queue Album", NULL, 
 		"queue selected album",
 		G_CALLBACK(act_queuealbum) },
 };
@@ -135,12 +135,10 @@ static GtkActionEntry action_track_one[] = {
 };
 
 static GtkActionEntry action_track_any[] = {
-	{ "QueueTracks", NULL, "_Queue Tracks", NULL, 
+	{ "QueueTracks", GTK_STOCK_ADD, "_Queue Tracks", NULL, 
 		"queue selected tracks",
 		G_CALLBACK(act_queuetrack) },
 };
-
-/* TODO: icons */
 
 static const char *uidesc =
 	"<ui>"
@@ -160,7 +158,7 @@ static const char *uidesc =
 	/* TODO: un-/hide track artist column */
 	/* TODO: show non-album tracks of artist */
 	/* TODO: hotkey to queue currently focused+selected album/track */
-	/* TODO: show queue */
+	/* TODO: show queue, search */
 
 	"  </menubar>"	
 
@@ -177,7 +175,7 @@ static const char *uidesc =
 	"  </toolbar>"
 
 /* treeview context menus */
-	"  <popup name='ArtistPopup'>"	/* NOTE: also disabled below */
+	"  <popup name='ArtistPopup'>"
 	"  </popup>"
 
 	"  <popup name='AlbumPopup'>"
@@ -315,7 +313,7 @@ GtkWidget *browse_window( gint artist, gint album, gint track )
 	/* top window */
 
 	me = childwindow_new( "browse", hpane, ui, uidesc );
-	gtk_window_set_default_size(GTK_WINDOW(me), 700, 400);
+	gtk_window_set_default_size(GTK_WINDOW(me), 800, 400);
 	gtk_paned_set_position( GTK_PANED(hpane), 300 );
 	gtk_paned_set_position( GTK_PANED(vpane), 200 );
 
@@ -324,10 +322,8 @@ GtkWidget *browse_window( gint artist, gint album, gint track )
 
 	/* context menus */
 
-#if 0
 	context = gtk_ui_manager_get_widget( ui, "/ArtistPopup" );
 	context_add( GTK_TREE_VIEW(artview), GTK_MENU(context) );
-#endif
 
 	context = gtk_ui_manager_get_widget( ui, "/AlbumPopup" );
 	context_add( GTK_TREE_VIEW(albview), GTK_MENU(context) );

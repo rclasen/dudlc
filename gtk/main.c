@@ -240,7 +240,6 @@ static void open_browse( GtkAction *action, gpointer data )
 	track = duc_cmd_curtrack( con );
 	win = browse_window( track->album->artist->id,
 		track->album->id, track->id );
-	gtk_window_set_default_size(GTK_WINDOW(win), 700, 400);
 	gtk_widget_show( win );
 	duc_track_free( track );
 }
@@ -310,9 +309,9 @@ int main( int argc, char **argv )
 		{ "OptionMenu", NULL, "_Options", NULL, NULL, NULL },
 
 		{ "ShowMenu", NULL, "_Show", NULL, NULL, NULL },
-		{ "SearchTrack", NULL, "_Search Track", "<control>S",
+		{ "SearchTrack", GTK_STOCK_FIND, "_Search Track", "<control>S",
 			"search tracks", G_CALLBACK(open_tracksearch) },
-		{ "Browse", NULL, "B_rowse Archive", "<control>R",
+		{ "Browse", GTK_STOCK_OPEN, "B_rowse Archive", "<control>R",
 			"browse Archive", G_CALLBACK(open_browse) },
 	};
 	GtkToggleActionEntry action_tentries[] = {
@@ -354,15 +353,35 @@ int main( int argc, char **argv )
 	GtkAction *action;
 
 
+	/* TODO: remove duplicate code for ui_managers */
 	/* *TODO: error handling */
-	/* TODO: keyboard shortcuts */
-	/* TODO: icon */
+	/* TODO: remember window positions */
+	/* TODO: playbox keyboard shortcuts */
+	/* TODO: icons 
+	GTK_STOCK_CDROM queue_album
+	GTK_STOCK_ADD + queue_track
+	GTK_STOCK_REMOVE -
+
+	GTK_STOCK_CANCEL
+	GTK_STOCK_CLEAR
+	GTK_STOCK_DELETE queue:del 
+	GTK_STOCK_STOP
+
+	GTK_STOCK_FIND tracksearch
+	GTK_STOCK_INDEX
+	GTK_STOCK_INFO
+	GTK_STOCK_OPEN browse
+	GTK_STOCK_REFRESH browse: reload artist list
+	 */
 	/* TODO: check window/icon names */
 	/* TODO: view/edit frontend for user, clients, tags, filtertop,
 	 * history, album_search, artist_search,
 	 */
-	/* TODO: context menu */
+	/* TODO: playbox context menu */
 	/* TODO: retry connect every x seconds */
+	/* TODO: drag'n'drop within queue to reorder */
+	/* TODO: drag'n'drop towards queue */
+
 
 	options_init( &opt );
 

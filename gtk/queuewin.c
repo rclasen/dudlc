@@ -86,32 +86,31 @@ static void selection_on_change( GtkTreeSelection *sel, gpointer data )
 	
 }
 
-/* TODO: icons */
-
 static GtkActionEntry action_always[] = {
 	{ "FileMenu", NULL, "_File", NULL, NULL, NULL },
 	{ "Close", GTK_STOCK_CLOSE, "_Close", "<control>W", 
 		"close this window", G_CALLBACK(act_close) },
 
 	{ "EditMenu", NULL, "_Edit", NULL, NULL, NULL },
-	{ "Clear", NULL, "_Clear Queue", NULL,
+	{ "Clear", GTK_STOCK_CLEAR, "_Clear Queue", NULL,
 		"clear queue", G_CALLBACK(act_clear) },
 
 	{ "ShowMenu", NULL, "_Show", NULL, NULL, NULL },
 };
 
 static GtkActionEntry action_any[] = {
-	{ "UnqueueTracks", NULL, "Unqueue Tracks", NULL, 
+	{ "UnqueueTracks", GTK_STOCK_DELETE, "Unqueue Tracks", NULL, 
 		"unqueue selected tracks", 
 		G_CALLBACK(act_unqueue_tracks) },
 };
 
 static GtkActionEntry action_one[] = {
-	{ "Browse", NULL, "B_rowse Track", "<control>R", 
+	{ "Browse", GTK_STOCK_OPEN, "B_rowse Track", "<control>R", 
 		"show related information for selected track",
 		G_CALLBACK(act_browse) },
 	/* TODO: Unqueue album, artist, user */
 	/* TODO: filter artist, album  */
+	/* TODO: show search */
 };
 
 static const char *uidesc =

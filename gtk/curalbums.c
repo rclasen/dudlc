@@ -86,10 +86,10 @@ static GtkActionEntry action_always[] = {
 };
 
 static GtkActionEntry action_album_one[] = {
-	{ "Browse", NULL, "B_rowse Track", "<control>R", 
+	{ "Browse", GTK_STOCK_OPEN, "B_rowse Track", "<control>R", 
 		"show related information for selected album",
 		G_CALLBACK(act_browse) },
-	{ "QueueAlbum", NULL, "_Queue Album", NULL, 
+	{ "QueueAlbum", GTK_STOCK_CDROM, "_Queue Album", NULL, 
 		"queue selected album",
 		G_CALLBACK(act_queuealbum) },
 };
@@ -116,7 +116,7 @@ static const char *uidesc =
 	"    </menu>"
 	/* TODO: filter artst, album */
 	/* TODO: hotkey to queue currently focused+selected album */
-	/* TODO: show queue */
+	/* TODO: show queue, search */
 
 	"  </menubar>"	
 
