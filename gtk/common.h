@@ -111,6 +111,8 @@ void context_add( GtkTreeView *view, GtkMenu *menu );
  * treehelper
  */
 
+gint tree_select_count( GtkTreeSelection *sel );
+
 void tree_view_select( GtkTreeView *view, int col, int selid );
 gint tree_view_select_count( GtkTreeView *list );
 void tree_view_column_on_clicked( GtkWidget *col, GtkTreeView *view );

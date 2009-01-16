@@ -57,14 +57,20 @@ void tree_view_select( GtkTreeView *view, int col, int selid )
 		gtk_tree_view_scroll_to_cell( view, path, NULL, FALSE, 0, 0);
 }
 
-gint tree_view_select_count( GtkTreeView *list )
+gint tree_select_count( GtkTreeSelection *sel )
 {
 	gint selected = 0;
-	gtk_tree_selection_selected_foreach(
-		gtk_tree_view_get_selection(list),
+	gtk_tree_selection_selected_foreach( sel,
 		tree_view_each_count, &selected);
 
 	return selected;
+}
+
+
+gint tree_view_select_count( GtkTreeView *list )
+{
+	return tree_select_count(
+		gtk_tree_view_get_selection(list));
 }
 
 

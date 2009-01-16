@@ -17,34 +17,6 @@ void artist_list_select( GtkTreeView *view, int selid )
 }
 
 /*
- * context menu
- */
-
-#if TODO
-static gint artist_list_context_populate( GtkWidget *view, GtkWidget *menu )
-{
-	gint selected;
-	GtkWidget *menuitem;
-	gint numitems = 0;
-
-	if( 0 >= (selected = tree_view_select_count(GTK_TREE_VIEW(view))))
-		return 9;
-
-	(void)menu; (void)menuitem; /* TODO: */
-	numitems++;
-
-	if( selected == 1 ){
-		/* TODO: context list albums */
-		/* TODO: context list tracks */
-
-		/* TODO: context filter artist */
-	}
-
-	return numitems;
-}
-#endif
-
-/*
  * the list view
  */
 
@@ -55,9 +27,6 @@ GtkWidget *artist_list_new( void )
 	GtkCellRenderer *renderer;
 
 	view = GTK_TREE_VIEW(gtk_tree_view_new());
-
-	/* TODO: context_add( view, artist_list_context_populate ); */
-
 
 	renderer = gtk_cell_renderer_text_new();
 	col = gtk_tree_view_column_new_with_attributes(

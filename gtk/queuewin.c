@@ -21,7 +21,6 @@ typedef struct {
 static void act_close( GtkAction *action, gpointer *data )
 {
 	(void)action;
-	(void)data;
 	gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(data), FALSE);
 }
 
@@ -37,26 +36,6 @@ static void act_unqueue_tracks( GtkAction *action, GtkTreeView *view )
 	(void)action;
 	queue_list_select_deltrack( view );
 }
-
-/*
-static void act_unqueue_album( GtkAction *action, GtkTreeView *view )
-{
-	(void)action;
-	queue_list_select_delalbum( view );
-}
-
-static void act_unqueue_artist( GtkAction *action, GtkTreeView *view )
-{
-	(void)action;
-	queue_list_select_delartist( view );
-}
-
-static void act_unqueue_user( GtkAction *action, GtkTreeView *view )
-{
-	(void)action;
-	queue_list_select_deluser( view );
-}
-*/
 
 static void act_browse_each( 
 	GtkTreeModel	*model,
@@ -97,7 +76,7 @@ static void selection_on_change( GtkTreeSelection *sel, gpointer data )
 
 	(void)data;
 
-	selected = tree_view_select_count( GTK_TREE_VIEW(queue_view) );
+	selected = tree_select_count( sel );
 
 	if( NULL != (ag = g_object_get_data(G_OBJECT(sel),"agroup-one")))
 		gtk_action_group_set_sensitive(ag, selected == 1);
@@ -128,7 +107,7 @@ static GtkActionEntry action_any[] = {
 };
 
 static GtkActionEntry action_one[] = {
-	{ "Browse", NULL, "_Browse Track", NULL, 
+	{ "Browse", NULL, "B_rowse Track", "<control>R", 
 		"show related information for selected track",
 		G_CALLBACK(act_browse) },
 	/* TODO: Unqueue album, artist, user */

@@ -67,60 +67,6 @@ void track_list_select_queuealbum( GtkTreeView *list )
 }
 
 /*
- * context menu
- */
-#if TODO
-static void track_list_context_qtrack_on_activate(GtkWidget *menuitem, gpointer data)
-{
-	(void)menuitem;
-	track_list_select_queueadd(GTK_TREE_VIEW(data));
-}
-
-static void track_list_context_qalbum_on_activate(GtkWidget *menuitem, gpointer data)
-{
-	(void)menuitem;
-	track_list_select_queuealbum(GTK_TREE_VIEW(data));
-}
-
-static gint track_list_context_populate( GtkWidget *view, GtkWidget *menu )
-{
-	gint selected;
-	GtkWidget *menuitem;
-	gint numitems = 0;
-
-
-	if( 0 >= (selected = tree_view_select_count(GTK_TREE_VIEW(view))))
-		return 0;
-
-
-	menuitem = gtk_menu_item_new_with_label( selected > 1 
-		? "queue tracks"
-		: "queue track" );
-	g_signal_connect(menuitem, "activate",
-		(GCallback)track_list_context_qtrack_on_activate, view);
-	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
-	numitems++;
-
-	if( selected == 1 ){
-		menuitem = gtk_menu_item_new_with_label("queue album");
-		g_signal_connect(menuitem, "activate",
-			(GCallback)track_list_context_qalbum_on_activate, view);
-		gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
-		numitems++;
-
-		/* TODO: context list artist albums*/
-		/* TODO: context list artist tracks*/
-		/* TODO: context list albums tracks */
-
-		/* TODO: context filter artist */
-		/* TODO: context filter album */
-	}
-
-	return numitems;
-}
-#endif
-
-/*
  * the list view
  */
 
@@ -131,9 +77,6 @@ GtkWidget *track_list_new( gboolean full )
 	GtkCellRenderer *renderer;
 
 	view = GTK_TREE_VIEW(gtk_tree_view_new());
-
-	/* TODO: context_add( view, track_list_context_populate ); */
-
 
 
 	renderer = gtk_cell_renderer_text_new();

@@ -46,46 +46,6 @@ void album_list_select_queuealbum( GtkTreeView *list )
 }
 
 /*
- * context menu
- */
-
-#if TODO
-static void album_list_context_qalbum_on_activate(GtkWidget *menuitem, gpointer data)
-{
-	(void)menuitem;
-	album_list_select_queuealbum(GTK_TREE_VIEW(data));
-}
-
-static gint album_list_context_populate( GtkWidget *view, GtkWidget *menu )
-{
-	gint selected;
-	GtkWidget *menuitem;
-	gint numitems = 0;
-
-	if( 0 >= (selected = tree_view_select_count(GTK_TREE_VIEW(view))))
-		return 9;
-
-	menuitem = gtk_menu_item_new_with_label( selected > 1 
-		? "queue albums"
-		: "queue album" );
-	g_signal_connect(menuitem, "activate",
-		(GCallback)album_list_context_qalbum_on_activate, view);
-	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
-	numitems++;
-
-	if( selected == 1 ){
-		/* TODO: context list tracks */
-		/* TODO: context list artists tracks */
-
-		/* TODO: context filter artist */
-		/* TODO: context filter album */
-	}
-
-	return numitems;
-}
-#endif
-
-/*
  * the list view
  */
 
@@ -96,8 +56,6 @@ GtkWidget *album_list_new( gboolean full )
 	GtkCellRenderer *renderer;
 
 	view = GTK_TREE_VIEW(gtk_tree_view_new());
-
-	/* TODO: context_add( view, album_list_context_populate ); */
 
 
 	renderer = gtk_cell_renderer_text_new();
