@@ -47,6 +47,11 @@ static void track_list_each_queuealbum(
  * selection processing
  */
 
+void track_list_select( GtkTreeView *view, int selid )
+{
+	tree_view_select( view, TRACKLIST_ID, selid );
+}
+
 void track_list_select_queueadd( GtkTreeView *list )
 {
 	gtk_tree_selection_selected_foreach(
@@ -64,6 +69,7 @@ void track_list_select_queuealbum( GtkTreeView *list )
 /*
  * context menu
  */
+#if TODO
 static void track_list_context_qtrack_on_activate(GtkWidget *menuitem, gpointer data)
 {
 	(void)menuitem;
@@ -112,6 +118,7 @@ static gint track_list_context_populate( GtkWidget *view, GtkWidget *menu )
 
 	return numitems;
 }
+#endif
 
 /*
  * the list view
@@ -125,7 +132,7 @@ GtkWidget *track_list_new( gboolean full )
 
 	view = GTK_TREE_VIEW(gtk_tree_view_new());
 
-	context_add( view, track_list_context_populate );
+	/* TODO: context_add( view, track_list_context_populate ); */
 
 
 

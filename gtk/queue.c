@@ -51,48 +51,6 @@ void queue_list_select_deltrack( GtkTreeView *list )
 }
 
 /*
- * context menu
- */
-static void queue_list_context_deltrack_on_activate(GtkWidget *menuitem, gpointer data)
-{
-	(void)menuitem;
-	queue_list_select_deltrack(GTK_TREE_VIEW(data));
-}
-
-static gint queue_list_context_populate( GtkWidget *view, GtkWidget *menu )
-{
-	gint selected;
-	GtkWidget *menuitem;
-	gint numitems = 0;
-
-
-	if( 0 >= (selected = tree_view_select_count(GTK_TREE_VIEW(view))))
-		return 0;
-
-
-	menuitem = gtk_menu_item_new_with_label( "unqueue" );
-	g_signal_connect(menuitem, "activate",
-		(GCallback)queue_list_context_deltrack_on_activate, view);
-	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
-	numitems++;
-
-	if( selected == 1 ){
-		/* TODO: context unqueue artist */
-		/* TODO: context unqueue album */
-		/* TODO: context unqueue user */
-
-		/* TODO: context list artist albums*/
-		/* TODO: context list artist tracks*/
-		/* TODO: context list albums tracks */
-
-		/* TODO: context filter artist */
-		/* TODO: context filter album */
-	}
-
-	return numitems;
-}
-
-/*
  * keypress
  */
 
@@ -142,6 +100,7 @@ GtkWidget *queue_list_new( void )
 		G_TYPE_INT,	/* QUEUELIST_DURATION */
 		G_TYPE_INT,	/* QUEUELIST_ARTIST_ID */
 		G_TYPE_STRING,	/* QUEUELIST_ARTIST */
+		G_TYPE_INT,	/* QUEUELIST_TRACK_ID */
 		G_TYPE_STRING	/* QUEUELIST_TITLE */
 		) );
 
@@ -176,6 +135,9 @@ GtkWidget *queue_list_new( void )
 		QUEUELIST_ARTIST, sortfunc_str, (gpointer)QUEUELIST_ARTIST, NULL);
 
 	gtk_tree_sortable_set_sort_func( GTK_TREE_SORTABLE(store),
+		QUEUELIST_TRACK_ID, sortfunc_int, (gpointer)QUEUELIST_TRACK_ID, NULL);
+
+	gtk_tree_sortable_set_sort_func( GTK_TREE_SORTABLE(store),
 		QUEUELIST_TITLE, sortfunc_str, (gpointer)QUEUELIST_TITLE, NULL);
 
 
@@ -183,9 +145,7 @@ GtkWidget *queue_list_new( void )
 	g_object_unref(store);
 
 
-	/* context menu */
-
-	context_add( view, queue_list_context_populate );
+	/* keyboard */
 	g_signal_connect(view, "key-press-event",
 		(GCallback)queue_list_on_keypress, NULL);
 
@@ -303,6 +263,7 @@ void queue_list_store_add( GtkTreeModel *store, duc_queue *queue )
 		QUEUELIST_DURATION, queue->track->duration,
 		QUEUELIST_ARTIST_ID, queue->track->artist->id,
 		QUEUELIST_ARTIST, artist,
+		QUEUELIST_TRACK_ID, queue->track->id,
 		QUEUELIST_TITLE, title,
 		-1);
 

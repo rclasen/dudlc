@@ -22,12 +22,40 @@ static void tree_view_each_count(
 	(void)model;
 	(void)path;
 	(void)iter;
-	(*(gint*)data)++;
+	++(*(gint*)data);
 }
 
 /*
  * selection processing
  */
+
+void tree_view_select( GtkTreeView *view, int col, int selid )
+{
+	GtkTreeModel *store;
+	GtkTreeSelection *sel;
+	GtkTreeIter iter;
+	GtkTreePath *path;
+
+	store = gtk_tree_view_get_model( view );
+	sel = gtk_tree_view_get_selection( view );
+
+	if( ! gtk_tree_model_get_iter_first( GTK_TREE_MODEL(store), &iter ) )
+		return;
+
+	do {
+		gint modid;
+		gtk_tree_model_get( store, &iter, col, &modid, -1);
+		if( selid == modid ){
+			gtk_tree_selection_select_iter( sel, &iter );
+			path = gtk_tree_model_get_path( store, &iter );
+			break;
+		}
+		
+	} while( gtk_tree_model_iter_next( GTK_TREE_MODEL(store), &iter ));
+
+	if( path )
+		gtk_tree_view_scroll_to_cell( view, path, NULL, FALSE, 0, 0);
+}
 
 gint tree_view_select_count( GtkTreeView *list )
 {
@@ -39,8 +67,9 @@ gint tree_view_select_count( GtkTreeView *list )
 	return selected;
 }
 
+
 /*
- *
+ * helper to select inc-search column
  */
 
 void tree_view_column_on_clicked( GtkWidget *col, GtkTreeView *view )

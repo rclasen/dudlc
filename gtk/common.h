@@ -91,8 +91,8 @@ void cellfunc_time(
  */
 
 int toggle_win_on_delete( GtkWidget *widget, GdkEvent  *event, GtkAction *action );
-GtkWidget *childwindow_new( const char *title, GtkWidget *contents );
-GtkWidget *childscroll_new( const char *title, GtkWidget *contents );
+GtkWidget *childwindow_new( const char *title, GtkWidget *contents, GtkUIManager *ui, const char *uidesc );
+GtkWidget *childscroll_new( const char *title, GtkWidget *contents, GtkUIManager *ui, const char *uidesc );
 
 /*
  * tracksearch.c
@@ -105,12 +105,13 @@ GtkWidget *tracksearch_window( void );
  */
 
 typedef gint (*context_populate_func)( GtkWidget *view, GtkWidget *menu );
-void context_add( GtkTreeView *view, context_populate_func func );
+void context_add( GtkTreeView *view, GtkMenu *menu );
 
 /*
  * treehelper
  */
 
+void tree_view_select( GtkTreeView *view, int col, int selid );
 gint tree_view_select_count( GtkTreeView *list );
 void tree_view_column_on_clicked( GtkWidget *col, GtkTreeView *view );
 
@@ -134,6 +135,7 @@ GtkWidget *track_list_new( gboolean full );
 GtkWidget *track_list_new_with_list( gboolean full, duc_it_track *in );
 void track_list_populate( GtkTreeView *view, duc_it_track *in );
 void track_list_clear( GtkTreeView *view );
+void track_list_select( GtkTreeView *view, int id );
 void track_list_select_queueadd( GtkTreeView *list );
 void track_list_select_queuealbum( GtkTreeView *list );
 
@@ -154,6 +156,7 @@ GtkWidget *album_list_new( gboolean full );
 GtkWidget *album_list_new_with_list( gboolean full, duc_it_album *in );
 void album_list_populate( GtkTreeView *view, duc_it_album *in );
 void album_list_clear( GtkTreeView *view );
+void album_list_select( GtkTreeView *view, int id );
 void album_list_select_queuealbum( GtkTreeView *list );
 
 /*
@@ -169,6 +172,7 @@ enum {
 GtkWidget *artist_list_new( void );
 GtkWidget *artist_list_new_with_list( duc_it_artist *in );
 void artist_list_populate( GtkTreeView *view, duc_it_artist *in );
+void artist_list_select( GtkTreeView *view, int id );
 
 /*
  * queue.c
@@ -185,6 +189,7 @@ enum {
 	QUEUELIST_DURATION,
 	QUEUELIST_ARTIST_ID,
 	QUEUELIST_ARTIST,
+	QUEUELIST_TRACK_ID,
 	QUEUELIST_TITLE,
 	QUEUELIST_N_COLUMNS,
 };
@@ -230,6 +235,6 @@ void curtracks_clear( void );
  * browse.c
  */
 
-GtkWidget *browse_window( void );
+GtkWidget *browse_window( gint artist, gint album, gint track );
 
 #endif //_COMMON_H

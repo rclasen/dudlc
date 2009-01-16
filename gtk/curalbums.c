@@ -20,7 +20,7 @@ GtkWidget *curalbums_new( GtkAction *action )
 	sel = gtk_tree_view_get_selection( GTK_TREE_VIEW(albums_view));
 	gtk_tree_selection_set_mode( GTK_TREE_SELECTION(sel), GTK_SELECTION_MULTIPLE );
 
-	win = childscroll_new( "albums of current artist", albums_view );
+	win = childscroll_new( "albums of current artist", albums_view, NULL, NULL );
 	gtk_signal_connect( GTK_OBJECT(win), "delete_event", 
 			G_CALLBACK( toggle_win_on_delete ), action);
 	gtk_window_set_default_size(GTK_WINDOW(win), 500, 300);

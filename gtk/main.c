@@ -15,7 +15,7 @@
 #include "common.h"
 
 dudlc *con = NULL;
-static GtkWidget *main_win, *main_menu /*, *ctl_status */;
+static GtkWidget *main_win, *main_menu;
 static int needupdate = 0;
 
 static GtkWidget *queue_win;
@@ -229,29 +229,20 @@ static void albums_toggle( GtkAction *action, gpointer data )
 	toggle_win_on_toggle( action, albums_win );
 }
 
-/*
-static void status_toggle( GtkAction *action, gpointer data ) 
-{
-	(void)data;
-	if(gtk_toggle_action_get_active(GTK_TOGGLE_ACTION(action))) 
-		gtk_widget_show(ctl_status);
-	else {
-		gtk_widget_hide(ctl_status);
-		shrink_y(GTK_WINDOW(main_win));
-	}
-}
-*/
-
 static void open_browse( GtkAction *action, gpointer data ) 
 {
+	duc_track *track;
 	GtkWidget *win;
 
 	(void)action;
 	(void)data;
 
-	win = browse_window();
+	track = duc_cmd_curtrack( con );
+	win = browse_window( track->album->artist->id,
+		track->album->id, track->id );
 	gtk_window_set_default_size(GTK_WINDOW(win), 700, 400);
 	gtk_widget_show( win );
+	duc_track_free( track );
 }
 
 static void open_tracksearch( GtkAction *action, gpointer data ) 
@@ -327,10 +318,6 @@ int main( int argc, char **argv )
 	GtkToggleActionEntry action_tentries[] = {
 		{ "OptButtons", NULL, "show _Buttons", "<control>B", 
 			"show/hide player buttons", G_CALLBACK(buttons_toggle), 1 },
-/*
-		{ "OptStatusbar", NULL, "show _Statusbar", NULL, 
-			"show/hide status bar", G_CALLBACK(status_toggle), 0 },
-*/
 		{ "OptMenu", NULL, "show _Menu", "<control>M", 
 			"show/hide menu", G_CALLBACK(menu_toggle), 1 },
 		{ "OptQueue", NULL, "show Q_ueue", "<control>U",
@@ -355,7 +342,6 @@ int main( int argc, char **argv )
 		"    <menu name='Option' action='OptionMenu'>"
 		"      <menuitem name='Menu' action='OptMenu'/>"
 		"      <menuitem name='Buttons' action='OptButtons'/>"
-		/* TODO: "      <menuitem name='Status' action='OptStatusbar'/>" */
 		"      <menuitem name='Queue' action='OptQueue'/>"
 		"      <menuitem name='Album' action='OptAlbum'/>"
 		"      <menuitem name='Artist' action='OptArtist'/>"

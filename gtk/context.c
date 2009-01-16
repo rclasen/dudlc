@@ -9,31 +9,19 @@
 
 #include "common.h"
 
-static void context_show( GtkWidget *view, GdkEventButton *event, gpointer data)
+static void context_show( GdkEventButton *event, GtkMenu *popup )
 {
-	GtkWidget *menu;
+	g_return_if_fail(popup);
 
-	if( NULL == data )
-		return;
-
-
-	menu = gtk_menu_new();
-	if( 0 < (*(context_populate_func)data)( view, menu )){
-
-		gtk_widget_show_all(menu);
-
-		gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL,
-			(event != NULL) ? event->button : 0,
-			gdk_event_get_time((GdkEvent*)event));
-
-	} else {
-		gtk_widget_destroy(menu);
-	}
+	gtk_menu_popup(GTK_MENU(popup), NULL, NULL, NULL, NULL,
+		(event != NULL) ? event->button : 0,
+		gdk_event_get_time((GdkEvent*)event));
 }
 
 static gboolean context_on_popup( GtkWidget *view, gpointer data)
 {
-	context_show(view, NULL, data);
+	(void)view;
+	context_show( NULL, data);
 
 	return TRUE;
 }
@@ -60,15 +48,24 @@ static gboolean context_on_button( GtkWidget *view, GdkEventButton *event, gpoin
 		}
         }
 
-	context_show(view, event, data);
+	context_show( event, data);
 
 	return TRUE;
 }
 
-void context_add( GtkTreeView *view, context_populate_func func )
+static void context_menu_unref( GtkMenu *menu, GClosure *closure )
 {
-	g_signal_connect( view, "popup-menu", (GCallback)context_on_popup, func );
-	g_signal_connect( view, "button-press-event", (GCallback)context_on_button, func );
+	(void)closure;
+	g_object_unref(G_OBJECT(menu));
+}
+
+void context_add( GtkTreeView *view, GtkMenu *menu )
+{
+	g_return_if_fail( menu );
+	g_object_ref( G_OBJECT(menu) );
+	g_signal_connect_data( view, "popup-menu", (GCallback)context_on_popup, menu,
+		(GClosureNotify)context_menu_unref, 0 );
+	g_signal_connect( view, "button-press-event", (GCallback)context_on_button, menu );
 }
 
 

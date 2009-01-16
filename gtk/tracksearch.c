@@ -62,7 +62,7 @@ GtkWidget *tracksearch_window( void )
 	winbox = gtk_vbox_new( FALSE, 0 );
 
 	/* window */
-	win = childwindow_new( "search tracks", winbox );
+	win = childwindow_new( "search tracks", winbox, NULL, NULL );
 	gtk_window_set_default_size(GTK_WINDOW(win), 600, 300);
 
 	/* TODO: use g_object_set_data() */

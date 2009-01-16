@@ -66,7 +66,7 @@ static void browse_album_select_on_change(
 }
 
 
-GtkWidget *browse_window( void )
+GtkWidget *browse_window( gint artist, gint album, gint track )
 {
 	GtkWidget *me;
 	GtkWidget *hpane, *vpane;
@@ -143,8 +143,17 @@ GtkWidget *browse_window( void )
 	g_signal_connect( albsel, "changed", 
 		G_CALLBACK(browse_album_select_on_change), trkview );
 
+	/* select track */
+	if( artist >= 0 ){
+		artist_list_select( GTK_TREE_VIEW(artview), artist );
+		if( album >= 0 ){
+			album_list_select( GTK_TREE_VIEW(albview), album );
+			if( track >= 0 )
+				track_list_select( GTK_TREE_VIEW(trkview), track );
+		}
+	}
 
-	me = childwindow_new( "browse", hpane );
+	me = childwindow_new( "browse", hpane, NULL, NULL );
 
 	gtk_window_set_default_size(GTK_WINDOW(me), 700, 400);
 	gtk_paned_set_position( GTK_PANED(hpane), 300 );

@@ -33,6 +33,11 @@ static void album_list_each_queuealbum(
  * selection processing
  */
 
+void album_list_select( GtkTreeView *view, int selid )
+{
+	tree_view_select( view, ALBUMLIST_ID, selid );
+}
+
 void album_list_select_queuealbum( GtkTreeView *list )
 {
 	gtk_tree_selection_selected_foreach(
@@ -44,6 +49,7 @@ void album_list_select_queuealbum( GtkTreeView *list )
  * context menu
  */
 
+#if TODO
 static void album_list_context_qalbum_on_activate(GtkWidget *menuitem, gpointer data)
 {
 	(void)menuitem;
@@ -77,6 +83,7 @@ static gint album_list_context_populate( GtkWidget *view, GtkWidget *menu )
 
 	return numitems;
 }
+#endif
 
 /*
  * the list view
@@ -90,7 +97,7 @@ GtkWidget *album_list_new( gboolean full )
 
 	view = GTK_TREE_VIEW(gtk_tree_view_new());
 
-	context_add( view, album_list_context_populate );
+	/* TODO: context_add( view, album_list_context_populate ); */
 
 
 	renderer = gtk_cell_renderer_text_new();

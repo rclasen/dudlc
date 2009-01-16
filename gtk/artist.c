@@ -11,11 +11,16 @@
 
 #include "common.h"
 
+void artist_list_select( GtkTreeView *view, int selid )
+{
+	tree_view_select( view, ALBUMLIST_ID, selid );
+}
+
 /*
  * context menu
  */
 
-
+#if TODO
 static gint artist_list_context_populate( GtkWidget *view, GtkWidget *menu )
 {
 	gint selected;
@@ -37,6 +42,7 @@ static gint artist_list_context_populate( GtkWidget *view, GtkWidget *menu )
 
 	return numitems;
 }
+#endif
 
 /*
  * the list view
@@ -50,7 +56,7 @@ GtkWidget *artist_list_new( void )
 
 	view = GTK_TREE_VIEW(gtk_tree_view_new());
 
-	context_add( view, artist_list_context_populate );
+	/* TODO: context_add( view, artist_list_context_populate ); */
 
 
 	renderer = gtk_cell_renderer_text_new();
