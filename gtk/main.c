@@ -419,6 +419,7 @@ int main( int argc, char **argv )
 	/* menu */
         main_menu = gtk_ui_manager_get_widget(ui_manager, "/MainMenu");
 	gtk_box_pack_start( GTK_BOX( mainbox ), main_menu, FALSE, FALSE, 0 );
+	gtk_widget_show(main_menu);
 
 	if( opt_hmenu ){
 		if( NULL != (action = gtk_ui_manager_get_action( ui_manager,
@@ -432,7 +433,6 @@ int main( int argc, char **argv )
 	/* hotkeys */
 	accels = gtk_ui_manager_get_accel_group( ui_manager );
 	gtk_window_add_accel_group( GTK_WINDOW(main_win), accels );
-	gtk_widget_show( main_menu );
 
 	/* player controls */
 	playbox = playbox_new();
