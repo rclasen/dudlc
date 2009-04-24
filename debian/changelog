@@ -1,3 +1,26 @@
+dudlc (0.1.16) unstable; urgency=low
+
+  * cli: moved config file handling into seperate module
+  * gtk: code cleanup, split into several files
+  * gtk: added view for track lists
+  * gtk: therefor connection changed to global var.
+  * gtk: added view for album lists
+  * gtk: added queue window
+  * gtk: added track search window
+  * gtk: menu + button hiding is now optional
+  * gtk: added gtkdudlc man page
+  * minor cleanups to header inclusion + man pages
+  * lib: made iterators type-safe
+  * gtk: moved common functions to treehelper.c
+  * gtk: select sorting colum for inplace searching, too
+  * gtk: keep queue window around on delete-event, just hide it
+  * gtk: don't default to multi-select
+  * gtk: added window to browse archive
+  * gtk: added menu+toolbar to all child windows
+  * gtk: keep track + album lists up to date
+
+ -- Rainer Clasen <bj@zuto.de>  Fri, 24 Apr 2009 13:34:08 +0200
+
 dudlc (0.1.15) unstable; urgency=low
 
   * fix: use default port

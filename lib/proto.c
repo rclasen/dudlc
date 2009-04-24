@@ -25,6 +25,7 @@ int _duc_vsend( dudlc *p, const char *fmt, va_list ap )
 	char buf[BUFLENLINE];
 	int len;
 
+	/* TODO: report error */
 	if( p->inreply )
 		return -1;
 
@@ -198,6 +199,7 @@ int _duc_rnext( dudlc *p )
 				break;
 			}
 
+			/* TODO: queue bcast */
 			_duc_bcast( p, l );
 			continue;
 		} 
@@ -232,6 +234,8 @@ int _duc_rlast( dudlc *p )
 
 	/* read everything up to the last line */
 	while( ! (r = _duc_rnext(p)));
+
+	/* TODO: emit queued bcast */
 
 	if( r == -1 )
 		return -1;
@@ -273,6 +277,7 @@ void duc_poll( dudlc *p )
 	while( NULL != (l = duc_sock_getline(p->con))){
 		if( strlen(l) < 4 ){
 			duc_close( p );
+			/* TODO: report error */
 			return;
 		}
 

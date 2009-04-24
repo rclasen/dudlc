@@ -20,7 +20,7 @@ dudlc_SOURCES= events.c \
 	main.c \
 	tty.c \
 	options.c
-dudlc_HEADERS=\
+noinst_HEADERS=\
 	events.h \
 	main.h \
 	tty.h \

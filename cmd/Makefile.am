@@ -12,7 +12,7 @@ libdudlccmd_la_SOURCES= \
 	command.c \
 	idlist.c \
 	parseval.c
-libdudlccmd_la_HEADERS=	\
+noinst_HEADERS=	\
 	idlist.h \
 	parseval.h
 
