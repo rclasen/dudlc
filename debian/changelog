@@ -1,3 +1,9 @@
+dudlc (0.1.18) unstable; urgency=low
+
+  * gtk: accept --geometry
+
+ -- Rainer Clasen <bj@zuto.de>  Thu, 20 Aug 2009 22:02:48 +0200
+
 dudlc (0.1.17) unstable; urgency=low
 
   * rebuild for lenny

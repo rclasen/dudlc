@@ -266,6 +266,7 @@ int main( int argc, char **argv )
 {
 	options opt;
 	char *opt_cfg = NULL;
+	char *opt_geometry = NULL;
 	gboolean opt_hmenu = FALSE;
 	gboolean opt_hbuttons = FALSE;
 	duc_events events;
@@ -293,6 +294,10 @@ int main( int argc, char **argv )
 			G_OPTION_ARG_FILENAME,	&opt_cfg,
 			"alternate config file",
 			"config" },
+		{ "geometry",	'g', 0,
+			G_OPTION_ARG_STRING,	&opt_geometry,
+			"initial window position and size",
+			"geometry" },
 		{ "hidemenu",	'm', 0,
 			G_OPTION_ARG_NONE,	&opt_hmenu,
 			"hide menu on startup", NULL },
@@ -505,6 +510,8 @@ int main( int argc, char **argv )
 	duc_open( con );
 
 	/* run */
+	if( opt_geometry )
+		gtk_window_parse_geometry( GTK_WINDOW(main_win), opt_geometry );
 	gtk_widget_show( main_win );
 	gtk_main();
 
