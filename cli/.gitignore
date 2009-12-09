@@ -10,3 +10,6 @@ config.log
 .libs
 config.status
 libtool
+dudlc
+*.a
+*.o

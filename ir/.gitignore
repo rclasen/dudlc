@@ -10,5 +10,6 @@ config.log
 .libs
 config.status
 libtool
-commands.txt
-stamp-h1
+irdudl
+*.a
+*.o

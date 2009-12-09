@@ -8,3 +8,5 @@ dudl-lirc
 libdudlc0
 libdudlc-dev
 dudl-gtk
+*.a
+*.o

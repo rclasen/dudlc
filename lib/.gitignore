@@ -10,4 +10,7 @@ config.log
 .libs
 config.status
 libtool
-dudlc
+commands.txt
+stamp-h1
+*.a
+*.o

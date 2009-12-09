@@ -10,4 +10,5 @@ config.log
 .libs
 config.status
 libtool
-irdudl
+*.a
+*.o

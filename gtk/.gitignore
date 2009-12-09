@@ -11,3 +11,5 @@ config.log
 config.status
 libtool
 gtkdudlc
+*.a
+*.o

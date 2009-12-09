@@ -5,3 +5,5 @@ stamp-h.in
 config.h
 stamp-h1
 stamp-h
+*.a
+*.o
