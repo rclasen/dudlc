@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2008 Rainer Clasen
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms described in the file LICENSE included in this
  * distribution.
@@ -32,7 +32,7 @@ static int idl_addclist( t_idlist *idl, char *in, char **end, dudlc *con, t_conv
 
 	while(1){
 		int id;
-		
+
 		id = (*conv)( con, ntok, &e );
 		if( ntok == e ){
 			if( end )
@@ -138,7 +138,7 @@ static int val_enum( t_enum *lst, char *in, char **end )
 
 		if( 0 != strncasecmp(it->text, in, len) )
 			continue;
-			
+
 		if( ilen > len && isalnum(in[len]))
 			continue;
 
@@ -249,7 +249,7 @@ t_idlist *val_userlist( dudlc *con, char *in, char **end )
 	return idl;
 }
 
-/* 
+/*
  * track := 'c'|<id>|<aid>/<pos>
  */
 int val_track( dudlc *con, char *in, char **end )
@@ -431,7 +431,7 @@ int val_tag( dudlc *con, char *in, char **end )
 /* TODO: cannot specify multiple symbolic tags:
  * - val_tag takes up all non-space characters
  * - ... because idl_addclist passes the whole list as string
- * 
+ *
  * either make addclist split the list before calling val_tag
  * or make val_tag onle look for alphnum chars
  */

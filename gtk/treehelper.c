@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2008 Rainer Clasen
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms described in the file LICENSE included in this
  * distribution.
@@ -50,7 +50,7 @@ void tree_view_select( GtkTreeView *view, int col, int selid )
 			path = gtk_tree_model_get_path( store, &iter );
 			break;
 		}
-		
+
 	} while( gtk_tree_model_iter_next( GTK_TREE_MODEL(store), &iter ));
 
 	if( path )

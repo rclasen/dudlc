@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2008 Rainer Clasen
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms described in the file LICENSE included in this
  * distribution.
@@ -20,8 +20,8 @@ duc_it_client *_duc_it_client_new( dudlc *p, const char *cmd, ... )
 	va_list ap;
 
 	va_start(ap,cmd);
-	it = _duc_it_newv(p, 
-		(_duc_converter)_duc_client_parse, 
+	it = _duc_it_newv(p,
+		(_duc_converter)_duc_client_parse,
 		(_duc_free_func)duc_client_free,
 		cmd, ap );
 	va_end(ap);
@@ -49,7 +49,7 @@ duc_client *_duc_client_parse( char *line, char **end )
 	s = e+1;
 	if( NULL == (c->addr = _duc_fielddup( s, &e )))
 		goto clean2;
-	
+
 	s = e+1;
 	if( NULL == (c->user = _duc_user_parse(s, &e )))
 		goto clean3;

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2008 Rainer Clasen
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms described in the file LICENSE included in this
  * distribution.
@@ -87,7 +87,7 @@ int duc_sock_connect( t_duc_sock *s )
 	sa.sin_port = htons(s->port);
 	sa.sin_addr = *(struct in_addr *)he->h_addr_list[0];
 
-	if( 0 > connect( s->fd, (const struct sockaddr*)&sa, 
+	if( 0 > connect( s->fd, (const struct sockaddr*)&sa,
 				sizeof(struct sockaddr_in))){
 		duc_sock_disconnect( s );
 		return -1;
@@ -147,7 +147,7 @@ static inline void freeline( t_duc_sock *s )
 	memmove(s->buf, s->buf + s->llen, s->ilen - s->llen );
 	s->ilen -= s->llen;
 	s->llen = 0;
-	s->buf[s->ilen] = 0; 
+	s->buf[s->ilen] = 0;
 }
 
 int duc_sock_recv( t_duc_sock *s )
@@ -158,7 +158,7 @@ int duc_sock_recv( t_duc_sock *s )
 		return -1;
 
 	DPRINTF("duc_sock_recv\n");
-	if( 0 > (len = recv( s->fd, s->buf + s->ilen, 
+	if( 0 > (len = recv( s->fd, s->buf + s->ilen,
 					BUFLENRCV - s->ilen-1, 0 ))){
 		return -1;
 	}
@@ -173,7 +173,7 @@ int duc_sock_recv( t_duc_sock *s )
 
 	return 0;
 }
-	
+
 char *duc_sock_getline( t_duc_sock *s )
 {
 	freeline( s );
@@ -190,7 +190,7 @@ char *duc_sock_getline( t_duc_sock *s )
 			return NULL;
 		}
 
-		fprintf( stderr, "line too long for BUFLENRCV, " 
+		fprintf( stderr, "line too long for BUFLENRCV, "
 				"truncating\n" ); /* TODO */
 	}
 

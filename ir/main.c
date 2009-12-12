@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (c) 2008 Rainer Clasen
  *
  * This program is free software; you can redistribute it
@@ -14,7 +14,7 @@
  * The GNU General Public License is often shipped with GNU software, and
  * is generally kept in a file called COPYING or LICENSE.  If you do not
  * have a copy of the license, write to the Free Software Foundation,
- * 59 Temple Place, Suite 330, Boston, MA 02111 USA. 
+ * 59 Temple Place, Suite 330, Boston, MA 02111 USA.
  */
 
 
@@ -92,12 +92,12 @@ static int dudl_cmd( dudlc *con, char *cmd )
 
 	if( rv != -EIO )
 		return rv;
-	
+
 	DPRINT("retrying command" );
 	return duc_cmd(con, cmd );
 }
 
-/* 
+/*
  * execute lirc cmds as long as lircd is alive
  */
 static void loop_lirccmd( struct lirc_config *config, char *code )
@@ -127,7 +127,7 @@ static inline void setmax( int *max, int b )
 		*max = b;
 }
 
-/* 
+/*
  * (re-)connect to lircd and execute commands
  */
 static void loop_lirc( void )
@@ -274,7 +274,7 @@ int main(int argc, char *argv[])
 			{"pidfile", no_argument, NULL, 'l'},
 			{0, 0, 0, 0}
 		};
-		c = getopt_long(argc, argv, "bhfDlH:P:u:p:", 
+		c = getopt_long(argc, argv, "bhfDlH:P:u:p:",
 				long_options, NULL);
 		if (c == -1)
 			break;
@@ -305,8 +305,8 @@ int main(int argc, char *argv[])
 			break;
 		case 'l':
 			if( ! pidfile )
-				asprintf( &pidfile, 
-				"/var/run/%s.pid", progname ); 
+				asprintf( &pidfile,
+				"/var/run/%s.pid", progname );
 			break;
 		default:
 			needhelp++;
@@ -355,7 +355,7 @@ int main(int argc, char *argv[])
 	}
 
 	if( pidfile && ! lockfile_check(pidfile, L_PID)){
-		syslog( LOG_ERR, "cannot create pidfile: %m"); 
+		syslog( LOG_ERR, "cannot create pidfile: %m");
 		exit( EXIT_FAILURE );
 	}
 
@@ -376,7 +376,7 @@ int main(int argc, char *argv[])
 	}
 
 	if( pidfile && lockfile_create(pidfile, 0, L_PID)){
-		syslog( LOG_ERR, "cannot create pidfile: %m"); 
+		syslog( LOG_ERR, "cannot create pidfile: %m");
 		exit( EXIT_FAILURE );
 	}
 

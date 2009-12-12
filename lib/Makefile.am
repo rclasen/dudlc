@@ -25,7 +25,7 @@ libdudlc_la_SOURCES= album.c \
 	tag.c \
 	track.c \
 	user.c \
-	sfilter.c 
+	sfilter.c
 
 .PHONY: commands.txt
 commands.txt:
@@ -40,4 +40,4 @@ checkserver:
 		grep duc_cmd_$$cmd *.c > /dev/null || echo $$cmd ; \
 	done < ../../dudld/commands.txt
 
-	
+

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2008 Rainer Clasen
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms described in the file LICENSE included in this
  * distribution.
@@ -15,7 +15,7 @@
  * helper for selection processinig
  */
 
-static void album_list_each_queuealbum( 
+static void album_list_each_queuealbum(
 	GtkTreeModel  *model,
 	GtkTreePath   *path,
 	GtkTreeIter   *iter,
@@ -75,7 +75,7 @@ GtkWidget *album_list_new( gboolean full )
 	gtk_tree_view_column_set_resizable( col, TRUE );
 	gtk_tree_view_column_set_sort_column_id(col, ALBUMLIST_YEAR);
 	gtk_tree_view_append_column( view, col );
-	
+
 	if( full ){
 
 	renderer = gtk_cell_renderer_text_new();
@@ -97,7 +97,7 @@ GtkWidget *album_list_new( gboolean full )
 	gtk_tree_view_column_set_resizable( col, TRUE );
 	gtk_tree_view_column_set_sort_column_id(col, ALBUMLIST_ALBUM);
 	gtk_tree_view_append_column( view, col );
-	
+
 
 	gtk_tree_view_set_search_column( GTK_TREE_VIEW(view), ALBUMLIST_ARTIST );
 	gtk_widget_show(GTK_WIDGET(view));
@@ -109,7 +109,7 @@ GtkWidget *album_list_new_with_list( gboolean full, duc_it_album *in )
 {
 	GtkWidget *view;
 
-	if( NULL == (view = album_list_new(full))) 
+	if( NULL == (view = album_list_new(full)))
 		return NULL;
 
 	album_list_populate( GTK_TREE_VIEW(view), in );
@@ -137,7 +137,7 @@ void album_list_populate( GtkTreeView *view, duc_it_album *in )
 		sartist = g_locale_to_utf8( album->artist->artist, -1, NULL, NULL, NULL);
 
 		gtk_list_store_append( GTK_LIST_STORE(store), &add );
-		gtk_list_store_set( GTK_LIST_STORE(store), &add, 
+		gtk_list_store_set( GTK_LIST_STORE(store), &add,
 			ALBUMLIST_ID, album->id,
 			ALBUMLIST_YEAR, album->year,
 			ALBUMLIST_ARTIST_ID, album->artist->id,

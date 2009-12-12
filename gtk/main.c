@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2008 Rainer Clasen
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms described in the file LICENSE included in this
  * distribution.
@@ -98,7 +98,7 @@ static void ev_conn( dudlc *c )
 
 	stat = duc_cmd_status( c );
 	playbox_buttons_enable( stat );
-	
+
 	if( NULL != (t = duc_cmd_curtrack( c ))){
 		detail_update( t );
 
@@ -179,7 +179,7 @@ static void shrink_y( GtkWindow *win )
 	gtk_window_resize( win, x, 1 );
 }
 
-static void menu_toggle( GtkAction *action, gpointer data ) 
+static void menu_toggle( GtkAction *action, gpointer data )
 {
 	(void)data;
 	if( gtk_toggle_action_get_active( GTK_TOGGLE_ACTION(action)))
@@ -190,11 +190,11 @@ static void menu_toggle( GtkAction *action, gpointer data )
 	}
 }
 
-static void buttons_toggle( GtkAction *action, gpointer data ) 
+static void buttons_toggle( GtkAction *action, gpointer data )
 {
 	gboolean show;
 	(void)data;
-	
+
 	show = gtk_toggle_action_get_active(GTK_TOGGLE_ACTION(action));
 
 	playbox_buttons_show( show );
@@ -202,7 +202,7 @@ static void buttons_toggle( GtkAction *action, gpointer data )
 		shrink_y(GTK_WINDOW(main_win));
 }
 
-static void toggle_win_on_toggle( GtkAction *action, GtkWidget *win ) 
+static void toggle_win_on_toggle( GtkAction *action, GtkWidget *win )
 {
 	if( gtk_toggle_action_get_active( GTK_TOGGLE_ACTION(action)))
 		gtk_widget_show(GTK_WIDGET(win));
@@ -211,25 +211,25 @@ static void toggle_win_on_toggle( GtkAction *action, GtkWidget *win )
 	}
 }
 
-static void queue_toggle( GtkAction *action, gpointer data ) 
+static void queue_toggle( GtkAction *action, gpointer data )
 {
 	(void)data;
 	toggle_win_on_toggle( action, queue_win );
 }
 
-static void tracks_toggle( GtkAction *action, gpointer data ) 
+static void tracks_toggle( GtkAction *action, gpointer data )
 {
 	(void)data;
 	toggle_win_on_toggle( action, tracks_win );
 }
 
-static void albums_toggle( GtkAction *action, gpointer data ) 
+static void albums_toggle( GtkAction *action, gpointer data )
 {
 	(void)data;
 	toggle_win_on_toggle( action, albums_win );
 }
 
-static void open_browse( GtkAction *action, gpointer data ) 
+static void open_browse( GtkAction *action, gpointer data )
 {
 	duc_track *track;
 	GtkWidget *win;
@@ -244,7 +244,7 @@ static void open_browse( GtkAction *action, gpointer data )
 	duc_track_free( track );
 }
 
-static void open_tracksearch( GtkAction *action, gpointer data ) 
+static void open_tracksearch( GtkAction *action, gpointer data )
 {
 	GtkWidget *win;
 
@@ -304,11 +304,11 @@ int main( int argc, char **argv )
 		{ "hidebuttons",	'b', 0,
 			G_OPTION_ARG_NONE,	&opt_hbuttons,
 			"hide buttons on startup", NULL },
-		{ NULL, 0, 0, 0, NULL, NULL, NULL } 
+		{ NULL, 0, 0, 0, NULL, NULL, NULL }
 	};
 	GtkActionEntry action_entries[] = {
 		{ "FileMenu", NULL, "_File", NULL, NULL, NULL },
-		{ "Quit", GTK_STOCK_QUIT, "_Quit", "<control>Q", 
+		{ "Quit", GTK_STOCK_QUIT, "_Quit", "<control>Q",
 			"Quit the program", G_CALLBACK(gtk_main_quit) },
 
 		{ "OptionMenu", NULL, "_Options", NULL, NULL, NULL },
@@ -320,17 +320,17 @@ int main( int argc, char **argv )
 			"browse Archive", G_CALLBACK(open_browse) },
 	};
 	GtkToggleActionEntry action_tentries[] = {
-		{ "OptButtons", NULL, "show _Buttons", "<control>B", 
+		{ "OptButtons", NULL, "show _Buttons", "<control>B",
 			"show/hide player buttons", G_CALLBACK(buttons_toggle), 1 },
-		{ "OptMenu", NULL, "show _Menu", "<control>M", 
+		{ "OptMenu", NULL, "show _Menu", "<control>M",
 			"show/hide menu", G_CALLBACK(menu_toggle), 1 },
 		{ "OptQueue", NULL, "show Q_ueue", "<control>U",
 			"show queue contents", G_CALLBACK(queue_toggle), 0},
 		{ "OptArtist", NULL, "show _Artist", "<control>A",
-			"show ablums of current artist", 
+			"show ablums of current artist",
 			G_CALLBACK(albums_toggle), 0 },
 		{ "OptAlbum", NULL, "show A_lbum", "<control>L",
-			"show tracks of current album", 
+			"show tracks of current album",
 			G_CALLBACK(tracks_toggle), 0 },
 	};
 	const char * ui_description =
@@ -350,7 +350,7 @@ int main( int argc, char **argv )
 		"      <menuitem name='Album' action='OptAlbum'/>"
 		"      <menuitem name='Artist' action='OptArtist'/>"
 		"    </menu>"
-		"  </menubar>"	
+		"  </menubar>"
 		"</ui>";
         GtkActionGroup *agroup_main;
 	GtkAccelGroup *accels;
@@ -362,14 +362,14 @@ int main( int argc, char **argv )
 	/* *TODO: error handling */
 	/* TODO: remember window positions */
 	/* TODO: playbox keyboard shortcuts */
-	/* TODO: icons 
+	/* TODO: icons
 	GTK_STOCK_CDROM queue_album
 	GTK_STOCK_ADD + queue_track
 	GTK_STOCK_REMOVE -
 
 	GTK_STOCK_CANCEL
 	GTK_STOCK_CLEAR
-	GTK_STOCK_DELETE queue:del 
+	GTK_STOCK_DELETE queue:del
 	GTK_STOCK_STOP
 
 	GTK_STOCK_FIND tracksearch
@@ -417,7 +417,7 @@ int main( int argc, char **argv )
 	/* main window */
 	main_win = gtk_window_new( GTK_WINDOW_TOPLEVEL );
 	gtk_window_set_title( GTK_WINDOW(main_win), "dudlc" );
-	gtk_signal_connect( GTK_OBJECT( main_win ), "destroy", 
+	gtk_signal_connect( GTK_OBJECT( main_win ), "destroy",
 			G_CALLBACK( main_win_on_destroy ), NULL);
 
 	mainbox = gtk_vbox_new( FALSE, 0 );
@@ -426,17 +426,17 @@ int main( int argc, char **argv )
 
 	/* actions + uimanager for menu, toolbar + hotkeys */
 	agroup_main = gtk_action_group_new("MainWindowActions");
-        gtk_action_group_add_actions(agroup_main, action_entries, 
+        gtk_action_group_add_actions(agroup_main, action_entries,
 		G_N_ELEMENTS(action_entries), NULL);
-        gtk_action_group_add_toggle_actions(agroup_main, action_tentries, 
+        gtk_action_group_add_toggle_actions(agroup_main, action_tentries,
 		G_N_ELEMENTS(action_tentries), NULL);
-        
+
         ui_manager = gtk_ui_manager_new();
         gtk_ui_manager_insert_action_group(ui_manager, agroup_main, 0);
-        
+
         if (!gtk_ui_manager_add_ui_from_string(ui_manager, ui_description, -1, &err)) {
                 g_message("Building main menu failed : %s", err->message);
-                g_error_free(err); 
+                g_error_free(err);
 		exit(EXIT_FAILURE);
         }
 
@@ -486,7 +486,7 @@ int main( int argc, char **argv )
 			(gchar*)"/MainMenu/Option/Artist");
 	albums_win = curalbums_new( action );
 
-	
+
 	/* TODO: statusbar
 	 * trackid, servername, username, play_status, sleep, random, gap, filterstat */
 

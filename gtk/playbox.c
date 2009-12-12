@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2008 Rainer Clasen
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms described in the file LICENSE included in this
  * distribution.
@@ -114,7 +114,7 @@ void playbox_progress_update( int r )
 		gtk_range_set_value( GTK_RANGE(ctl_prog), 0 );
 	else if( duration < r )
 		gtk_range_set_value( GTK_RANGE(ctl_prog), duration );
-	else 
+	else
 		gtk_range_set_value( GTK_RANGE(ctl_prog), r );
 	progress_seekable = 1;
 }
@@ -276,7 +276,7 @@ GtkWidget *playbox_new( void )
 	/* track details */
 
 	/* TODO: maybe use GtkLabel instead of GtkEntry
-	 * _set_selctable( TRUE ); 
+	 * _set_selctable( TRUE );
 	 * update of text-fields may cause window enlargment
 	 */
 	ctl_title = gtk_entry_new();
@@ -289,7 +289,7 @@ GtkWidget *playbox_new( void )
 	gtk_container_add( GTK_CONTAINER( box ), ctl_rowa );
 	gtk_widget_show( ctl_rowa );
 
-	/* TODO: more details 
+	/* TODO: more details
 	 * IDs (as tooltip?), Tags, filter, album_artist (as tooltip?) */
 
 	/* TODO: use fill-level instead of value for progress - req. gtk 2.12*/
@@ -308,6 +308,6 @@ GtkWidget *playbox_new( void )
 	gtk_box_pack_start( GTK_BOX( box ), ctl_buttons,
 			TRUE, FALSE, 0 );
 	gtk_widget_show( ctl_buttons );
-	
+
 	return(box);
 }

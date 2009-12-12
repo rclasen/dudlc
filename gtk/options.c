@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2008 Rainer Clasen
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms described in the file LICENSE included in this
  * distribution.
@@ -58,9 +58,9 @@ int options_read( options *opt, const char *fname )
 
 	keyfile = g_key_file_new();
 	if( ! g_key_file_load_from_file( keyfile, fname, G_KEY_FILE_NONE, &err )){
-		if( err->domain == G_KEY_FILE_ERROR && 
+		if( err->domain == G_KEY_FILE_ERROR &&
 				err->code == G_KEY_FILE_ERROR_NOT_FOUND )
-			fprintf( stderr, "error reading config %s: %s", 
+			fprintf( stderr, "error reading config %s: %s",
 					fname, err->message );
 		g_key_file_free( keyfile );
 		keyfile = NULL;

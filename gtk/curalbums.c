@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2008 Rainer Clasen
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms described in the file LICENSE included in this
  * distribution.
@@ -22,7 +22,7 @@ typedef struct {
 	gint	album;
 } t_curids;
 
-static void act_browse_each( 
+static void act_browse_each(
 	GtkTreeModel	*model,
 	GtkTreePath	*path,
 	GtkTreeIter	*iter,
@@ -45,7 +45,7 @@ static void act_browse( GtkAction *action, GtkTreeView *view )
 	(void)action;
 
 	sel = gtk_tree_view_get_selection( view );
-	gtk_tree_selection_selected_foreach( sel, 
+	gtk_tree_selection_selected_foreach( sel,
 		(GtkTreeSelectionForeachFunc)act_browse_each, &ids );
 
 	win = browse_window( ids.artist, ids.album, -1 );
@@ -69,16 +69,16 @@ static void selection_on_change( GtkTreeSelection *sel, gpointer data )
 
 	if( NULL != (ag = g_object_get_data(G_OBJECT(sel),"agroup-one")))
 		gtk_action_group_set_sensitive(ag, selected == 1);
-	
+
 	if( NULL != (ag = g_object_get_data(G_OBJECT(sel),"agroup-any")))
 		gtk_action_group_set_sensitive(ag, selected >= 1);
-	
+
 }
 
 
 static GtkActionEntry action_always[] = {
 	{ "FileMenu", NULL, "_File", NULL, NULL, NULL },
-	{ "Close", GTK_STOCK_CLOSE, "_Close", "<control>W", 
+	{ "Close", GTK_STOCK_CLOSE, "_Close", "<control>W",
 		"close this window", G_CALLBACK(act_close) },
 
 	{ "ShowMenu", NULL, "_Show", NULL, NULL, NULL },
@@ -86,10 +86,10 @@ static GtkActionEntry action_always[] = {
 };
 
 static GtkActionEntry action_album_one[] = {
-	{ "Browse", GTK_STOCK_OPEN, "B_rowse Track", "<control>R", 
+	{ "Browse", GTK_STOCK_OPEN, "B_rowse Track", "<control>R",
 		"show related information for selected album",
 		G_CALLBACK(act_browse) },
-	{ "QueueAlbum", GTK_STOCK_CDROM, "_Queue Album", NULL, 
+	{ "QueueAlbum", GTK_STOCK_CDROM, "_Queue Album", NULL,
 		"queue selected album",
 		G_CALLBACK(act_queuealbum) },
 };
@@ -118,7 +118,7 @@ static const char *uidesc =
 	/* TODO: hotkey to queue currently focused+selected album */
 	/* TODO: show queue, search */
 
-	"  </menubar>"	
+	"  </menubar>"
 
 /* toolbar */
 	"  <toolbar name='Toolbar'>"
@@ -158,24 +158,24 @@ GtkWidget *curalbums_new( GtkAction *action )
 	albums_view = album_list_new(TRUE);
 	sel = gtk_tree_view_get_selection( GTK_TREE_VIEW(albums_view));
 	gtk_tree_selection_set_mode( GTK_TREE_SELECTION(sel), GTK_SELECTION_MULTIPLE );
-	g_signal_connect( sel, "changed", 
+	g_signal_connect( sel, "changed",
 		G_CALLBACK(selection_on_change), NULL );
 
 	/* actions + uimanager for menu, toolbar + hotkeys */
 	ag_always = gtk_action_group_new("Always");
-        gtk_action_group_add_actions(ag_always, action_always, 
+        gtk_action_group_add_actions(ag_always, action_always,
 		G_N_ELEMENTS(action_always), action );
 
 	ag_album_one = gtk_action_group_new("AlbumOne");
 	g_object_set_data( G_OBJECT(sel), "agroup-one", ag_album_one);
 	gtk_action_group_set_sensitive(ag_album_one, FALSE );
-        gtk_action_group_add_actions(ag_album_one, action_album_one, 
+        gtk_action_group_add_actions(ag_album_one, action_album_one,
 		G_N_ELEMENTS(action_album_one), albums_view );
 
 	ag_album_any = gtk_action_group_new("AlbumAny");
 	g_object_set_data( G_OBJECT(sel), "agroup-any", ag_album_any);
 	gtk_action_group_set_sensitive(ag_album_any, FALSE );
-        gtk_action_group_add_actions(ag_album_any, action_album_any, 
+        gtk_action_group_add_actions(ag_album_any, action_album_any,
 		G_N_ELEMENTS(action_album_any), albums_view );
 
 	ui = gtk_ui_manager_new();
@@ -185,7 +185,7 @@ GtkWidget *curalbums_new( GtkAction *action )
 
 	/* top window */
 	win = childscroll_new( "albums of current artist", albums_view, ui, uidesc );
-	gtk_signal_connect( GTK_OBJECT(win), "delete_event", 
+	gtk_signal_connect( GTK_OBJECT(win), "delete_event",
 			G_CALLBACK( toggle_win_on_delete ), action);
 	gtk_window_set_default_size(GTK_WINDOW(win), 500, 300);
 

@@ -13,7 +13,7 @@ command.
 .PP
 \fBirdudl\fP is a lirc client to access a dudld jukebox.
 
-The specified 
+The specified
 .B <lirc_config>
 defines the commands issued on lirc key presses. It uses the same syntax
 as irexec. Please consult the lirc documentation for a description.

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2008 Rainer Clasen
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms described in the file LICENSE included in this
  * distribution.
@@ -34,18 +34,18 @@ typedef struct {
 	struct _duc_it_datalist *list;
 	_duc_free_func freefunc;
 } _duc_iter;
-	
+
 
 /*
  * _duc_it_new: submit comand to server and return new iterator to read
  * the results
  */
-_duc_iter *_duc_it_new( dudlc *p, 
-	_duc_converter conv, 
+_duc_iter *_duc_it_new( dudlc *p,
+	_duc_converter conv,
 	_duc_free_func free,
 	const char *cmd, ... );
-_duc_iter *_duc_it_newv( dudlc *p, 
-	_duc_converter conv, 
+_duc_iter *_duc_it_newv( dudlc *p,
+	_duc_converter conv,
 	_duc_free_func free,
 	const char *cmd, va_list ap );
 /* parse last received line and return response structure */
@@ -56,10 +56,10 @@ void *_duc_it_next( _duc_iter *i );
 void _duc_it_done( _duc_iter *i );
 
 
-/* 
+/*
  * helper to define typesafe iterator for custom result structures
  *
- * <name> becomes 
+ * <name> becomes
  * row typedef:		duc_<name>
  * iterator typedef:	duc_it_<name>
  * proto methods:	_duc_it_<name>_new

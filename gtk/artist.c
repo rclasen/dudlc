@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2008 Rainer Clasen
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms described in the file LICENSE included in this
  * distribution.
@@ -45,8 +45,8 @@ GtkWidget *artist_list_new( void )
 	gtk_tree_view_column_set_resizable( col, TRUE );
 	gtk_tree_view_column_set_sort_column_id(col, ARTISTLIST_ARTIST);
 	gtk_tree_view_append_column( view, col );
-	
-	
+
+
 	gtk_tree_view_set_search_column( GTK_TREE_VIEW(view), ARTISTLIST_ARTIST );
 	gtk_widget_show(GTK_WIDGET(view));
 
@@ -57,7 +57,7 @@ GtkWidget *artist_list_new_with_list( duc_it_artist *in )
 {
 	GtkWidget *view;
 
-	if( NULL == (view = artist_list_new())) 
+	if( NULL == (view = artist_list_new()))
 		return NULL;
 
 	artist_list_populate( GTK_TREE_VIEW(view), in );
@@ -81,7 +81,7 @@ void artist_list_populate( GtkTreeView *view, duc_it_artist *in )
 		sartist = g_locale_to_utf8( artist->artist, -1, NULL, NULL, NULL);
 
 		gtk_list_store_append( GTK_LIST_STORE(store), &add );
-		gtk_list_store_set( GTK_LIST_STORE(store), &add, 
+		gtk_list_store_set( GTK_LIST_STORE(store), &add,
 			ARTISTLIST_ID, artist->id,
 			ARTISTLIST_ARTIST, sartist,
 			-1);

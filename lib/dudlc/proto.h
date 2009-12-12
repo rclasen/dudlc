@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2008 Rainer Clasen
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms described in the file LICENSE included in this
  * distribution.
@@ -38,7 +38,7 @@ int _duc_cmd_succ( dudlc *c, const char *fmt, ... );
 int _duc_cmd_int( dudlc *c, const char *fmt, ... );
 double _duc_cmd_double( dudlc *c, const char *fmt, ... );
 char *_duc_cmd_string( dudlc *c, const char *fmt, ... );
-void *_duc_cmd_conv( dudlc *c, _duc_converter conv, 
+void *_duc_cmd_conv( dudlc *c, _duc_converter conv,
 		const char *fmt, ... );
 
 

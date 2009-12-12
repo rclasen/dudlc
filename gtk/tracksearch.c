@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2008 Rainer Clasen
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms described in the file LICENSE included in this
  * distribution.
@@ -47,7 +47,7 @@ static void tracksearch_on_destroy( GtkWidget *widget, search_widgets *wg )
 }
 
 static void selection_on_change(
-	GtkTreeSelection *sel, 
+	GtkTreeSelection *sel,
 	gpointer data )
 {
 	GtkActionGroup *ag;
@@ -59,7 +59,7 @@ static void selection_on_change(
 
 	if( NULL != (ag = g_object_get_data(G_OBJECT(sel),"agroup-one")))
 		gtk_action_group_set_sensitive(ag, selected == 1);
-	
+
 	if( NULL != (ag = g_object_get_data(G_OBJECT(sel),"agroup-any")))
 		gtk_action_group_set_sensitive(ag, selected >= 1);
 }
@@ -81,7 +81,7 @@ typedef struct {
 	gint	track;
 } t_curids;
 
-static void act_browse_each( 
+static void act_browse_each(
 	GtkTreeModel	*model,
 	GtkTreePath	*path,
 	GtkTreeIter	*iter,
@@ -106,7 +106,7 @@ static void act_browse( GtkAction *action, GtkTreeView *view )
 	(void)action;
 
 	sel = gtk_tree_view_get_selection( view );
-	gtk_tree_selection_selected_foreach( sel, 
+	gtk_tree_selection_selected_foreach( sel,
 		(GtkTreeSelectionForeachFunc)act_browse_each, &ids );
 
 	win = browse_window( ids.artist, ids.album, ids.track );
@@ -128,7 +128,7 @@ static void act_queuetrack( GtkAction *action, gpointer *data )
 
 static GtkActionEntry action_always[] = {
 	{ "FileMenu", NULL, "_File", NULL, NULL, NULL },
-	{ "Close", GTK_STOCK_CLOSE, "_Close", "<control>W", 
+	{ "Close", GTK_STOCK_CLOSE, "_Close", "<control>W",
 		"close this window", G_CALLBACK(act_close) },
 
 	{ "ShowMenu", NULL, "_Show", NULL, NULL, NULL },
@@ -136,16 +136,16 @@ static GtkActionEntry action_always[] = {
 };
 
 static GtkActionEntry action_track_one[] = {
-	{ "Browse", GTK_STOCK_OPEN, "B_rowse Track", "<control>R", 
+	{ "Browse", GTK_STOCK_OPEN, "B_rowse Track", "<control>R",
 		"show related information for selected track",
 		G_CALLBACK(act_browse) },
-	{ "QueueAlbum", GTK_STOCK_CDROM, "_Queue Album", NULL, 
+	{ "QueueAlbum", GTK_STOCK_CDROM, "_Queue Album", NULL,
 		"queue selected album",
 		G_CALLBACK(act_queuealbum) },
 };
 
 static GtkActionEntry action_track_any[] = {
-	{ "QueueTracks", GTK_STOCK_ADD, "_Queue Tracks", NULL, 
+	{ "QueueTracks", GTK_STOCK_ADD, "_Queue Tracks", NULL,
 		"queue selected tracks",
 		G_CALLBACK(act_queuetrack) },
 };
@@ -171,7 +171,7 @@ static const char *uidesc =
 	/* TODO: hotkey to queue currently focused+selected album/track */
 	/* TODO: show queue */
 
-	"  </menubar>"	
+	"  </menubar>"
 
 /* toolbar */
 	"  <toolbar name='Toolbar'>"
@@ -257,13 +257,13 @@ GtkWidget *tracksearch_window( void )
 
 	/* scrolled result list */
 	scroll = gtk_scrolled_window_new( GTK_ADJUSTMENT(NULL), GTK_ADJUSTMENT(NULL) );
-	gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW(scroll), 
+	gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW(scroll),
 		GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC );
 
 	wg->list = track_list_new_with_list( TRUE, NULL );
 	sel = gtk_tree_view_get_selection( GTK_TREE_VIEW(wg->list) );
 	gtk_tree_selection_set_mode( GTK_TREE_SELECTION(sel), GTK_SELECTION_MULTIPLE );
-	g_signal_connect( G_OBJECT(sel), "changed", 
+	g_signal_connect( G_OBJECT(sel), "changed",
 		G_CALLBACK(selection_on_change), NULL );
 	gtk_container_add( GTK_CONTAINER(scroll), wg->list );
 	gtk_widget_show( wg->list );
@@ -280,20 +280,20 @@ GtkWidget *tracksearch_window( void )
 
 	/* actions + uimanager for menu, toolbar + hotkeys */
 	ag_always = gtk_action_group_new("TracksearchAlways");
-        gtk_action_group_add_actions(ag_always, action_always, 
+        gtk_action_group_add_actions(ag_always, action_always,
 		G_N_ELEMENTS(action_always), NULL );
 	close = gtk_action_group_get_action( ag_always, "Close" );
 
 	ag_track_one = gtk_action_group_new("TracksearchOne");
 	g_object_set_data( G_OBJECT(sel), "agroup-one", ag_track_one);
 	gtk_action_group_set_sensitive(ag_track_one, FALSE );
-        gtk_action_group_add_actions(ag_track_one, action_track_one, 
+        gtk_action_group_add_actions(ag_track_one, action_track_one,
 		G_N_ELEMENTS(action_track_one), wg->list );
 
 	ag_track_any = gtk_action_group_new("TracksearchAny");
 	g_object_set_data( G_OBJECT(sel), "agroup-any", ag_track_any);
 	gtk_action_group_set_sensitive(ag_track_any, FALSE );
-        gtk_action_group_add_actions(ag_track_any, action_track_any, 
+        gtk_action_group_add_actions(ag_track_any, action_track_any,
 		G_N_ELEMENTS(action_track_any), wg->list );
 
 	ui = gtk_ui_manager_new();

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (c) 2008 Rainer Clasen
  *
  * This program is free software; you can redistribute it
@@ -14,7 +14,7 @@
  * The GNU General Public License is often shipped with GNU software, and
  * is generally kept in a file called COPYING or LICENSE.  If you do not
  * have a copy of the license, write to the Free Software Foundation,
- * 59 Temple Place, Suite 330, Boston, MA 02111 USA. 
+ * 59 Temple Place, Suite 330, Boston, MA 02111 USA.
  */
 
 
@@ -27,13 +27,13 @@
 #include <unistd.h>
 #include <signal.h>
 #include <term.h>
-     
+
 #include <readline/readline.h>
 #include <readline/history.h>
 
 #include "command.h"
 #include "main.h"
-#include "tty.h"     
+#include "tty.h"
 
 static char tent[4096];
 static struct {
@@ -46,9 +46,9 @@ static struct {
 	.anorm = "",
 };
 
-/* 
+/*
  * pointer function that builds the list of completions for current
- * context 
+ * context
  */
 duc_cgen cgen = NULL;
 
@@ -102,8 +102,8 @@ static char *tty_cgen( const char *text, int state )
 	return (*cgen)( con, text, state );
 }
 
-/* 
- * handler invoked by readline to get a list of complettions 
+/*
+ * handler invoked by readline to get a list of complettions
  */
 static char **tty_completer( const char *text, int start, int end )
 {
@@ -210,7 +210,7 @@ void tty_init( const char *name, const char *prompt )
 
 	rl_readline_name = name;
 	rl_attempted_completion_function = tty_completer;
-	
+
 	rl_callback_handler_install( prompt, tty_executor );
 }
 

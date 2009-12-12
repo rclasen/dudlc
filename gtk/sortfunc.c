@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2008 Rainer Clasen
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms described in the file LICENSE included in this
  * distribution.
@@ -64,6 +64,6 @@ gint sortfunc_albumpos( GtkTreeModel *model,
 
 	/* album pos */
 	return sortfunc_int( model, a, b, data );
-}	
+}
 
 

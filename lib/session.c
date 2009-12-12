@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2008 Rainer Clasen
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms described in the file LICENSE included in this
  * distribution.
@@ -95,7 +95,7 @@ int duc_open( dudlc *p )
 
 	s+=5;
 	p->vmajor = strtol(s, &e, 10 );
-	if( s == e ){ 
+	if( s == e ){
 		p->vmajor = 0;
 		p->vminor = 0;
 	} else {

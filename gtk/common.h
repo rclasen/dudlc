@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2008 Rainer Clasen
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms described in the file LICENSE included in this
  * distribution.
@@ -65,21 +65,21 @@ gint sortfunc_albumpos( GtkTreeModel *model,
  * cellfunc
  */
 
-void cellfunc_trackid( 
+void cellfunc_trackid(
 	GtkTreeViewColumn *col,
 	GtkCellRenderer *cell,
 	GtkTreeModel *model,
 	GtkTreeIter *iter,
 	gpointer data );
 
-void cellfunc_duration( 
+void cellfunc_duration(
 	GtkTreeViewColumn *col,
 	GtkCellRenderer *cell,
 	GtkTreeModel *model,
 	GtkTreeIter *iter,
 	gpointer data );
 
-void cellfunc_time( 
+void cellfunc_time(
 	GtkTreeViewColumn *col,
 	GtkCellRenderer *cell,
 	GtkTreeModel *model,

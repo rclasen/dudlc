@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2008 Rainer Clasen
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms described in the file LICENSE included in this
  * distribution.
@@ -20,7 +20,7 @@ duc_it_tag *_duc_it_tag_new( dudlc *p, const char *cmd, ... )
 	va_list ap;
 
 	va_start(ap,cmd);
-	it = _duc_it_newv(p, 
+	it = _duc_it_newv(p,
 		(_duc_converter)_duc_tag_parse,
 		(_duc_free_func)duc_tag_free,
 		cmd, ap );
@@ -77,7 +77,7 @@ void duc_tag_free( duc_tag *n )
 
 duc_tag *duc_cmd_tagget( dudlc *c, int id )
 {
-	return _duc_cmd_conv(c, (_duc_converter)_duc_tag_parse, 
+	return _duc_cmd_conv(c, (_duc_converter)_duc_tag_parse,
 			"tagget %d", id );
 }
 

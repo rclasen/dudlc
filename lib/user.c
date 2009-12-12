@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2008 Rainer Clasen
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms described in the file LICENSE included in this
  * distribution.
@@ -20,7 +20,7 @@ duc_it_user *_duc_it_user_new( dudlc *p, const char *cmd, ... )
 	va_list ap;
 
 	va_start(ap,cmd);
-	it = _duc_it_newv(p, 
+	it = _duc_it_newv(p,
 		(_duc_converter)_duc_user_parse,
 		(_duc_free_func)duc_user_free,
 		cmd, ap );
@@ -85,7 +85,7 @@ duc_it_user *duc_cmd_userlist( dudlc *c )
 
 duc_user *duc_cmd_userget( dudlc *c, int uid )
 {
-	return _duc_cmd_conv(c, (_duc_converter)_duc_user_parse, 
+	return _duc_cmd_conv(c, (_duc_converter)_duc_user_parse,
 			"userget %d", uid);
 }
 

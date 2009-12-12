@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2008 Rainer Clasen
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms described in the file LICENSE included in this
  * distribution.
@@ -60,7 +60,7 @@ int idl_addlist( t_idlist *idl, char *list, char **end )
 {
 	char *tok = list;
 	int added = 0;
-	
+
 	if( end )
 		*end = list;
 

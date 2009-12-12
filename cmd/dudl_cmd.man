@@ -11,12 +11,12 @@ For now you have to rely on the online help that's available through the
 .BR help
 command.
 
-The filter syntax for the 
+The filter syntax for the
 .BR tracksearchf
-and 
+and
 .BR filterset
-is explained in the 
-.BR dudl_filter (1) 
+is explained in the
+.BR dudl_filter (1)
 manpage.
 
 .SH SEE ALSO

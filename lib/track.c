@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2008 Rainer Clasen
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms described in the file LICENSE included in this
  * distribution.
@@ -20,8 +20,8 @@ duc_it_track *_duc_it_track_new( dudlc *p, const char *cmd, ... )
 	va_list ap;
 
 	va_start(ap,cmd);
-	it = _duc_it_newv(p, 
-		(_duc_converter)_duc_track_parse, 
+	it = _duc_it_newv(p,
+		(_duc_converter)_duc_track_parse,
 		(_duc_free_func)duc_track_free,
 		cmd, ap );
 	va_end(ap);

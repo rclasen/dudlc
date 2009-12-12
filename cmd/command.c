@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2008 Rainer Clasen
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms described in the file LICENSE included in this
  * distribution.
@@ -103,7 +103,7 @@ static char **get_commands( dudlc *dudl, const char *text )
 	char **helpv = NULL;
 	int helpc = 0;
 	int len;
-	
+
 	len = strlen(text);
 
 	it = duc_cmd_help(dudl);
@@ -394,7 +394,7 @@ CMD(c_random)
 	if( 0 > (rnd = duc_cmd_random(dudl)))
 		return -1;
 
-	dmsg_msg( "random play (when queue is empty) is %s\n", 
+	dmsg_msg( "random play (when queue is empty) is %s\n",
 			rnd ? "on" : "off" );
 	return 0;
 }
@@ -436,7 +436,7 @@ CMD(c_cut)
 	if( 0 > (x = duc_cmd_cut(dudl)))
 		return -1;
 
-	dmsg_msg( "silence suppression is %s\n", 
+	dmsg_msg( "silence suppression is %s\n",
 			x ? "on" : "off" );
 	return 0;
 }
@@ -454,7 +454,7 @@ CMD(c_replaygain)
 	(void)argv;
 	if( 0 > (x = duc_cmd_replaygain(dudl)))
 		return -1;
-	
+
 	/* TODO: replaygain method names */
 	dmsg_msg( "replaygain method in use: %d\n", x );
 	return 0;
@@ -1507,7 +1507,7 @@ t_cmd cmds_top[] = {
 	{ "historytrack",	NULL,
 		c_historytrack,		args_tracknum,
 		"history for titles" },
-	
+
 	{ "taglist",		NULL,
 		c_taglist,		args_none,
 		"show all tags" },
@@ -1814,7 +1814,7 @@ static int cmd_arg_parse( dudlc *dudl, t_cmd *cmd, char *line )
 
 	cmd_arg_free(cmd, argv);
 	return 0;
-	
+
 clean1:
 	cmd_arg_free(cmd, argv);
 	return -1;
@@ -1866,7 +1866,7 @@ static duc_cgen cmd_find_arg_genc( dudlc *dudl, t_cmd *cmd, char *line, unsigned
 	cmd_arg_free(cmd, argv);
 
 	return arg->genc;
-	
+
 clean1:
 	cmd_arg_free(cmd, argv);
 	return NULL;

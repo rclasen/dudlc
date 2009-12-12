@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2008 Rainer Clasen
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms described in the file LICENSE included in this
  * distribution.
@@ -21,14 +21,14 @@ static void on_add_widget( GtkUIManager *ui, GtkWidget *item, GtkWidget *box )
 {
 	(void)ui;
 
-	gtk_box_pack_start( GTK_BOX( box ), item, 
+	gtk_box_pack_start( GTK_BOX( box ), item,
 		FALSE, FALSE, 0 );
 	gtk_widget_show( item );
 }
 
-GtkWidget *childwindow_new( 
-	const char *title, 
-	GtkWidget *contents, 
+GtkWidget *childwindow_new(
+	const char *title,
+	GtkWidget *contents,
 	GtkUIManager *ui,
 	const char *uidesc)
 {
@@ -49,13 +49,13 @@ GtkWidget *childwindow_new(
 		GtkAccelGroup *accels;
 
 		g_object_set_data( G_OBJECT(me), "uimanager", ui );
-       
-		g_signal_connect( G_OBJECT(ui), "add-widget", 
+
+		g_signal_connect( G_OBJECT(ui), "add-widget",
 			G_CALLBACK(on_add_widget), mainbox );
 
 		if (!gtk_ui_manager_add_ui_from_string(ui, uidesc, -1, &err)) {
 			g_message("Building UI failed : %s", err->message);
-			g_error_free(err); 
+			g_error_free(err);
 			g_assert(0);
 			return NULL;
 		}
@@ -73,16 +73,16 @@ GtkWidget *childwindow_new(
 }
 
 
-GtkWidget *childscroll_new( 
-	const char *title, 
-	GtkWidget *contents, 
+GtkWidget *childscroll_new(
+	const char *title,
+	GtkWidget *contents,
 	GtkUIManager *ui,
 	const char *uidesc )
 {
 	GtkWidget *scroll;
 
 	scroll = gtk_scrolled_window_new( GTK_ADJUSTMENT(NULL), GTK_ADJUSTMENT(NULL) );
-	gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW(scroll), 
+	gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW(scroll),
 		GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC );
 	gtk_container_add( GTK_CONTAINER(scroll), contents );
 	gtk_widget_show( contents );

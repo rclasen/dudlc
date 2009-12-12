@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2008 Rainer Clasen
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms described in the file LICENSE included in this
  * distribution.
@@ -14,8 +14,8 @@
 #include "dudlc/proto.h"
 #include "dudlc/iterate.h"
 
-_duc_iter *_duc_it_new( dudlc *p, 
-	_duc_converter conv, 
+_duc_iter *_duc_it_new( dudlc *p,
+	_duc_converter conv,
 	_duc_free_func freefunc,
 	const char *cmd, ... )
 {
@@ -29,8 +29,8 @@ _duc_iter *_duc_it_new( dudlc *p,
 	return it;
 }
 
-_duc_iter *_duc_it_newv( dudlc *p, 
-	_duc_converter conv, 
+_duc_iter *_duc_it_newv( dudlc *p,
+	_duc_converter conv,
 	_duc_free_func freefunc,
 	const char *cmd, va_list ap )
 {
@@ -73,7 +73,7 @@ _duc_iter *_duc_it_newv( dudlc *p,
 		} else {
 			last->next = next;
 			last = next;
-		}	
+		}
 
 		last->next = NULL;
 		last->data = (*conv)( line, &end );
@@ -81,7 +81,7 @@ _duc_iter *_duc_it_newv( dudlc *p,
 			goto clean2;
 
 	} while( 0 <= _duc_rnext(p) );
-		
+
 
 	return it;
 clean2:
@@ -110,7 +110,7 @@ void *_duc_it_next( _duc_iter *i )
 	cur = i->list;
 	i->list = cur->next;
 
-	/* 
+	/*
 	 * gives away ownership of data, so don't free it:
 	 * (*i->freefunc)(cur->data);
 	 */
@@ -124,7 +124,7 @@ void _duc_it_done( _duc_iter *i )
 
 	if( ! i )
 		return;
-	
+
 	while( i->list ){
 		struct _duc_it_datalist *cur = i->list;
 

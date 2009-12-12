@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2008 Rainer Clasen
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms described in the file LICENSE included in this
  * distribution.
@@ -15,7 +15,7 @@
  * helper for selection processing
  */
 
-static void track_list_each_queueadd( 
+static void track_list_each_queueadd(
 	GtkTreeModel  *model,
 	GtkTreePath   *path,
 	GtkTreeIter   *iter,
@@ -29,7 +29,7 @@ static void track_list_each_queueadd(
 	duc_cmd_queueadd( con, trackid );
 }
 
-static void track_list_each_queuealbum( 
+static void track_list_each_queuealbum(
 	GtkTreeModel  *model,
 	GtkTreePath   *path,
 	GtkTreeIter   *iter,
@@ -85,19 +85,19 @@ GtkWidget *track_list_new( gboolean full )
 	g_signal_connect(col, "clicked", (GCallback)tree_view_column_on_clicked, view );
 	gtk_tree_view_column_set_title( col, "Id" );
 	gtk_tree_view_column_pack_start( col, renderer, TRUE );
-	gtk_tree_view_column_set_cell_data_func( col, renderer, 
+	gtk_tree_view_column_set_cell_data_func( col, renderer,
 		cellfunc_trackid, (gpointer)TRACKLIST_ALBUM_POS, NULL );
 	gtk_tree_view_column_set_resizable( col, TRUE );
 	gtk_tree_view_column_set_sort_column_id(col, TRACKLIST_ALBUM_POS);
 	gtk_tree_view_append_column( view, col );
-	
+
 	renderer = gtk_cell_renderer_text_new();
 	col = gtk_tree_view_column_new();
 	g_object_set_data( G_OBJECT(col), "columnum", (gpointer)TRACKLIST_DURATION);
 	g_signal_connect(col, "clicked", (GCallback)tree_view_column_on_clicked, view );
 	gtk_tree_view_column_set_title( col, "Duration" );
 	gtk_tree_view_column_pack_start( col, renderer, TRUE );
-	gtk_tree_view_column_set_cell_data_func( col, renderer, 
+	gtk_tree_view_column_set_cell_data_func( col, renderer,
 		cellfunc_duration, (gpointer)TRACKLIST_DURATION, NULL );
 	gtk_tree_view_column_set_resizable( col, TRUE );
 	gtk_tree_view_column_set_sort_column_id(col, TRACKLIST_DURATION);
@@ -122,9 +122,9 @@ GtkWidget *track_list_new( gboolean full )
 	gtk_tree_view_column_set_resizable( col, TRUE );
 	gtk_tree_view_column_set_sort_column_id(col, TRACKLIST_ALBUM);
 	gtk_tree_view_append_column( view, col );
-	
+
 	}
-	
+
 	renderer = gtk_cell_renderer_text_new();
 	col = gtk_tree_view_column_new_with_attributes(
 			"Title", renderer, "text", TRACKLIST_TITLE, NULL );
@@ -133,9 +133,9 @@ GtkWidget *track_list_new( gboolean full )
 	gtk_tree_view_column_set_resizable( col, TRUE );
 	gtk_tree_view_column_set_sort_column_id(col, TRACKLIST_TITLE);
 	gtk_tree_view_append_column( view, col );
-	
+
 	/* TODO: add column with tags of track */
-	
+
 	gtk_tree_view_set_search_column( GTK_TREE_VIEW(view), TRACKLIST_ALBUM_POS );
 	gtk_widget_show(GTK_WIDGET(view));
 
@@ -146,7 +146,7 @@ GtkWidget *track_list_new_with_list( gboolean full, duc_it_track *in )
 {
 	GtkWidget *view;
 
-	if( NULL == (view = track_list_new(full))) 
+	if( NULL == (view = track_list_new(full)))
 		return NULL;
 
 	track_list_populate( GTK_TREE_VIEW(view), in );
@@ -178,7 +178,7 @@ void track_list_populate( GtkTreeView *view, duc_it_track *in )
 		artist = g_locale_to_utf8( track->artist->artist, -1, NULL, NULL, NULL);
 
 		gtk_list_store_append( GTK_LIST_STORE(store), &add );
-		gtk_list_store_set( GTK_LIST_STORE(store), &add, 
+		gtk_list_store_set( GTK_LIST_STORE(store), &add,
 			TRACKLIST_ID, track->id,
 			TRACKLIST_ALBUM_ID, track->album->id,
 			TRACKLIST_ALBUM_POS, track->albumnr,

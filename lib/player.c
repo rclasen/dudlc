@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2008 Rainer Clasen
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms described in the file LICENSE included in this
  * distribution.
@@ -22,7 +22,7 @@ duc_playstatus duc_cmd_status( dudlc *c )
 
 duc_track *duc_cmd_curtrack( dudlc *c )
 {
-	return _duc_cmd_conv(c, (_duc_converter) _duc_track_parse, 
+	return _duc_cmd_conv(c, (_duc_converter) _duc_track_parse,
 			"curtrack");
 }
 

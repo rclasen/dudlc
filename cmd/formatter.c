@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2008 Rainer Clasen
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms described in the file LICENSE included in this
  * distribution.
@@ -104,15 +104,15 @@ char *dfmt_track( char *buf, unsigned int len, duc_track *t )
 	char tim[10];
 
 	minutes(tim, 10, t->duration);
-	snprintf( buf, len, 
+	snprintf( buf, len,
 			"%7s "
 			"%s%-18.18s%s "
 			"%-5.5s "
-			"%s%-16.16s%s " 
+			"%s%-16.16s%s "
 			"%-29s",
-			dfmt_trackid(t->album->id, t->albumnr), 
+			dfmt_trackid(t->album->id, t->albumnr),
 			BF, t->album->album, NF,
-			tim, 
+			tim,
 			BF, t->artist->artist, NF,
 			t->title );
 
@@ -232,7 +232,7 @@ char *dfmt_albumhead( char *buf, unsigned int len )
 
 char *dfmt_album( char *buf, unsigned int len, duc_album *q )
 {
-	snprintf( buf, len, "%4d %4d %-25s %-20s", 
+	snprintf( buf, len, "%4d %4d %-25s %-20s",
 			q->id, q->year, q->artist->artist, q->album);
 	return buf;
 }

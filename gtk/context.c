@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2008 Rainer Clasen
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms described in the file LICENSE included in this
  * distribution.
@@ -35,7 +35,7 @@ static gboolean context_on_button( GtkWidget *view, GdkEventButton *event, gpoin
 		GtkTreePath *path;
 
 		if( gtk_tree_view_get_path_at_pos(GTK_TREE_VIEW(view),
-                                             (gint) event->x, 
+                                             (gint) event->x,
                                              (gint) event->y,
                                              &path, NULL, NULL, NULL)){
 

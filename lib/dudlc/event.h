@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2008 Rainer Clasen
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms described in the file LICENSE included in this
  * distribution.
@@ -25,7 +25,7 @@ typedef void (*duc_ev_argint)( dudlc *c, int i );
 typedef void (*duc_ev_argclient)( dudlc *c, duc_client *t );
 typedef void (*duc_ev_argqueue)( dudlc *c, duc_queue *t );
 typedef void (*duc_ev_argtag)( dudlc *c, duc_tag *t );
-typedef void (*duc_ev_argtrack)( dudlc *c, 
+typedef void (*duc_ev_argtrack)( dudlc *c,
 		duc_track *t);
 
 typedef struct {

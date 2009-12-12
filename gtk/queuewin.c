@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2008 Rainer Clasen
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms described in the file LICENSE included in this
  * distribution.
@@ -37,7 +37,7 @@ static void act_unqueue_tracks( GtkAction *action, GtkTreeView *view )
 	queue_list_select_deltrack( view );
 }
 
-static void act_browse_each( 
+static void act_browse_each(
 	GtkTreeModel	*model,
 	GtkTreePath	*path,
 	GtkTreeIter	*iter,
@@ -62,7 +62,7 @@ static void act_browse( GtkAction *action, GtkTreeView *view )
 	(void)action;
 
 	sel = gtk_tree_view_get_selection( view );
-	gtk_tree_selection_selected_foreach( sel, 
+	gtk_tree_selection_selected_foreach( sel,
 		(GtkTreeSelectionForeachFunc)act_browse_each, &ids );
 
 	win = browse_window( ids.artist, ids.album, ids.track );
@@ -80,15 +80,15 @@ static void selection_on_change( GtkTreeSelection *sel, gpointer data )
 
 	if( NULL != (ag = g_object_get_data(G_OBJECT(sel),"agroup-one")))
 		gtk_action_group_set_sensitive(ag, selected == 1);
-	
+
 	if( NULL != (ag = g_object_get_data(G_OBJECT(sel),"agroup-any")))
 		gtk_action_group_set_sensitive(ag, selected >= 1);
-	
+
 }
 
 static GtkActionEntry action_always[] = {
 	{ "FileMenu", NULL, "_File", NULL, NULL, NULL },
-	{ "Close", GTK_STOCK_CLOSE, "_Close", "<control>W", 
+	{ "Close", GTK_STOCK_CLOSE, "_Close", "<control>W",
 		"close this window", G_CALLBACK(act_close) },
 
 	{ "EditMenu", NULL, "_Edit", NULL, NULL, NULL },
@@ -99,13 +99,13 @@ static GtkActionEntry action_always[] = {
 };
 
 static GtkActionEntry action_any[] = {
-	{ "UnqueueTracks", GTK_STOCK_DELETE, "Unqueue Tracks", NULL, 
-		"unqueue selected tracks", 
+	{ "UnqueueTracks", GTK_STOCK_DELETE, "Unqueue Tracks", NULL,
+		"unqueue selected tracks",
 		G_CALLBACK(act_unqueue_tracks) },
 };
 
 static GtkActionEntry action_one[] = {
-	{ "Browse", GTK_STOCK_OPEN, "B_rowse Track", "<control>R", 
+	{ "Browse", GTK_STOCK_OPEN, "B_rowse Track", "<control>R",
 		"show related information for selected track",
 		G_CALLBACK(act_browse) },
 	/* TODO: Unqueue album, artist, user */
@@ -131,7 +131,7 @@ static const char *uidesc =
 	"      <menuitem name='Browse' action='Browse' />"
 	"    </menu>"
 
-	"  </menubar>"	
+	"  </menubar>"
 
 /* toolbar */
 	"  <toolbar name='Toolbar'>"
@@ -173,24 +173,24 @@ GtkWidget *queuewin_new( GtkAction *action )
 
 	sel = gtk_tree_view_get_selection( GTK_TREE_VIEW(queue_view));
 	gtk_tree_selection_set_mode( GTK_TREE_SELECTION(sel), GTK_SELECTION_MULTIPLE );
-	g_signal_connect( G_OBJECT(sel), "changed", 
+	g_signal_connect( G_OBJECT(sel), "changed",
 		G_CALLBACK(selection_on_change), NULL );
 
 	/* actions + uimanager for menu, toolbar + hotkeys */
 	ag_always = gtk_action_group_new("QueueAlways");
-        gtk_action_group_add_actions(ag_always, action_always, 
+        gtk_action_group_add_actions(ag_always, action_always,
 		G_N_ELEMENTS(action_always), action );
 
 	ag_one = gtk_action_group_new("QueueOne");
 	g_object_set_data( G_OBJECT(sel), "agroup-one", ag_one);
 	gtk_action_group_set_sensitive(ag_one, FALSE );
-        gtk_action_group_add_actions(ag_one, action_one, 
+        gtk_action_group_add_actions(ag_one, action_one,
 		G_N_ELEMENTS(action_one), queue_view );
 
 	ag_any = gtk_action_group_new("QueueAny");
 	g_object_set_data( G_OBJECT(sel), "agroup-any", ag_any);
 	gtk_action_group_set_sensitive(ag_any, FALSE );
-        gtk_action_group_add_actions(ag_any, action_any, 
+        gtk_action_group_add_actions(ag_any, action_any,
 		G_N_ELEMENTS(action_any), queue_view );
 
 	ui = gtk_ui_manager_new();
@@ -199,7 +199,7 @@ GtkWidget *queuewin_new( GtkAction *action )
 	gtk_ui_manager_insert_action_group(ui, ag_one, 2);
 
  	win = childscroll_new( "queue", queue_view, ui, uidesc );
-	gtk_signal_connect( GTK_OBJECT(win), "delete_event", 
+	gtk_signal_connect( GTK_OBJECT(win), "delete_event",
 			G_CALLBACK( toggle_win_on_delete ), action);
 	gtk_window_set_default_size(GTK_WINDOW(win), 800, 300);
 

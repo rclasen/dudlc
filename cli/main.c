@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (c) 2008 Rainer Clasen
  *
  * This program is free software; you can redistribute it
@@ -14,14 +14,14 @@
  * The GNU General Public License is often shipped with GNU software, and
  * is generally kept in a file called COPYING or LICENSE.  If you do not
  * have a copy of the license, write to the Free Software Foundation,
- * 59 Temple Place, Suite 330, Boston, MA 02111 USA. 
+ * 59 Temple Place, Suite 330, Boston, MA 02111 USA.
  */
 
 
 /* TODO: GPL license */
 
 #define _GNU_SOURCE
-     
+
 #include <stdlib.h>
 #include <errno.h>
 #include <sys/time.h>
@@ -84,7 +84,7 @@ static void loop( void )
 			perror( "select" );
 			exit( 1 );
 		}
-		
+
 		if( -1 != duc_fd(con) && FD_ISSET(duc_fd(con), &rfds)){
 			duc_poll(con);
 		}
@@ -179,7 +179,7 @@ int main( int argc, char **argv )
 
 	if( command ){
 		if( duc_open( con ) ){
-			fprintf( stderr, "failed to connect: %s\n", 
+			fprintf( stderr, "failed to connect: %s\n",
 					strerror(errno) );
 			exit(1);
 		}
@@ -209,7 +209,7 @@ int main( int argc, char **argv )
 static void usage( void )
 {
 	printf( "usage: %s [opts]\n", progname );
-	printf( 
+	printf(
 		" -h --help          this message\n"
 		" -H --host <host>   host running dudld\n"
 		" -P --port <port>   dudld port\n"

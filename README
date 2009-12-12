@@ -1,4 +1,4 @@
-lib	libdudlc 
+lib	libdudlc
 	Library for accessing a dudl daemon. Completely
 	encapuslates the protocol.
 

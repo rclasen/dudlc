@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2008 Rainer Clasen
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms described in the file LICENSE included in this
  * distribution.
@@ -156,7 +156,7 @@ double _duc_cmd_double( dudlc *c, const char *fmt, ... )
 	return  -1;
 }
 
-void *_duc_cmd_conv( dudlc *c, _duc_converter conv, 
+void *_duc_cmd_conv( dudlc *c, _duc_converter conv,
 		const char *fmt, ... )
 {
 	va_list ap;
@@ -202,8 +202,8 @@ int _duc_rnext( dudlc *p )
 			/* TODO: queue bcast */
 			_duc_bcast( p, l );
 			continue;
-		} 
-		
+		}
+
 		/* or fetch next input from server */
 		if( duc_sock_recv( p->con)){
 			duc_close( p );
@@ -323,7 +323,7 @@ char *_duc_fielddup( char *s, char **end )
 			}
 			escape = 0;
 			continue;
-		} 
+		}
 
 		if( *s == '\\' ){
 			escape++;

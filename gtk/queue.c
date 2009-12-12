@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2008 Rainer Clasen
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms described in the file LICENSE included in this
  * distribution.
@@ -18,7 +18,7 @@
  * helper for selection processing
  */
 
-static void queue_list_each_deltrack( 
+static void queue_list_each_deltrack(
 	GtkTreeModel	*model,
 	GtkTreePath	*path,
 	GtkTreeIter	*iter,
@@ -58,7 +58,7 @@ static gboolean queue_list_on_keypress(GtkTreeView *view, GdkEventKey *ev, gpoin
 {
 	(void) data;
 
-	/* TODO: gtk_accelerator_get_default_mod_mask  
+	/* TODO: gtk_accelerator_get_default_mod_mask
 	 * http://library.gnome.org/devel/gtk/stable/checklist-modifiers.html */
 	switch( ev->keyval ){
 	 case GDK_Delete:
@@ -176,7 +176,7 @@ GtkWidget *queue_list_new( void )
 	g_signal_connect(col, "clicked", (GCallback)tree_view_column_on_clicked, view );
 	gtk_tree_view_column_set_title( col, "Queued" );
 	gtk_tree_view_column_pack_start( col, renderer, TRUE );
-	gtk_tree_view_column_set_cell_data_func( col, renderer, 
+	gtk_tree_view_column_set_cell_data_func( col, renderer,
 		cellfunc_time, (gpointer)QUEUELIST_QUEUED, NULL );
 	gtk_tree_view_column_set_resizable( col, TRUE );
 	gtk_tree_view_column_set_sort_column_id(col, QUEUELIST_QUEUED);
@@ -188,19 +188,19 @@ GtkWidget *queue_list_new( void )
 	g_signal_connect(col, "clicked", (GCallback)tree_view_column_on_clicked, view );
 	gtk_tree_view_column_set_title( col, "TrackId" );
 	gtk_tree_view_column_pack_start( col, renderer, TRUE );
-	gtk_tree_view_column_set_cell_data_func( col, renderer, 
+	gtk_tree_view_column_set_cell_data_func( col, renderer,
 		cellfunc_trackid, (gpointer)QUEUELIST_ALBUM_POS, NULL );
 	gtk_tree_view_column_set_resizable( col, TRUE );
 	gtk_tree_view_column_set_sort_column_id(col, QUEUELIST_ALBUM_POS);
 	gtk_tree_view_append_column( view, col );
-	
+
 	renderer = gtk_cell_renderer_text_new();
 	col = gtk_tree_view_column_new();
 	g_object_set_data( G_OBJECT(col), "columnum", (gpointer)QUEUELIST_DURATION);
 	g_signal_connect(col, "clicked", (GCallback)tree_view_column_on_clicked, view );
 	gtk_tree_view_column_set_title( col, "Duration" );
 	gtk_tree_view_column_pack_start( col, renderer, TRUE );
-	gtk_tree_view_column_set_cell_data_func( col, renderer, 
+	gtk_tree_view_column_set_cell_data_func( col, renderer,
 		cellfunc_duration, (gpointer)QUEUELIST_DURATION, NULL );
 	gtk_tree_view_column_set_resizable( col, TRUE );
 	gtk_tree_view_column_set_sort_column_id(col, QUEUELIST_DURATION);
@@ -223,7 +223,7 @@ GtkWidget *queue_list_new( void )
 	gtk_tree_view_column_set_resizable( col, TRUE );
 	gtk_tree_view_column_set_sort_column_id(col, QUEUELIST_ALBUM);
 	gtk_tree_view_append_column( view, col );
-	
+
 	renderer = gtk_cell_renderer_text_new();
 	col = gtk_tree_view_column_new_with_attributes(
 			"Title", renderer, "text", QUEUELIST_TITLE, NULL );
@@ -232,9 +232,9 @@ GtkWidget *queue_list_new( void )
 	gtk_tree_view_column_set_resizable( col, TRUE );
 	gtk_tree_view_column_set_sort_column_id(col, QUEUELIST_TITLE);
 	gtk_tree_view_append_column( view, col );
-	
+
 	/* TODO: add column with tags of track */
-	
+
 	gtk_tree_view_set_search_column( GTK_TREE_VIEW(view), QUEUELIST_ID );
 	gtk_widget_show(GTK_WIDGET(view));
 
@@ -252,7 +252,7 @@ void queue_list_store_add( GtkTreeModel *store, duc_queue *queue )
 	user = g_locale_to_utf8( queue->user->name, -1, NULL, NULL, NULL);
 
 	gtk_list_store_append( GTK_LIST_STORE(store), &add );
-	gtk_list_store_set( GTK_LIST_STORE(store), &add, 
+	gtk_list_store_set( GTK_LIST_STORE(store), &add,
 		QUEUELIST_ID, queue->id,
 		QUEUELIST_USER_ID, queue->user->id,
 		QUEUELIST_USER, user,
@@ -304,7 +304,7 @@ void queue_list_store_del( GtkTreeModel *store, int queueid )
 			gtk_list_store_remove( GTK_LIST_STORE(store), &iter );
 			break;
 		}
-		
+
 	} while( gtk_tree_model_iter_next( GTK_TREE_MODEL(store), &iter ));
 }
 

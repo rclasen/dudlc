@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2008 Rainer Clasen
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms described in the file LICENSE included in this
  * distribution.
@@ -20,9 +20,9 @@ duc_it_album *_duc_it_album_new( dudlc *p, const char *cmd, ... )
 	va_list ap;
 
 	va_start(ap,cmd);
-	it = _duc_it_newv(p, 
-		(_duc_converter)_duc_album_parse, 
-		(_duc_free_func)duc_album_free, 
+	it = _duc_it_newv(p,
+		(_duc_converter)_duc_album_parse,
+		(_duc_free_func)duc_album_free,
 		cmd, ap );
 	va_end(ap);
 
@@ -81,7 +81,7 @@ void duc_album_free( duc_album *a )
 
 duc_album *duc_cmd_albumget( dudlc *c, int id )
 {
-	return _duc_cmd_conv( c, (_duc_converter)_duc_album_parse, 
+	return _duc_cmd_conv( c, (_duc_converter)_duc_album_parse,
 		"albumget %d", id );
 }
 
